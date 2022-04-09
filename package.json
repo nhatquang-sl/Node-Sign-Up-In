@@ -1,0 +1,26 @@
+{
+  "name": "Node-Sign-Up-In",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsnd --respawn src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nhatquang-sl/Node-Sign-Up-In.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nhatquang-sl/Node-Sign-Up-In/issues"
+  },
+  "homepage": "https://github.com/nhatquang-sl/Node-Sign-Up-In#readme",
+  "devDependencies": {
+    "ts-node": "^10.7.0",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.6.3"
+  }
+}
