@@ -22,12 +22,18 @@
   },
   "homepage": "https://github.com/nhatquang-sl/Node-Sign-Up-In#readme",
   "dependencies": {
+    "@sendgrid/mail": "^7.6.2",
+    "bcrypt": "^5.0.1",
     "express": "^4.17.3",
+    "sequelize": "^6.18.0",
+    "tedious": "^14.4.0",
     "tsc": "^2.0.4",
     "typescript": "^4.6.3"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
     "@types/express": "^4.17.13",
+    "@types/tedious": "^4.0.7",
     "prettier": "^2.6.2",
     "ts-node": "^10.7.0",
     "ts-node-dev": "^1.1.8"
