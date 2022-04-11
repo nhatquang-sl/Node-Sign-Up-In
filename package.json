@@ -4,7 +4,8 @@
   "description": "- `npm init -y`: generate `package.json`\r - `npm i typescript -D`: install TypeScript\r - `npx tsc --init`: create `tsconfig.json` for typescript compiler\r - `npm i ts-node -D`: allow us compile and run the typescript file\r - `npm i ts-node-dev -D`: allow auto reload\r - `npm install express -S`, `npm install @types/express -D`",
   "main": "index.js",
   "scripts": {
-    "start": "tsnd --respawn src/server.ts",
+    "start": "ts-node src/server.ts",
+    "dev": "tsnd --respawn src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -27,5 +28,8 @@
     "prettier": "^2.6.2",
     "ts-node": "^10.7.0",
     "ts-node-dev": "^1.1.8"
+  },
+  "engines": {
+    "node": "14.x"
   }
 }
