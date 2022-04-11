@@ -4,7 +4,7 @@
   "description": "- `npm init -y`: generate `package.json`\r - `npm i typescript -D`: install TypeScript\r - `npx tsc --init`: create `tsconfig.json` for typescript compiler\r - `npm i ts-node -D`: allow us compile and run the typescript file\r - `npm i ts-node-dev -D`: allow auto reload\r - `npm install express -S`, `npm install @types/express -D`",
   "main": "index.js",
   "scripts": {
-    "start": "npm run build && node build/server.js",
+    "start": "npm install typescript && npm run build && node build/server.js",
     "dev": "tsnd --respawn src/server.ts",
     "build": "tsc --build",
     "clean": "tsc --build --clean",
