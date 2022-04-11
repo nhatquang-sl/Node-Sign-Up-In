@@ -4,9 +4,12 @@
   "description": "- `npm init -y`: generate `package.json`\r - `npm i typescript -D`: install TypeScript\r - `npx tsc --init`: create `tsconfig.json` for typescript compiler\r - `npm i ts-node -D`: allow us compile and run the typescript file\r - `npm i ts-node-dev -D`: allow auto reload\r - `npm install express -S`, `npm install @types/express -D`",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/server.ts",
+    "start": "node build/server.js",
     "dev": "tsnd --respawn src/server.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc --build",
+    "clean": "tsc --build --clean",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "tsc"
   },
   "repository": {
     "type": "git",
@@ -21,6 +24,7 @@
   "homepage": "https://github.com/nhatquang-sl/Node-Sign-Up-In#readme",
   "dependencies": {
     "express": "^4.17.3",
+    "tsc": "^2.0.4",
     "typescript": "^4.6.3"
   },
   "devDependencies": {
