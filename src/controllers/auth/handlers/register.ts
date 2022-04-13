@@ -1,54 +1,46 @@
 import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
-import { sendEmail } from '../../../services/email';
 import { v4 as uuid } from 'uuid';
 
-import User from '../../../database/models/user';
+import { sendEmail } from '@services/email';
+import User from '@database/models/user';
 
-type RegisterRequest = {
-  firstName: string;
-  lastName: string;
-  emailAddress: string;
-  password: string;
-  securityStamp: string;
-};
+const handleRegister = async (request: Request, response: Response) => {
+  const req: User = request.body;
 
-const handleRegister = async (req: Request, res: Response) => {
-  const regRequest: RegisterRequest = req.body;
-
-  const errors = validateRequest(regRequest);
-  if (errors.length) return res.status(400).json({ errors });
+  const errors = validateRequest(req);
+  if (errors.length) return response.status(400).json({ errors });
 
   // Check for duplicate usernames in the db
   // https://sequelize.org/docs/v6/core-concepts/model-querying-finders/#findone
-  const duplicate = await User.findOne({ where: { emailAddress: regRequest.emailAddress } });
-  if (duplicate) return res.sendStatus(409); // Conflict
+  const duplicate = await User.findOne({ where: { emailAddress: req.emailAddress } });
+  if (duplicate) return response.sendStatus(409); // Conflict
 
   // encrypt the password
-  regRequest.password = await bcrypt.hash(regRequest.password, 10);
-  regRequest.securityStamp = uuid();
+  req.password = await bcrypt.hash(req.password, 10);
+  req.securityStamp = uuid();
 
   // Create and store the new user
-  const result = await User.create(regRequest);
+  const result = await User.create(req);
 
   const emailActiveCode = Buffer.from(
     JSON.stringify({
-      id: result.getDataValue('id'),
-      securityStamp: regRequest.securityStamp,
+      id: result.id,
+      securityStamp: req.securityStamp,
       timestamp: new Date().getTime()
     })
   ).toString('base64');
 
   await sendEmail(
-    regRequest.emailAddress,
+    req.emailAddress,
     'Welcome to QNN! Confirm Your Email',
     getActiveEmailMessage(`http://localhost:3500/auth/register-confirm/${emailActiveCode}`)
   );
 
-  res.status(201).json({ message: `New user ${regRequest.emailAddress} created!` });
+  response.status(201).json({ message: `New user ${req.emailAddress} created!` });
 };
 
-const validateRequest = (req: RegisterRequest) => {
+const validateRequest = (req: User) => {
   let errors = [];
 
   if (!req.firstName) errors.push('First Name is required!');

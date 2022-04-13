@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run build && node build/server.js",
-    "dev": "set NODE_ENV=development && tsnd --respawn src/server.ts",
+    "dev": "tsnd --respawn src/server.ts",
     "build": "npm install typescript && tsc --build",
     "clean": "tsc --build --clean",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -25,6 +25,8 @@
     "bcrypt": "^5.0.1",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
+    "jsonwebtoken": "^8.5.1",
+    "module-alias": "^2.2.2",
     "node-mailjet": "^3.3.7",
     "sequelize": "^6.18.0",
     "tedious": "^14.4.0",
@@ -35,6 +37,7 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
     "@types/express": "^4.17.13",
+    "@types/jsonwebtoken": "^8.5.8",
     "@types/node-mailjet": "^3.3.8",
     "@types/tedious": "^4.0.7",
     "@types/uuid": "^8.3.4",
@@ -44,5 +47,10 @@
   },
   "engines": {
     "node": "14.x"
+  },
+  "_moduleAliases": {
+    "@controllers": "build/controllers",
+    "@database": "build/database",
+    "@services": "build/services"
   }
 }

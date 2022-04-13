@@ -1,9 +1,11 @@
 import 'dotenv/config';
+import 'module-alias/register';
 import express from 'express';
 import path from 'path';
-import authRoute from './controllers/auth/route';
-import dbContext from './database';
-import User from './database/models/user';
+import authRoute from '@controllers/auth/route';
+// https://levelup.gitconnected.com/path-aliases-with-typescript-in-node-js-230803e3f200
+import dbContext from '@database';
+import User from '@database/models/user';
 
 const app = express();
 const PORT = process.env.PORT || 3500;
@@ -23,7 +25,7 @@ app.use('/auth', authRoute);
 
 dbContext.connect().then(async () => {
   // https://sequelize.org/docs/v6/core-concepts/model-basics/#model-synchronization
-  // User.sync();
-  await User.sync({ force: true });
+  await User.sync();
+  // await User.sync({ force: true });
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 });

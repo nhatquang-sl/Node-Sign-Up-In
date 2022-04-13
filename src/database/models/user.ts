@@ -1,7 +1,23 @@
-import { DataTypes, Model } from 'sequelize';
+import {
+  DataTypes,
+  Model,
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional
+} from 'sequelize';
 import dbContext from '..';
 
-class User extends Model {}
+// https://sequelize.org/docs/v6/other-topics/typescript/
+class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
+  declare id: CreationOptional<number>;
+  declare emailAddress: string;
+  declare password: string;
+  declare firstName: string;
+  declare lastName: string;
+  declare refreshToken: string;
+  declare securityStamp: string;
+  declare emailConfirmed: boolean;
+}
 
 // https://sequelize.org/docs/v6/core-concepts/model-basics/#data-types
 User.init(
@@ -18,6 +34,9 @@ User.init(
       allowNull: false // allowNull defaults to true
     },
     lastName: {
+      type: DataTypes.STRING
+    },
+    refreshToken: {
       type: DataTypes.STRING
     },
     securityStamp: {

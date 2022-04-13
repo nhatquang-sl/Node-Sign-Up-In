@@ -5,10 +5,16 @@ class DbContext {
 
   constructor() {
     // Option 3: Passing parameters separately (other dialects)
-    this.sequelize = new Sequelize('parkinglotsystem', 'nhatquang_sl_SQLLogin_1', 'h2omgkebzk', {
-      host: 'parkinglotsystem.mssql.somee.com',
-      dialect: 'mssql' /* one of 'mysql' | 'mariadb' | 'postgres' | 'mssql' */
-    });
+    this.sequelize = new Sequelize(
+      process.env.DB_NAME ?? '',
+      process.env.DB_USERNAME ?? '',
+      process.env.DB_PASSWORD,
+      {
+        host: process.env.DB_HOST,
+        dialect: 'mssql' /* one of 'mysql' | 'mariadb' | 'postgres' | 'mssql' */,
+        query: { raw: true }
+      }
+    );
   }
 
   /**
