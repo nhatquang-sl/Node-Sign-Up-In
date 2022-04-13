@@ -15,11 +15,18 @@ User.init(
     password: { type: DataTypes.STRING, allowNull: false },
     firstName: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false // allowNull defaults to true
     },
     lastName: {
       type: DataTypes.STRING
-      // allowNull defaults to true
+    },
+    securityStamp: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    emailConfirmed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   },
   {
@@ -28,10 +35,6 @@ User.init(
     modelName: 'User' // We need to choose the model name
   }
 );
-
-// https://sequelize.org/docs/v6/core-concepts/model-basics/#model-synchronization
-// User.sync();
-// User.sync({ force: true });
 
 // // the defined model is the class itself
 // console.log(User === sequelize.models.User); // true

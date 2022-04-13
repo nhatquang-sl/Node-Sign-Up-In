@@ -1,7 +1,9 @@
+import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import authRoute from './controllers/auth/route';
 import dbContext from './database';
+import User from './database/models/user';
 
 const app = express();
 const PORT = process.env.PORT || 3500;
@@ -19,5 +21,9 @@ app.use('/', express.static(path.join(__dirname, 'public')));
 
 app.use('/auth', authRoute);
 
-dbContext.connect();
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+dbContext.connect().then(async () => {
+  // https://sequelize.org/docs/v6/core-concepts/model-basics/#model-synchronization
+  // User.sync();
+  await User.sync({ force: true });
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+});

@@ -1,6 +1,4 @@
-import { Sequelize, QueryTypes } from 'sequelize';
-
-import config from './config';
+import { Sequelize } from 'sequelize';
 
 class DbContext {
   sequelize: Sequelize;
