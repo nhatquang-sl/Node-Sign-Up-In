@@ -19,7 +19,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 // Serve static files
-app.use('/', express.static(path.join(__dirname, 'public')));
+app.use('/', express.static(path.join(__dirname, 'client-app', 'build')));
+const router = express.Router();
+router.get('^/$|/index(.html)?', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client-app', 'build', 'index.html'));
+});
+app.use('/', router);
 
 app.use('/auth', authRoute);
 
