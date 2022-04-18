@@ -10,6 +10,12 @@ const reducer: Reducer<SettingsState> = (state = initialState, action) => {
   let newState = JSON.parse(JSON.stringify(state));
 
   switch (action.type) {
+    case `${SETTINGS.OPEN_SIDEBAR}`:
+      newState.sideBarOpen = true;
+      break;
+    case `${SETTINGS.CLOSE_SIDEBAR}`:
+      newState.sideBarOpen = false;
+      break;
     case `${SETTINGS.OPEN_SIDEBAR_AND_HEADER}`:
       newState.sideBarOpen = true;
       newState.headerOpen = true;

@@ -23,7 +23,7 @@ function Sidebar(props: Props) {
   const theme = useTheme();
 
   const handleDrawerClose = () => {
-    props.closeSidebarAndHeader();
+    props.closeSidebar();
   };
 
   return (

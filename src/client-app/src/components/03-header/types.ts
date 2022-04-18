@@ -1,9 +1,10 @@
 import { bindActionCreators, Dispatch } from 'redux';
-import { openSidebarAndHeader } from 'store/settings/actions';
+import { openSidebar, closeSidebarAndHeader } from 'store/settings/actions';
 import { SettingsState } from 'store/settings/types';
 
 interface PropsFromDispatch {
-  openSidebarAndHeader: typeof openSidebarAndHeader;
+  openSidebar: typeof openSidebar;
+  closeSidebarAndHeader: typeof closeSidebarAndHeader;
 }
 
 interface PropsFromState {
@@ -19,7 +20,8 @@ export const mapStateToProps = (store: any) => ({
 export const mapDispatchToProps = (dispatch: Dispatch) =>
   bindActionCreators(
     {
-      openSidebarAndHeader: openSidebarAndHeader
+      openSidebar,
+      closeSidebarAndHeader
     },
     dispatch
   );

@@ -19,7 +19,7 @@ export const mapStateToProps = (store: any) => ({
 export const mapDispatchToProps = (dispatch: Dispatch) =>
   bindActionCreators(
     {
-      openSidebarAndHeader: openSidebarAndHeader
+      openSidebarAndHeader
     },
     dispatch
   );

@@ -13,7 +13,7 @@ function App() {
   return (
     <div style={{ display: 'flex' }}>
       <ThemeProvider theme={theme}>
-        <Box sx={{ display: 'flex' }}>
+        <Box sx={{ display: 'flex', flex: 1 }}>
           <CssBaseline />
           <Header />
           <Sidebar />

@@ -1,12 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import Icon from '@mui/material/Icon';
-import Button from '@mui/material/Button';
+import { Slide, Toolbar, Button, IconButton, Icon, Typography } from '@mui/material';
 
 import { sidebarWidth } from 'store/constants';
 
@@ -34,28 +31,40 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 function Header(props: Props) {
+  const history = useHistory();
+
   const handleDrawerOpen = () => {
-    props.openSidebarAndHeader();
+    props.openSidebar();
+  };
+
+  const handleLoginClick = () => {
+    // props.closeSidebarAndHeader();
+    console.log('handleLoginClick');
+    history.push('/login');
   };
 
   return (
-    <AppBar position="fixed" open={props.settings.sideBarOpen}>
-      <Toolbar>
-        <IconButton
-          color="inherit"
-          aria-label="open drawer"
-          onClick={handleDrawerOpen}
-          edge="start"
-          sx={{ mr: 2, ...(props.settings.sideBarOpen && { display: 'none' }) }}
-        >
-          <Icon>menu</Icon>
-        </IconButton>
-        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-          Quang Nguyen
-        </Typography>
-        <Button color="inherit">Login</Button>
-      </Toolbar>
-    </AppBar>
+    <Slide in={props.settings.headerOpen}>
+      <AppBar position="fixed" open={props.settings.sideBarOpen}>
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={handleDrawerOpen}
+            edge="start"
+            sx={{ mr: 2, ...(props.settings.sideBarOpen && { display: 'none' }) }}
+          >
+            <Icon>menu</Icon>
+          </IconButton>
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+            Quang Nguyen
+          </Typography>
+          <Button href="/login" color="inherit">
+            Login
+          </Button>
+        </Toolbar>
+      </AppBar>
+    </Slide>
   );
 }
 

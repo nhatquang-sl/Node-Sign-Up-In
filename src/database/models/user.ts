@@ -14,16 +14,18 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare password: string;
   declare firstName: string;
   declare lastName: string;
-  declare refreshToken: string;
+  declare refreshToken?: string;
   declare securityStamp: string;
-  declare emailConfirmed: boolean;
+  declare emailConfirmed: boolean | false;
 }
+
+// class User extends Model {}
 
 // https://sequelize.org/docs/v6/core-concepts/model-basics/#data-types
 User.init(
   {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.INTEGER.UNSIGNED,
       autoIncrement: true,
       primaryKey: true
     },

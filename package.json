@@ -23,6 +23,7 @@
   "homepage": "https://github.com/nhatquang-sl/Node-Sign-Up-In#readme",
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "jsonwebtoken": "^8.5.1",
@@ -36,6 +37,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
+    "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
     "@types/jsonwebtoken": "^8.5.8",
     "@types/node-mailjet": "^3.3.8",
@@ -51,6 +53,7 @@
   "_moduleAliases": {
     "@controllers": "build/controllers",
     "@database": "build/database",
-    "@services": "build/services"
+    "@services": "build/services",
+    "@config": "build/config"
   }
 }

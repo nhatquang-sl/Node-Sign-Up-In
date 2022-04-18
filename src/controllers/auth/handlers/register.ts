@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
+import jwt from 'jsonwebtoken';
 
 import { sendEmail } from '@services/email';
 import User from '@database/models/user';
@@ -16,28 +17,67 @@ const handleRegister = async (request: Request, response: Response) => {
   const duplicate = await User.findOne({ where: { emailAddress: req.emailAddress } });
   if (duplicate) return response.sendStatus(409); // Conflict
 
+  req.emailConfirmed = false;
   // encrypt the password
   req.password = await bcrypt.hash(req.password, 10);
   req.securityStamp = uuid();
-
+  req.refreshToken = jwt.sign(
+    {
+      emailAddress: req.emailAddress
+    },
+    process.env.REFRESH_TOKEN_SECRET as string,
+    { expiresIn: '1d' }
+  );
+  console.log(req.id);
   // Create and store the new user
-  const result = await User.create(req);
+  const result = await User.create({
+    emailAddress: req.emailAddress,
+    firstName: req.firstName,
+    lastName: req.lastName,
+    password: req.password,
+    emailConfirmed: false,
+    refreshToken: req.refreshToken,
+    securityStamp: req.securityStamp
+  });
+  console.log(result.id);
+  await sendConfirmEmail(result);
 
+  response.cookie('jwt', req.refreshToken, {
+    httpOnly: true,
+    // sameSite: 'None',
+    // secure: true,
+    maxAge: 24 * 60 * 60 * 1000
+  });
+
+  // Create JWTs
+  const accessToken = jwt.sign(
+    { emailAddress: req.emailAddress, emailConfirmed: req.emailConfirmed },
+    process.env.ACCESS_TOKEN_SECRET as string,
+    { expiresIn: '30s' }
+  );
+  response.status(201).json({
+    accessToken,
+    firstName: result.firstName,
+    lastName: result.lastName,
+    emailAddress: result.emailAddress,
+    emailConfirmed: result.emailConfirmed
+  });
+};
+
+const sendConfirmEmail = async (user: User) => {
   const emailActiveCode = Buffer.from(
     JSON.stringify({
-      id: result.id,
-      securityStamp: req.securityStamp,
+      id: user.id,
+      securityStamp: user.securityStamp,
       timestamp: new Date().getTime()
     })
   ).toString('base64');
 
   await sendEmail(
-    req.emailAddress,
+    user.emailAddress,
     'Welcome to QNN! Confirm Your Email',
     getActiveEmailMessage(`http://localhost:3500/auth/register-confirm/${emailActiveCode}`)
   );
-
-  response.status(201).json({ message: `New user ${req.emailAddress} created!` });
 };
 
 const validateRequest = (req: User) => {
