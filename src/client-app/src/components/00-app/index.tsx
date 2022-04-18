@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -14,10 +15,12 @@ function App() {
     <div style={{ display: 'flex' }}>
       <ThemeProvider theme={theme}>
         <Box sx={{ display: 'flex', flex: 1 }}>
-          <CssBaseline />
-          <Header />
-          <Sidebar />
-          <Main />
+          <BrowserRouter>
+            <CssBaseline />
+            <Header />
+            <Sidebar />
+            <Main />
+          </BrowserRouter>
         </Box>
       </ThemeProvider>
     </div>

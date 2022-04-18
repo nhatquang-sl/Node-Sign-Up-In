@@ -25,7 +25,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
 User.init(
   {
     id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.BIGINT,
       autoIncrement: true,
       primaryKey: true
     },

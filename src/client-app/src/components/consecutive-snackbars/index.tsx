@@ -59,11 +59,11 @@ const ConsecutiveSnackBars = (props: Props) => {
     props.cleanUpSnackbar();
   };
   const { vertical, horizontal } = props.snackbar;
-  console.log({ vertical, horizontal });
+
   return (
     <div>
-      <Button onClick={handleClick('Message A')}>Show message A</Button>
-      <Button onClick={handleClick('Message B')}>Show message B</Button>
+      {/* <Button onClick={handleClick('Message A')}>Show message A</Button>
+      <Button onClick={handleClick('Message B')}>Show message B</Button> */}
       <Snackbar
         key={props.snackbar.messageInfo ? props.snackbar.messageInfo.key : undefined}
         anchorOrigin={{ vertical, horizontal }}

@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { createBrowserHistory } from 'history';
+import { Routes, Route } from 'react-router-dom';
 
 import ConsecutiveSnackBars from 'components/consecutive-snackbars';
 
@@ -10,20 +9,17 @@ import { Props, mapStateToProps, mapDispatchToProps } from './types';
 
 import SignIn from 'pages/auth/sign-in';
 import SignUp from 'pages/auth/sign-up';
-import RequestConfirmEmail from 'pages/auth/request-confirm-email';
+import RequestActivateEmail from 'pages/auth/request-activate-email';
 
-const history = createBrowserHistory();
 function Main(props: Props) {
   return (
     <Container open={props.settings.sideBarOpen}>
       {props.settings.headerOpen && <DrawerHeader />}
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<SignIn />} />
-          <Route path="/sign-up" element={<SignUp />} />
-          <Route path="/request-confirm-email" element={<RequestConfirmEmail />} />
-        </Routes>
-      </BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<SignIn />} />
+        <Route path="/register" element={<SignUp />} />
+        <Route path="/request-activate-email" element={<RequestActivateEmail />} />
+      </Routes>
       <ConsecutiveSnackBars />
     </Container>
   );

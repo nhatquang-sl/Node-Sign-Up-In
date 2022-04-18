@@ -54,6 +54,7 @@
     "@controllers": "build/controllers",
     "@database": "build/database",
     "@services": "build/services",
-    "@config": "build/config"
+    "@config": "build/config",
+    "@middleware": "build/middleware"
   }
 }

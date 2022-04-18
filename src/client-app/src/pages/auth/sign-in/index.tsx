@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
   Box,
@@ -17,11 +18,13 @@ import {
 import { Props, mapStateToProps, mapDispatchToProps } from './types';
 
 const SignIn = (props: Props) => {
-  console.log('Sign up');
-  useEffect(() => {
-    props.closeSidebarAndHeader();
-  }, []);
-  console.log('Login');
+  const navigate = useNavigate();
+
+  const { accessToken, emailConfirmed } = props.auth;
+  if (accessToken && emailConfirmed) navigate('/');
+  else if (accessToken) navigate('/request-activate-email');
+  else props.closeSidebarAndHeader();
+
   return (
     <Container component="main" maxWidth="xs">
       <Box
@@ -73,7 +76,7 @@ const SignIn = (props: Props) => {
               </Link>
             </Grid>
             <Grid item>
-              <Link href="sign-up" variant="body2">
+              <Link href="register" variant="body2">
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>

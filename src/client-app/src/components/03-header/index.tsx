@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { Slide, Toolbar, Button, IconButton, Icon, Typography } from '@mui/material';
@@ -30,34 +31,48 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 function Header(props: Props) {
+  const navigate = useNavigate();
+  const { accessToken, emailConfirmed } = props.auth;
+
   const handleDrawerOpen = () => {
     props.openSidebar();
   };
-
-  const handleLoginClick = () => {
-    // props.closeSidebarAndHeader();
-    console.log('handleLoginClick');
-  };
+  const handleMenu = () => {};
 
   return (
     <Slide in={props.settings.headerOpen}>
       <AppBar position="fixed" open={props.settings.sideBarOpen}>
         <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{ mr: 2, ...(props.settings.sideBarOpen && { display: 'none' }) }}
-          >
-            <Icon>menu</Icon>
-          </IconButton>
+          {emailConfirmed && (
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              edge="start"
+              sx={{ mr: 2, ...(props.settings.sideBarOpen && { display: 'none' }) }}
+            >
+              <Icon>menu</Icon>
+            </IconButton>
+          )}
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Quang Nguyen
+            Application
           </Typography>
-          <Button href="/login" color="inherit">
-            Login
-          </Button>
+          {accessToken ? (
+            <IconButton
+              size="large"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleMenu}
+              color="inherit"
+            >
+              <Icon>account_circle</Icon>
+            </IconButton>
+          ) : (
+            <Button onClick={() => navigate('/login')} color="inherit">
+              Login
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
     </Slide>

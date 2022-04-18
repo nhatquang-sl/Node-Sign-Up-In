@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
   Box,
@@ -42,16 +43,12 @@ interface State {
 }
 
 const SignUp = (props: Props) => {
-  console.log('Sign up', props.auth.pendingSignUp());
-  useEffect(() => {
-    props.closeSidebarAndHeader();
-    // let emailAddressError = undefined;
-    // if (props.auth.errors['emailAddress']?.length)
-    //   emailAddressError = props.auth.errors['emailAddress'][0];
-    // console.log(emailAddressError);
-  }, []);
+  const navigate = useNavigate();
 
-  // console.log(emailAddressError);
+  const { accessToken, emailConfirmed } = props.auth;
+  if (accessToken && emailConfirmed) navigate('/');
+  else if (accessToken) navigate('/request-activate-email');
+  else props.closeSidebarAndHeader();
 
   const [values, setValues] = useState<State>({
     firstName: 'quang',
