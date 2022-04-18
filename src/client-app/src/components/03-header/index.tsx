@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { useHistory } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { Slide, Toolbar, Button, IconButton, Icon, Typography } from '@mui/material';
@@ -31,8 +30,6 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 function Header(props: Props) {
-  const history = useHistory();
-
   const handleDrawerOpen = () => {
     props.openSidebar();
   };
@@ -40,7 +37,6 @@ function Header(props: Props) {
   const handleLoginClick = () => {
     // props.closeSidebarAndHeader();
     console.log('handleLoginClick');
-    history.push('/login');
   };
 
   return (

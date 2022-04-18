@@ -16,6 +16,9 @@ const reducer: Reducer<SettingsState> = (state = initialState, action) => {
     case `${SETTINGS.CLOSE_SIDEBAR}`:
       newState.sideBarOpen = false;
       break;
+    case `${SETTINGS.OPEN_HEADER}`:
+      newState.headerOpen = true;
+      break;
     case `${SETTINGS.OPEN_SIDEBAR_AND_HEADER}`:
       newState.sideBarOpen = true;
       newState.headerOpen = true;
