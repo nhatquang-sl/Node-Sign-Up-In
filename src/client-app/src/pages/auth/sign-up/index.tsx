@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -46,9 +46,11 @@ const SignUp = (props: Props) => {
   const navigate = useNavigate();
 
   const { accessToken, emailConfirmed } = props.auth;
-  if (accessToken && emailConfirmed) navigate('/');
-  else if (accessToken) navigate('/request-activate-email');
-  else props.closeSidebarAndHeader();
+  useEffect(() => {
+    if (accessToken && emailConfirmed) navigate('/');
+    else if (accessToken) navigate('/request-activate-email');
+    else props.closeSidebarAndHeader();
+  }, [accessToken, emailConfirmed]);
 
   const [values, setValues] = useState<State>({
     firstName: 'quang',

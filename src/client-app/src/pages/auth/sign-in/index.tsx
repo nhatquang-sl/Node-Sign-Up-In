@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -21,9 +21,11 @@ const SignIn = (props: Props) => {
   const navigate = useNavigate();
 
   const { accessToken, emailConfirmed } = props.auth;
-  if (accessToken && emailConfirmed) navigate('/');
-  else if (accessToken) navigate('/request-activate-email');
-  else props.closeSidebarAndHeader();
+  useEffect(() => {
+    if (accessToken && emailConfirmed) navigate('/');
+    else if (accessToken) navigate('/request-activate-email');
+    else props.closeSidebarAndHeader();
+  }, [accessToken, emailConfirmed]);
 
   return (
     <Container component="main" maxWidth="xs">

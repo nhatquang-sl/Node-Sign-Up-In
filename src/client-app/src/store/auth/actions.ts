@@ -13,4 +13,7 @@ const signUp = (request: User) => ({
   payload: axios.post(`${API_ENDPOINT}/auth/register`, request)
 });
 
-export { signIn, signUp };
+const logOut = () => ({
+  type: AUTH_TYPE.LOG_OUT
+});
+export { signIn, signUp, logOut };

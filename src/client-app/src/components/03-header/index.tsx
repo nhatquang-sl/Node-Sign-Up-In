@@ -3,7 +3,18 @@ import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import { Slide, Toolbar, Button, IconButton, Icon, Typography } from '@mui/material';
+import {
+  Slide,
+  Toolbar,
+  Button,
+  IconButton,
+  Icon,
+  Typography,
+  Box,
+  Tooltip,
+  Menu,
+  MenuItem
+} from '@mui/material';
 
 import { sidebarWidth } from 'store/constants';
 
@@ -29,16 +40,25 @@ const AppBar = styled(MuiAppBar, {
     })
   })
 }));
-
+const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 function Header(props: Props) {
   const navigate = useNavigate();
   const { accessToken, emailConfirmed } = props.auth;
-
+  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const handleDrawerOpen = () => {
     props.openSidebar();
   };
-  const handleMenu = () => {};
-
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
+  };
+  const handleCloseUserMenu = (setting: string | undefined) => {
+    switch (setting?.toLocaleLowerCase()) {
+      case 'logout':
+        props.logOut();
+        break;
+    }
+    setAnchorElUser(null);
+  };
   return (
     <Slide in={props.settings.headerOpen}>
       <AppBar position="fixed" open={props.settings.sideBarOpen}>
@@ -57,22 +77,48 @@ function Header(props: Props) {
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Application
           </Typography>
-          {accessToken ? (
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleMenu}
-              color="inherit"
+          <Box sx={{ flexGrow: 0 }}>
+            {accessToken ? (
+              <Tooltip title="Open settings">
+                <IconButton
+                  size="large"
+                  aria-label="account of current user"
+                  aria-controls="menu-appbar"
+                  aria-haspopup="true"
+                  onClick={handleOpenUserMenu}
+                  color="inherit"
+                >
+                  <Icon>account_circle</Icon>
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Button onClick={() => navigate('/login')} color="inherit">
+                Login
+              </Button>
+            )}
+            <Menu
+              sx={{ mt: '45px' }}
+              id="menu-appbar"
+              anchorEl={anchorElUser}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right'
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right'
+              }}
+              open={Boolean(anchorElUser)}
+              onClose={() => handleCloseUserMenu(undefined)}
             >
-              <Icon>account_circle</Icon>
-            </IconButton>
-          ) : (
-            <Button onClick={() => navigate('/login')} color="inherit">
-              Login
-            </Button>
-          )}
+              {settings.map((setting) => (
+                <MenuItem key={setting} onClick={() => handleCloseUserMenu(setting)}>
+                  <Typography textAlign="center">{setting}</Typography>
+                </MenuItem>
+              ))}
+            </Menu>
+          </Box>
         </Toolbar>
       </AppBar>
     </Slide>

@@ -49,6 +49,14 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
     case `${AUTH_TYPE.SIGN_IN}_REJECTED`:
       newState.removePending(action.type.replace('_REJECTED', ''));
       break;
+    case AUTH_TYPE.LOG_OUT:
+      newState.accessToken = '';
+      newState.firstName = '';
+      newState.lastName = '';
+      newState.emailAddress = '';
+      newState.emailConfirmed = false;
+      localStorage.clear();
+      break;
     default:
   }
   return newState;

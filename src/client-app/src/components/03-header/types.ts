@@ -1,11 +1,13 @@
 import { bindActionCreators, Dispatch } from 'redux';
 import { openSidebar, closeSidebarAndHeader } from 'store/settings/actions';
+import { logOut } from 'store/auth/actions';
 import { SettingsState } from 'store/settings/types';
 import { AuthState } from 'store/auth/types';
 
 interface PropsFromDispatch {
   openSidebar: typeof openSidebar;
   closeSidebarAndHeader: typeof closeSidebarAndHeader;
+  logOut: typeof logOut;
 }
 
 interface PropsFromState {
@@ -24,7 +26,8 @@ export const mapDispatchToProps = (dispatch: Dispatch) =>
   bindActionCreators(
     {
       openSidebar,
-      closeSidebarAndHeader
+      closeSidebarAndHeader,
+      logOut
     },
     dispatch
   );
