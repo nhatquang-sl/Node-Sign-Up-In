@@ -22,14 +22,8 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props,
 });
 
 const ConsecutiveSnackBars = (props: Props) => {
-  //   const [snackPack, setSnackPack] = useState<readonly SnackbarMessage[]>([]);
-  //   const [open, setOpen] = useState(false);
-  //   const [messageInfo, setMessageInfo] = useState<SnackbarMessage | undefined>(undefined);
-
+  const { snackPack, messageInfo, open, vertical, horizontal } = props.snackbar;
   useEffect(() => {
-    const { snackPack, messageInfo, open } = props.snackbar;
-    console.log(snackPack.length, !messageInfo, open);
-
     if (snackPack.length && !messageInfo) {
       // Set a new snack when we don't have an active one
       //   setMessageInfo({ ...snackPack[0] });
@@ -41,7 +35,7 @@ const ConsecutiveSnackBars = (props: Props) => {
       // Close an active snack when a new one is added
       props.closeSnackbar();
     }
-  }, [props.snackbar.open, props.snackbar.messageInfo, props.snackbar.snackPack]);
+  }, [open, messageInfo, snackPack]);
 
   const handleClick = (message: string) => () => {
     props.showSnackbar(message);
@@ -58,20 +52,18 @@ const ConsecutiveSnackBars = (props: Props) => {
   const handleExited = () => {
     props.cleanUpSnackbar();
   };
-  const { vertical, horizontal } = props.snackbar;
 
   return (
     <div>
       {/* <Button onClick={handleClick('Message A')}>Show message A</Button>
       <Button onClick={handleClick('Message B')}>Show message B</Button> */}
       <Snackbar
-        key={props.snackbar.messageInfo ? props.snackbar.messageInfo.key : undefined}
+        key={messageInfo?.key}
         anchorOrigin={{ vertical, horizontal }}
         open={props.snackbar.open}
         autoHideDuration={4000}
         onClose={handleClose}
         TransitionProps={{ onExited: handleExited }}
-        // message={props.snackbar.messageInfo ? props.snackbar.messageInfo.message : undefined}
         action={
           <React.Fragment>
             <IconButton aria-label="close" color="inherit" sx={{ p: 0.5 }} onClick={handleClose}>
@@ -80,8 +72,8 @@ const ConsecutiveSnackBars = (props: Props) => {
           </React.Fragment>
         }
       >
-        <Alert onClose={handleClose} sx={{ width: '100%' }} severity={props.snackbar.severity}>
-          {props.snackbar.messageInfo ? props.snackbar.messageInfo.message : undefined}
+        <Alert onClose={handleClose} sx={{ width: '100%' }} severity={messageInfo?.severity}>
+          {messageInfo?.message}
         </Alert>
       </Snackbar>
     </div>

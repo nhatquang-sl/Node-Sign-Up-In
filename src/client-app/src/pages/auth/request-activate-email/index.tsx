@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -10,8 +10,12 @@ import { Props, mapStateToProps, mapDispatchToProps } from './types';
 
 const RequestActivateEmail = (props: Props) => {
   const navigate = useNavigate();
-  if (!props.auth.accessToken) navigate('/login');
-  else props.openHeader();
+
+  useEffect(() => {
+    if (!props.auth.accessToken) navigate('/login');
+    else props.openHeader();
+  }, []);
+
   const [loading, setLoading] = useState(false);
 
   const handleSendActivateEmail = async () => {

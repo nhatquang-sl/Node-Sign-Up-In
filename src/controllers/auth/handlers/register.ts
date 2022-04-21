@@ -58,6 +58,7 @@ const handleRegister = async (request: Request, response: Response) => {
   );
   response.status(201).json({
     accessToken,
+    id: result.id,
     firstName: result.firstName,
     lastName: result.lastName,
     emailAddress: result.emailAddress,

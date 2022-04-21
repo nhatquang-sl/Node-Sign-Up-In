@@ -44,7 +44,14 @@ const handleLogin = async (request: Request, response: Response) => {
     // secure: true,
     maxAge: 24 * 60 * 60 * 1000
   });
-  response.json({ accessToken });
+  response.json({
+    accessToken,
+    id: foundUser.id,
+    firstName: foundUser.firstName,
+    lastName: foundUser.lastName,
+    emailAddress: foundUser.emailAddress,
+    emailConfirmed: foundUser.emailConfirmed
+  });
 };
 
 export default handleLogin;

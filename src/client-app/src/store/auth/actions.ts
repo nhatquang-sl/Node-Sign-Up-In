@@ -16,4 +16,23 @@ const signUp = (request: User) => ({
 const logOut = () => ({
   type: AUTH_TYPE.LOG_OUT
 });
-export { signIn, signUp, logOut };
+
+const updateAuth = (
+  id: number,
+  accessToken: string,
+  firstName: string,
+  lastName: string,
+  emailAddress: string,
+  emailConfirmed: boolean
+) => ({
+  type: AUTH_TYPE.UPDATE,
+  payload: {
+    id,
+    accessToken,
+    firstName,
+    lastName,
+    emailAddress,
+    emailConfirmed
+  }
+});
+export { signIn, signUp, logOut, updateAuth };

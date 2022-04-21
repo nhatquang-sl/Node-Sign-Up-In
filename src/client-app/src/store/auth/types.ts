@@ -1,7 +1,8 @@
 export enum AUTH_TYPE {
   SIGN_UP = 'SIGN_UP',
   SIGN_IN = 'SIGN_IN',
-  LOG_OUT = 'LOG_OUT'
+  LOG_OUT = 'LOG_OUT',
+  UPDATE = 'UPDATE_AUTH'
 }
 
 interface Dictionary<T> {
@@ -9,6 +10,7 @@ interface Dictionary<T> {
 }
 
 export class AuthState {
+  id: number = -1;
   accessToken: string = '';
   firstName: string = '';
   lastName: string = '';

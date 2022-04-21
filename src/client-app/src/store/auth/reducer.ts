@@ -57,6 +57,22 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
       newState.emailConfirmed = false;
       localStorage.clear();
       break;
+    case AUTH_TYPE.UPDATE:
+      newState.id = action.payload.id;
+      newState.accessToken = action.payload.accessToken;
+      newState.firstName = action.payload.accessToken;
+      newState.lastName = action.payload.lastName;
+      newState.emailAddress = action.payload.emailAddress;
+      newState.emailConfirmed = action.payload.emailConfirmed;
+      localStorage.auth = JSON.stringify({
+        id: newState.id,
+        accessToken: newState.accessToken,
+        emailAddress: newState.emailAddress,
+        emailConfirmed: newState.emailConfirmed,
+        firstName: newState.firstName,
+        lastName: newState.lastName
+      });
+      break;
     default:
   }
   return newState;

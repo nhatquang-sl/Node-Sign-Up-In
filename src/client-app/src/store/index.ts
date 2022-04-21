@@ -16,10 +16,10 @@ let middleWare = applyMiddleware(promiseMiddleware, logger, thunk);
 const store = createStore(reducer, middleWare);
 
 axios.interceptors.request.use((config: AxiosRequestConfig<any>) => {
-  const auth = JSON.parse(localStorage.auth);
-
-  if (config && config.headers && auth.accessToken)
+  if (config && config.headers && localStorage.auth) {
+    const auth = JSON.parse(localStorage.auth);
     config.headers.Authorization = `Bearer ${auth.accessToken}`;
+  }
   return config;
 });
 export default store;

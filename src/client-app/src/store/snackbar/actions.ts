@@ -9,9 +9,9 @@ const closeSnackbar = () => ({
 });
 const showSnackbar = (
   message: string,
+  severity: 'error' | 'info' | 'success' | 'warning' = 'info',
   vertical: 'top' | 'bottom' = 'bottom',
-  horizontal: 'left' | 'right' | 'center' = 'center',
-  severity: 'error' | 'info' | 'success' | 'warning' = 'info'
+  horizontal: 'left' | 'right' | 'center' = 'center'
 ) => {
   let mes = new SnackbarMessage();
   mes.message = message;
