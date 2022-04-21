@@ -10,6 +10,7 @@ import { Props, mapStateToProps, mapDispatchToProps } from './types';
 import SignIn from 'pages/auth/sign-in';
 import SignUp from 'pages/auth/sign-up';
 import RequestActivateEmail from 'pages/auth/request-activate-email';
+import Dashboard from 'pages/dashboard';
 
 function Main(props: Props) {
   return (
@@ -19,6 +20,7 @@ function Main(props: Props) {
         <Route path="/login" element={<SignIn />} />
         <Route path="/register" element={<SignUp />} />
         <Route path="/request-activate-email" element={<RequestActivateEmail />} />
+        <Route path="/" element={<Dashboard />} />
       </Routes>
       <ConsecutiveSnackBars />
     </Container>

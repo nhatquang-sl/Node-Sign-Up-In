@@ -86,7 +86,6 @@ const SignIn = (props: Props) => {
         res.data.emailAddress,
         res.data.emailConfirmed
       );
-      navigate('/');
     } catch (err) {
       props.showSnackbar('Invalid email or password', 'error');
     }
