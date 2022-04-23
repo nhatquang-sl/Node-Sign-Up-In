@@ -8,6 +8,34 @@
   - `"start": "tsnd --respawn src/server.ts"`
 - `npm install express -S`, `npm install @types/express -D`
 - `npm i prettier -D`
+### Deploy
+- `npm install -g vercel`: Installing vercel cli to global
+- `vercel login`: Login to Vercel
+- Update `package.json`
+  ```
+  "scripts": {
+    "start": "vercel dev",
+    "deploy" : "vercel deploy --prod"
+  },
+  ```
+- Add `vercel.json`
+  ```
+  {
+    "version": 2,
+    "builds": [
+        {
+            "src": "index.ts",
+            "use": "@vercel/node"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "index.ts"
+        }
+    ]
+  }
+  ```
 ## Front End
 - `npx create-react-app my-app --template typescript`: start a new Create React App project with TypeScript
-- `npm install --save @auth0/auth0-spa-js`: install the Auth0 SPA SDK
+- `npm i shx -D`: is a wrapper around ShellJS Unix commands, providing an easy solution for simple Unix-like, cross-platform commands in npm package scripts.

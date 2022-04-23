@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "tsnd --respawn index.ts",
     "start": "vercel dev",
-    "deploy": "vercel deploy --prod",
+    "deploy": "cd ../front-end && npm run build && cd ../back-end && vercel deploy --prod",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
