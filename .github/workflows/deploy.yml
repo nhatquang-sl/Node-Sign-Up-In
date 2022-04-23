@@ -10,7 +10,7 @@ jobs:
           node-version: '14'
       - run: |
           cd back-end
-          npm i
+          npm ci
           npm start
       - uses: amondnet/vercel-action@v20 #deploy
         with:
