@@ -11,7 +11,7 @@ jobs:
       - run: |
           cd back-end
           npm ci
-          npm start
+          npm run deploy
       - uses: amondnet/vercel-action@v20 #deploy
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required

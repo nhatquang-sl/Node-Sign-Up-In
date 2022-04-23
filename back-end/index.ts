@@ -15,10 +15,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 // Serve static files
-let fePath = path.join(__dirname, '..', 'front-end', 'build');
+let fePath = path.join(__dirname, '..', '..', 'front-end', 'build');
 console.log(process.env.NODE_ENV, 'production', process.env.NODE_ENV == 'production');
-if (process.env.NODE_ENV == 'production') {
-  fePath = path.join(__dirname, '..', '..', 'front-end', 'build');
+if (process.env.NODE_ENV == 'development') {
+  fePath = path.join(__dirname, '..', 'front-end', 'build');
   console.log('prod', fePath);
 }
 app.use('/', express.static(fePath));
