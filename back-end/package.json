@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsnd --respawn index.ts",
+    "dev": "set NODE_ENV=development&& tsnd --respawn index.ts",
     "start": "vercel dev",
     "deploy": "cd ../front-end && npm run build && cd ../back-end && vercel deploy --prod",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -17,17 +17,21 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
+    "node-mailjet": "^3.3.13",
     "typescript": "^4.6.3",
     "vercel": "^24.1.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
+    "@types/node-mailjet": "^3.3.8",
     "module-alias": "^2.2.2",
     "prettier": "^2.6.2",
     "ts-node": "^10.7.0",
     "ts-node-dev": "^1.1.8"
   },
   "_moduleAliases": {
-    "@config": "./config"
+    "@config": "./config",
+    "@services": "./services",
+    "@libs": "../lib"
   }
 }
