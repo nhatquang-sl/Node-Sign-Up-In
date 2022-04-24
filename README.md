@@ -8,6 +8,20 @@
   - `"start": "tsnd --respawn src/server.ts"`
 - `npm install express -S`, `npm install @types/express -D`
 - `npm i prettier -D`
+- `npm i module-alias -D`: Create aliases of directories and register custom module paths in NodeJS
+  - Update `package.json`
+  ```
+  "_moduleAliases": {
+    "@config": "./config"
+  }
+  ```
+  - Update `tsconfig.json`
+  ```
+  "paths": {
+    "@config": ["config"],
+    "@config/*": ["config/*"]
+  }
+  ```
 ### Deploy
 - `npm install -g vercel`: Installing vercel cli to global
 - `vercel login`: Login to Vercel

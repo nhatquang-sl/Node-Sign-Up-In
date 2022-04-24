@@ -1,10 +1,14 @@
+import 'module-alias/register';
 import express from 'express';
 import path from 'path';
-
+import cors from 'cors';
+import ENV from '@config';
+import corsOptions from '@config/cors-options';
+console.log(ENV);
 const app = express();
-const PORT = process.env.PORT || 3500;
 
-console.log(process.env.NODE_ENV);
+// Cross Origin Resource Sharing
+app.use(cors(corsOptions));
 
 // built-in middleware to handle urlencoded data
 // in other words, form data:
@@ -15,20 +19,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 // Serve static files
-let fePath = path.join(__dirname, 'public');
-// console.log(process.env.NODE_ENV, 'production', process.env.NODE_ENV == 'production');
-// if (process.env.NODE_ENV == 'development') {
-//   fePath = path.join(__dirname, '..', 'front-end', 'build');
-//   console.log('prod', fePath);
-// }
+const fePath = path.join(__dirname, 'public');
 app.use('/', express.static(fePath));
 const router = express.Router();
 router.get('^/$|/index(.html)?', (req, res) => {
   res.sendFile(path.join(fePath, 'index.html'));
 });
 router.get('/health-check', (req, res) => {
-  res.json('0.0.3');
+  res.json(ENV.APP_VERSION);
 });
 app.use('/', router);
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(ENV.PORT, () => console.log(`Server running on port ${ENV.PORT}`));
