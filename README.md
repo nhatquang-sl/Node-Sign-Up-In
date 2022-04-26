@@ -51,5 +51,30 @@
   }
   ```
 ## Front End
-- `npx create-react-app my-app --template typescript`: start a new Create React App project with TypeScript
+- `npx create-react-app front-end --template typescript`: start a new Create React App project with TypeScript
+- `npm install @mui/material @mui/styled-engine-sc styled-components`: install MUI with styled-components.
+  - switch to `styled-components` 
+      - update `tsconfig.json`
+        ```
+        {
+          "compilerOptions": {
+            "paths": {
+              "@mui/styled-engine": ["./node_modules/@mui/styled-engine-sc"]
+            }
+          },
+        }
+        ```
+      - update `package.json`
+        - replace `"@mui/styled-engine-sc": "^5.6.1"` to `"@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"`
+        - add
+          ```
+          "resolutions": {
+            "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"
+          },
+          ```
+- add front and icons to index.html
+  ```
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+  ```
 - `npm i shx -D`: is a wrapper around ShellJS Unix commands, providing an easy solution for simple Unix-like, cross-platform commands in npm package scripts.
