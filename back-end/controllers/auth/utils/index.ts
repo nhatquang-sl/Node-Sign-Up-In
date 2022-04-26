@@ -1,12 +1,12 @@
 import ENV from '@config';
 import { sendEmail } from '@services/email';
-import UserDto from '@libs/dto/User';
+import UserDto from '@libs/dto/user';
 
-export const sendActivateEmail = async (user: UserDto) => {
+export const sendActivateEmail = async (user: UserDto, securityStamp: string) => {
   const emailActiveCode = Buffer.from(
     JSON.stringify({
       id: user.id,
-      securityStamp: user.securityStamp,
+      securityStamp: securityStamp,
       timestamp: new Date().getTime(),
     })
   ).toString('base64');
@@ -14,7 +14,7 @@ export const sendActivateEmail = async (user: UserDto) => {
   await sendEmail(
     user.emailAddress,
     'Welcome to QNN! Confirm Your Email',
-    getActiveEmailMessage(`${ENV.HOST}/auth/register-confirm/${emailActiveCode}`)
+    getActiveEmailMessage(`${ENV.APP_HOST}/auth/register-confirm/${emailActiveCode}`)
   );
 };
 

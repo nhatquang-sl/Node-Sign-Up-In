@@ -1,10 +1,13 @@
-class UserDto {
-  declare id: number;
-  declare emailAddress: string;
-  declare firstName: string;
-  declare lastName: string;
-  declare securityStamp: string;
-  declare emailConfirmed: boolean | false;
+interface UserDto {
+  id: number;
+  firstName: string;
+  lastName: string;
+  emailAddress: string;
+  emailConfirmed: boolean | false;
 }
 
-export default UserDto;
+interface UserAuthDto extends UserDto {
+  accessToken: string;
+}
+
+export { UserDto, UserAuthDto };

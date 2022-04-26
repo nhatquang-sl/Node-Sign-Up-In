@@ -4,7 +4,12 @@ import path from 'path';
 import cors from 'cors';
 import ENV from '@config';
 import corsOptions from '@config/cors-options';
+import dbContext from '@database';
+import User from '@database/models/user';
+import authRoute from '@controllers/auth/route';
+
 console.log(ENV);
+
 const app = express();
 
 // Cross Origin Resource Sharing
@@ -30,4 +35,11 @@ router.get('/health-check', (req, res) => {
 });
 app.use('/', router);
 
-app.listen(ENV.PORT, () => console.log(`Server running on port ${ENV.PORT}`));
+app.use('/auth', authRoute);
+
+dbContext.connect().then(async () => {
+  // https://sequelize.org/docs/v6/core-concepts/model-basics/#model-synchronization
+  // await User.sync();
+  // await User.sync({ force: true });
+  app.listen(ENV.PORT, () => console.log(`Server running on port ${ENV.PORT}`));
+});
