@@ -33,7 +33,7 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
         emailAddress: newState.emailAddress,
         emailConfirmed: newState.emailConfirmed,
         firstName: newState.firstName,
-        lastName: newState.lastName
+        lastName: newState.lastName,
       });
       newState.removePending(action.type.replace('_FULFILLED', ''));
       break;
@@ -70,7 +70,7 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
         emailAddress: newState.emailAddress,
         emailConfirmed: newState.emailConfirmed,
         firstName: newState.firstName,
-        lastName: newState.lastName
+        lastName: newState.lastName,
       });
       break;
     default:

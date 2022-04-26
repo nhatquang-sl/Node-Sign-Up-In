@@ -1,20 +1,21 @@
 import axios from 'axios';
-import { AUTH_TYPE, User } from './types';
+import { UserRegisterDto } from '@libs/dto/user';
+import { AUTH_TYPE } from './types';
 
 import { API_ENDPOINT } from '../constants';
 
 const signIn = () => ({
   type: AUTH_TYPE.SIGN_IN,
-  payload: axios.get(`${API_ENDPOINT}//auth/login`)
+  payload: axios.get(`${API_ENDPOINT}//auth/login`),
 });
 
-const signUp = (request: User) => ({
+const signUp = (request: UserRegisterDto) => ({
   type: AUTH_TYPE.SIGN_UP,
-  payload: axios.post(`${API_ENDPOINT}/auth/register`, request)
+  payload: axios.post(`${API_ENDPOINT}/auth/register`, request),
 });
 
 const logOut = () => ({
-  type: AUTH_TYPE.LOG_OUT
+  type: AUTH_TYPE.LOG_OUT,
 });
 
 const updateAuth = (
@@ -32,7 +33,7 @@ const updateAuth = (
     firstName,
     lastName,
     emailAddress,
-    emailConfirmed
-  }
+    emailConfirmed,
+  },
 });
 export { signIn, signUp, logOut, updateAuth };

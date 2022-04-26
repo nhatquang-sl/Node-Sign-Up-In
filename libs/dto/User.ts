@@ -10,4 +10,11 @@ interface UserAuthDto extends UserDto {
   accessToken: string;
 }
 
-export { UserDto, UserAuthDto };
+interface UserRegisterDto {
+  firstName: string;
+  lastName: string;
+  emailAddress: string;
+  password: string;
+}
+
+export type { UserDto, UserAuthDto, UserRegisterDto };
