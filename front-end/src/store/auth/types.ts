@@ -1,7 +1,7 @@
-import { UserAuthDto } from '@libs/dto/user';
+import { UserAuthDto } from 'shared/user/dto';
 
 export enum AUTH_TYPE {
-  SIGN_UP = 'SIGN_UP',
+  REGISTER = 'REGISTER',
   SIGN_IN = 'SIGN_IN',
   LOG_OUT = 'LOG_OUT',
   UPDATE = 'UPDATE_AUTH',
@@ -20,8 +20,12 @@ export class AuthState implements UserAuthDto {
   emailConfirmed: boolean = false;
   pendingTypes: string[] = [];
   errors: Dictionary<string[]> = {};
+  firstNameError: string | undefined;
+  lastNameError: string | undefined;
+  emailAddressError: string | undefined;
+  passwordError: string[] = [];
   pendingSignUp(): boolean {
-    return this.pendingTypes.includes(AUTH_TYPE.SIGN_UP);
+    return this.pendingTypes.includes(AUTH_TYPE.REGISTER);
   }
   removePending(pendingType: string): void {
     this.pendingTypes = this.pendingTypes.filter((pt) => pt !== pendingType);

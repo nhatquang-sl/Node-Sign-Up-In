@@ -17,12 +17,12 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
   const newState: AuthState = cloneDeep(state);
 
   switch (action.type) {
-    case `${AUTH_TYPE.SIGN_UP}_PENDING`:
+    case `${AUTH_TYPE.REGISTER}_PENDING`:
     case `${AUTH_TYPE.SIGN_IN}_PENDING`:
       newState.errors = {};
       newState.pendingTypes.push(action.type.replace('_PENDING', ''));
       break;
-    case `${AUTH_TYPE.SIGN_UP}_FULFILLED`:
+    case `${AUTH_TYPE.REGISTER}_FULFILLED`:
       newState.accessToken = action.payload.data.accessToken;
       newState.firstName = action.payload.data.accessToken;
       newState.lastName = action.payload.data.lastName;
@@ -39,12 +39,19 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
       break;
     case `${AUTH_TYPE.SIGN_IN}_FULFILLED`:
       break;
-    case `${AUTH_TYPE.SIGN_UP}_REJECTED`:
+    case `${AUTH_TYPE.REGISTER}_REJECTED`:
+      newState.removePending(action.type.replace('_REJECTED', ''));
       if (action.payload.response.status === 409) {
         newState.errors['emailAddress'] = [];
         newState.errors['emailAddress'].push('Duplicated email address!');
       }
-      newState.removePending(action.type.replace('_REJECTED', ''));
+      if (action.payload.response.status === 400) {
+        const data = action.payload.response.data;
+        newState.firstNameError = data.firstNameError;
+        newState.lastNameError = data.lastNameError;
+        newState.emailAddressError = data.emailAddressError;
+        newState.passwordError = data.passwordError;
+      }
       break;
     case `${AUTH_TYPE.SIGN_IN}_REJECTED`:
       newState.removePending(action.type.replace('_REJECTED', ''));
@@ -64,14 +71,7 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
       newState.lastName = action.payload.lastName;
       newState.emailAddress = action.payload.emailAddress;
       newState.emailConfirmed = action.payload.emailConfirmed;
-      localStorage.auth = JSON.stringify({
-        id: newState.id,
-        accessToken: newState.accessToken,
-        emailAddress: newState.emailAddress,
-        emailConfirmed: newState.emailConfirmed,
-        firstName: newState.firstName,
-        lastName: newState.lastName,
-      });
+      localStorage.auth = JSON.stringify(action.payload);
       break;
     default:
   }

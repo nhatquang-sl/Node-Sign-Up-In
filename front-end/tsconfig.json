@@ -21,8 +21,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "paths": {
-      "@mui/styled-engine": ["./node_modules/@mui/styled-engine-sc"],
-      "@libs/*": ["../../libs/*"]
+      "@mui/styled-engine": ["./node_modules/@mui/styled-engine-sc"]
     }
   },
   "include": [

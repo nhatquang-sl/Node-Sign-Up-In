@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
 import jwt from 'jsonwebtoken';
 
+import { validateUserRegister } from '@libs/user/validate';
 import User from '@database/models/user';
 
 import { sendActivateEmail } from '../utils';
@@ -10,8 +11,14 @@ import { sendActivateEmail } from '../utils';
 const handleRegister = async (request: Request, response: Response) => {
   const req: User = request.body;
 
-  const errors = validateRequest(req);
-  if (errors.length) return response.status(400).json({ errors });
+  const { firstNameError, lastNameError, emailAddressError, passwordError } = validateUserRegister(
+    request.body
+  );
+  if (firstNameError || lastNameError || emailAddressError || passwordError.length) {
+    return response
+      .status(400)
+      .json({ firstNameError, lastNameError, emailAddressError, passwordError });
+  }
 
   // Check for duplicate usernames in the db
   // https://sequelize.org/docs/v6/core-concepts/model-querying-finders/#findone

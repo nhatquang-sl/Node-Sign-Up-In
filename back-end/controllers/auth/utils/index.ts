@@ -1,6 +1,6 @@
 import ENV from '@config';
 import { sendEmail } from '@services/email';
-import UserDto from '@libs/dto/user';
+import { UserDto } from '@libs/user/dto';
 
 export const sendActivateEmail = async (user: UserDto, securityStamp: string) => {
   const emailActiveCode = Buffer.from(

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { UserRegisterDto } from '@libs/dto/user';
+import { UserRegisterDto, UserAuthDto } from 'shared/user/dto';
 import { AUTH_TYPE } from './types';
 
 import { API_ENDPOINT } from '../constants';
@@ -9,8 +9,8 @@ const signIn = () => ({
   payload: axios.get(`${API_ENDPOINT}//auth/login`),
 });
 
-const signUp = (request: UserRegisterDto) => ({
-  type: AUTH_TYPE.SIGN_UP,
+const register = (request: UserRegisterDto) => ({
+  type: AUTH_TYPE.REGISTER,
   payload: axios.post(`${API_ENDPOINT}/auth/register`, request),
 });
 
@@ -18,22 +18,8 @@ const logOut = () => ({
   type: AUTH_TYPE.LOG_OUT,
 });
 
-const updateAuth = (
-  id: number,
-  accessToken: string,
-  firstName: string,
-  lastName: string,
-  emailAddress: string,
-  emailConfirmed: boolean
-) => ({
+const updateAuth = (userAuth: UserAuthDto) => ({
   type: AUTH_TYPE.UPDATE,
-  payload: {
-    id,
-    accessToken,
-    firstName,
-    lastName,
-    emailAddress,
-    emailConfirmed,
-  },
+  payload: userAuth,
 });
-export { signIn, signUp, logOut, updateAuth };
+export { signIn, register, logOut, updateAuth };

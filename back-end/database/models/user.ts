@@ -6,7 +6,7 @@ import {
   InferCreationAttributes,
   CreationOptional,
 } from 'sequelize';
-import { UserDto, UserAuthDto } from '@libs/dto/user';
+import { UserDto, UserAuthDto } from '@libs/user/dto';
 import dbContext from '..';
 
 // https://sequelize.org/docs/v6/other-topics/typescript/
