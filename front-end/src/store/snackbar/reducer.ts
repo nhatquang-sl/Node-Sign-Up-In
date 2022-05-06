@@ -1,7 +1,7 @@
 import { Reducer } from 'redux';
 import cloneDeep from 'lodash/cloneDeep';
 
-import { SNACKBAR, SnackbarMessage, SnackbarState } from './types';
+import { SNACKBAR, SnackbarState } from './types';
 
 const initialState: SnackbarState = new SnackbarState();
 

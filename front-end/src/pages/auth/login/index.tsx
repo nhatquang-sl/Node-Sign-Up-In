@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+
 import {
   Container,
   Box,
@@ -19,62 +20,38 @@ import {
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import { validateUserRegister } from 'shared/user/validate';
+import { validateEmailAddress } from 'shared/user/validate';
 import { closeSidebarAndHeader } from 'store/settings/actions';
+import { showSnackbar } from 'store/snackbar/actions';
 
 import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
 
-const Register = (props: Props) => {
+const Login = (props: Props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const [values, setValues] = useState<State>({
+    emailAddress: 'sunlight01@gmail.com',
+    // emailAddress: '',
+    emailAddressError: undefined,
+    password: '1234567x@X',
+    // password: '',
+    passwordError: undefined,
+    showPassword: false,
+  });
+
   const { accessToken, emailConfirmed } = props.auth;
+  const loginError = props.auth.error.login;
+
   useEffect(() => {
     if (accessToken && emailConfirmed) navigate('/');
     else if (accessToken) navigate('/request-activate-email');
     else dispatch(closeSidebarAndHeader());
   }, [accessToken, emailConfirmed, navigate, dispatch]);
 
-  const { firstNameError, lastNameError, emailAddressError, passwordError } = props.auth;
   useEffect(() => {
-    setValues((v) => ({
-      ...v,
-      firstNameError,
-      lastNameError,
-      emailAddressError,
-      passwordError,
-    }));
-  }, [firstNameError, lastNameError, emailAddressError, passwordError]);
-
-  const [values, setValues] = useState<State>({
-    firstName: '',
-    firstNameError: '',
-    lastName: '',
-    lastNameError: '',
-    emailAddress: '',
-    emailAddressError: '',
-    password: '',
-    passwordError: [],
-    showPassword: false,
-    submitted: false,
-  });
-
-  const handleChange = (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValues({ ...values, [prop]: event.target.value });
-
-    if (values.submitted) {
-      const { firstNameError, lastNameError, emailAddressError, passwordError } =
-        validateUserRegister({ ...values, [prop]: event.target.value });
-      setValues({
-        ...values,
-        [prop]: event.target.value,
-        firstNameError,
-        lastNameError,
-        emailAddressError,
-        passwordError,
-      });
-    }
-  };
+    loginError && dispatch(showSnackbar(loginError, 'error'));
+  }, [loginError, dispatch]);
 
   const handleClickShowPassword = () => {
     setValues({
@@ -87,26 +64,24 @@ const Register = (props: Props) => {
     event.preventDefault();
   };
 
+  const handleChange = (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    setValues({ ...values, [prop]: event.target.value });
+  };
+
   const handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
 
-    const { firstNameError, lastNameError, emailAddressError, passwordError } =
-      validateUserRegister(values);
-
+    const emailAddressError = validateEmailAddress(values.emailAddress);
+    const passwordError = values.password ? undefined : 'Password is required';
     setValues({
       ...values,
-      firstNameError,
-      lastNameError,
       emailAddressError,
       passwordError,
-      submitted: true,
     });
 
-    if (firstNameError || lastNameError || emailAddressError || passwordError.length) {
-      return;
-    }
+    if (emailAddressError || passwordError) return;
 
-    props.register(values);
+    props.login(values);
   };
 
   return (
@@ -123,45 +98,17 @@ const Register = (props: Props) => {
           <Icon>lock</Icon>
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign up
+          Login
         </Typography>
         <Box component="form" noValidate sx={{ mt: 3 }} onSubmit={handleSubmit}>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                autoComplete="given-name"
-                name="firstName"
-                required
-                fullWidth
-                id="firstName"
-                label="First Name"
-                autoFocus
-                value={values.firstName}
-                onChange={handleChange('firstName')}
-                error={!!values.firstNameError?.length}
-                helperText={values.firstNameError}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                id="lastName"
-                label="Last Name"
-                name="lastName"
-                autoComplete="family-name"
-                value={values.lastName}
-                onChange={handleChange('lastName')}
-                error={!!values.lastNameError?.length}
-                helperText={values.lastNameError}
-              />
-            </Grid>
             <Grid item xs={12}>
               <TextField
                 required
                 fullWidth
                 id="email"
                 label="Email Address"
+                type="email"
                 name="email"
                 autoComplete="email"
                 value={values.emailAddress}
@@ -171,12 +118,7 @@ const Register = (props: Props) => {
               />
             </Grid>
             <Grid item xs={12}>
-              <FormControl
-                variant="outlined"
-                required
-                fullWidth
-                error={!!values.passwordError.length}
-              >
+              <FormControl variant="outlined" required fullWidth error={!!values.passwordError}>
                 <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                 <OutlinedInput
                   id="outlined-adornment-password"
@@ -197,9 +139,7 @@ const Register = (props: Props) => {
                   }
                   label="Password"
                 />
-                {values.passwordError.map((e, i) => (
-                  <FormHelperText key={i}>{e}</FormHelperText>
-                ))}
+                <FormHelperText>{values.passwordError}</FormHelperText>
               </FormControl>
             </Grid>
           </Grid>
@@ -208,14 +148,19 @@ const Register = (props: Props) => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            loading={props.auth.pendingRegister()}
+            loading={props.auth.pendingLogin()}
           >
-            Sign Up
+            Submit
           </LoadingButton>
-          <Grid container justifyContent="flex-end">
-            <Grid item>
-              <Link href="/login" variant="body2">
-                Already have an account? Sign in
+          <Grid container justifyContent="space-between">
+            <Grid item md="auto" xs={12}>
+              <Link href="#" variant="body2">
+                Forgot password?
+              </Link>
+            </Grid>
+            <Grid item md="auto" xs={12}>
+              <Link href="register" variant="body2">
+                {"Don't have an account? Sign Up"}
               </Link>
             </Grid>
           </Grid>
@@ -225,4 +170,4 @@ const Register = (props: Props) => {
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Register);
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

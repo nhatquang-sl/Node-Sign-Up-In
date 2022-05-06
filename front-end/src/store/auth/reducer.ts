@@ -1,7 +1,7 @@
 import { Reducer } from 'redux';
 import cloneDeep from 'lodash/cloneDeep';
 
-import { AUTH_TYPE, AuthState } from './types';
+import { AUTH_TYPE, AuthState, AuthError } from './types';
 
 let initialState: AuthState = new AuthState();
 if (localStorage.auth) {
@@ -18,11 +18,12 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
 
   switch (action.type) {
     case `${AUTH_TYPE.REGISTER}_PENDING`:
-    case `${AUTH_TYPE.SIGN_IN}_PENDING`:
-      newState.errors = {};
+    case `${AUTH_TYPE.LOGIN}_PENDING`:
+      newState.error = new AuthError();
       newState.pendingTypes.push(action.type.replace('_PENDING', ''));
       break;
     case `${AUTH_TYPE.REGISTER}_FULFILLED`:
+    case `${AUTH_TYPE.LOGIN}_FULFILLED`:
       newState.accessToken = action.payload.data.accessToken;
       newState.firstName = action.payload.data.accessToken;
       newState.lastName = action.payload.data.lastName;
@@ -37,23 +38,25 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
       });
       newState.removePending(action.type.replace('_FULFILLED', ''));
       break;
-    case `${AUTH_TYPE.SIGN_IN}_FULFILLED`:
-      break;
     case `${AUTH_TYPE.REGISTER}_REJECTED`:
       newState.removePending(action.type.replace('_REJECTED', ''));
+      const data = action.payload.response.data;
       if (action.payload.response.status === 409) {
-        newState.errors['emailAddress'] = [];
-        newState.errors['emailAddress'].push('Duplicated email address!');
+        newState.emailAddressError = data.emailAddressError;
       }
       if (action.payload.response.status === 400) {
-        const data = action.payload.response.data;
         newState.firstNameError = data.firstNameError;
         newState.lastNameError = data.lastNameError;
         newState.emailAddressError = data.emailAddressError;
         newState.passwordError = data.passwordError;
       }
       break;
-    case `${AUTH_TYPE.SIGN_IN}_REJECTED`:
+    case `${AUTH_TYPE.LOGIN}_REJECTED`:
+      const status = action.payload.response.status;
+      console.log(action.payload.response);
+      if (status === 400 || status === 401) {
+        newState.error.login = action.payload.response.data.message;
+      }
       newState.removePending(action.type.replace('_REJECTED', ''));
       break;
     case AUTH_TYPE.LOG_OUT:

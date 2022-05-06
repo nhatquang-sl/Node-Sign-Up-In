@@ -1,12 +1,12 @@
 import axios from 'axios';
-import { UserRegisterDto, UserAuthDto } from 'shared/user/dto';
+import { UserLoginDto, UserRegisterDto, UserAuthDto } from 'shared/user/dto';
 import { AUTH_TYPE } from './types';
 
 import { API_ENDPOINT } from '../constants';
 
-const signIn = () => ({
-  type: AUTH_TYPE.SIGN_IN,
-  payload: axios.get(`${API_ENDPOINT}//auth/login`),
+const login = (request: UserLoginDto) => ({
+  type: AUTH_TYPE.LOGIN,
+  payload: axios.post(`${API_ENDPOINT}/auth/login`, request),
 });
 
 const register = (request: UserRegisterDto) => ({
@@ -22,4 +22,4 @@ const updateAuth = (userAuth: UserAuthDto) => ({
   type: AUTH_TYPE.UPDATE,
   payload: userAuth,
 });
-export { signIn, register, logOut, updateAuth };
+export { login, register, logOut, updateAuth };

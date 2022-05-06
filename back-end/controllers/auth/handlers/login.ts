@@ -1,24 +1,20 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { UserLoginDto } from '@libs/user/dto';
 
 import User from '@database/models/user';
 
-type LoginRequest = {
-  emailAddress: string;
-  password: string;
-};
-
 const handleLogin = async (request: Request, response: Response) => {
-  const req: LoginRequest = request.body;
+  const req: UserLoginDto = request.body;
   if (!req.emailAddress || !req.password)
     return response.status(400).json({ message: 'Username and password are required.' });
   const foundUser = await User.findOne({ where: { emailAddress: req.emailAddress } });
-  if (!foundUser) return response.sendStatus(401); // Unauthorized
+  if (!foundUser) return response.status(401).json({ message: 'Username or password invalid.' }); // Unauthorized
 
   // Evaluate password
   const match = await bcrypt.compare(req.password, foundUser.password);
-  if (!match) return response.sendStatus(401);
+  if (!match) return response.status(401).json({ message: 'Username or password invalid.' }); // Unauthorized
 
   // Create JWTs
   const accessToken = jwt.sign(

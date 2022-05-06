@@ -8,7 +8,7 @@ import { DrawerHeader, Container } from './styles';
 import { Props, mapStateToProps, mapDispatchToProps } from './types';
 
 import Register from 'pages/auth/register';
-// import SignUp from 'pages/auth/sign-up';
+import Login from 'pages/auth/login';
 // import RequestActivateEmail from 'pages/auth/request-activate-email';
 import Dashboard from 'pages/dashboard';
 
@@ -17,11 +17,12 @@ function Main(props: Props) {
     <Container open={props.settings.sideBarOpen}>
       {props.settings.headerOpen && <DrawerHeader />}
       <Routes>
-        {/* <Route path="/login" element={<SignIn />} />
+        {/*  />
         <Route path="/register" element={<SignUp />} />
         <Route path="/request-activate-email" element={<RequestActivateEmail />} /> */}
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/" element={<Register />} />
+        <Route path="/" element={<Dashboard />} />
       </Routes>
       <ConsecutiveSnackBars />
     </Container>

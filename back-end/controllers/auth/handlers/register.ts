@@ -23,7 +23,8 @@ const handleRegister = async (request: Request, response: Response) => {
   // Check for duplicate usernames in the db
   // https://sequelize.org/docs/v6/core-concepts/model-querying-finders/#findone
   const duplicate = await User.findOne({ where: { emailAddress: req.emailAddress } });
-  if (duplicate) return response.sendStatus(409); // Conflict
+  if (duplicate)
+    return response.status(409).json({ emailAddressError: 'Duplicated email address!' }); // Conflict
 
   req.emailConfirmed = false;
   // encrypt the password

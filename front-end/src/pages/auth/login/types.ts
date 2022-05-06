@@ -1,11 +1,13 @@
 import { bindActionCreators, Dispatch } from 'redux';
-import { UserRegisterDto } from 'shared/user/dto';
-import { register } from 'store/auth/actions';
+import { UserLoginDto } from 'shared/user/dto';
+import { showSnackbar } from 'store/snackbar/actions';
+import { login } from 'store/auth/actions';
 import { SettingsState } from 'store/settings/types';
 import { AuthState } from 'store/auth/types';
 
 interface PropsFromDispatch {
-  register: typeof register;
+  showSnackbar: typeof showSnackbar;
+  login: typeof login;
 }
 
 interface PropsFromState {
@@ -13,16 +15,13 @@ interface PropsFromState {
   auth: AuthState;
 }
 
-export interface Props extends PropsFromDispatch, PropsFromState {}
-
-export interface State extends UserRegisterDto {
-  firstNameError: string | undefined;
-  lastNameError: string | undefined;
+export interface State extends UserLoginDto {
   emailAddressError: string | undefined;
-  passwordError: string[];
+  passwordError: string | undefined;
   showPassword: boolean;
-  submitted: boolean;
 }
+
+export interface Props extends PropsFromDispatch, PropsFromState {}
 
 export const mapStateToProps = (store: any) => ({
   settings: store.settings,
@@ -32,7 +31,8 @@ export const mapStateToProps = (store: any) => ({
 export const mapDispatchToProps = (dispatch: Dispatch) =>
   bindActionCreators(
     {
-      register,
+      showSnackbar,
+      login,
     },
     dispatch
   );

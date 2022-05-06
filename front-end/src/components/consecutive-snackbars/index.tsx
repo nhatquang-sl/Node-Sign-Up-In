@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
-import { Button, Snackbar, IconButton, Icon } from '@mui/material';
+import React, { useEffect } from 'react';
+import { connect, useDispatch } from 'react-redux';
+import { Snackbar, IconButton, Icon } from '@mui/material';
 // import Alert from '@mui/material/Alert';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
+
+import { openSnackbar, closeSnackbar } from 'store/snackbar/actions';
 
 import { Props, mapStateToProps, mapDispatchToProps } from './types';
 
@@ -22,7 +24,13 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props,
 });
 
 const ConsecutiveSnackBars = (props: Props) => {
-  const { snackPack, messageInfo, open, vertical, horizontal } = props.snackbar;
+  const dispatch = useDispatch();
+
+  const { snackPack, messageInfo, open } = props.snackbar;
+  const vertical = messageInfo?.vertical ?? 'bottom';
+  const horizontal = messageInfo?.horizontal ?? 'center';
+  const severity = messageInfo?.severity ?? 'info';
+
   useEffect(() => {
     if (snackPack.length && !messageInfo) {
       // Set a new snack when we don't have an active one
@@ -30,23 +38,23 @@ const ConsecutiveSnackBars = (props: Props) => {
       //   setSnackPack((prev) => prev.slice(1));
       //   setOpen(true);
 
-      props.openSnackbar();
+      dispatch(openSnackbar());
     } else if (snackPack.length && messageInfo && open) {
       // Close an active snack when a new one is added
-      props.closeSnackbar();
+      dispatch(closeSnackbar());
     }
-  }, [open, messageInfo, snackPack]);
+  }, [open, messageInfo, snackPack, dispatch]);
 
-  const handleClick = (message: string) => () => {
-    props.showSnackbar(message);
-    // setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
-  };
+  // const handleClick = (message: string) => () => {
+  //   props.showSnackbar(message);
+  //   // setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
+  // };
 
   const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }
-    props.closeSnackbar();
+    dispatch(closeSnackbar());
   };
 
   const handleExited = () => {
@@ -72,7 +80,7 @@ const ConsecutiveSnackBars = (props: Props) => {
           </React.Fragment>
         }
       >
-        <Alert onClose={handleClose} sx={{ width: '100%' }} severity={messageInfo?.severity}>
+        <Alert onClose={handleClose} sx={{ width: '100%' }} severity={severity}>
           {messageInfo?.message}
         </Alert>
       </Snackbar>
