@@ -1,16 +1,24 @@
-import { sendEmail } from '@services/email';
 import {
   DataTypes,
   Model,
   InferAttributes,
   InferCreationAttributes,
   CreationOptional,
+  NonAttribute,
+  Association,
 } from 'sequelize';
 import { UserDto, UserAuthDto } from '@libs/user/dto';
+import Role from './role';
 import dbContext from '..';
 
 // https://sequelize.org/docs/v6/other-topics/typescript/
-class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> implements UserDto {
+class User
+  extends Model<
+    InferAttributes<User, { omit: 'roles' }>,
+    InferCreationAttributes<User, { omit: 'roles' }>
+  >
+  implements UserDto
+{
   declare id: CreationOptional<number>;
   declare emailAddress: string;
   declare password: string;
@@ -19,6 +27,10 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> i
   declare refreshToken?: string;
   declare securityStamp: string;
   declare emailConfirmed: boolean | false;
+  declare roles?: NonAttribute<Role[]>;
+  declare static associations: {
+    roles: Association<User, Role>;
+  };
   static getAuthDto(user: User, accessToken: string): UserAuthDto {
     const dto: UserAuthDto = {
       id: user.id,
@@ -67,7 +79,7 @@ User.init(
   {
     // Other model options go here
     sequelize: dbContext.sequelize, // We need to pass the connection instance
-    modelName: 'User', // We need to choose the model name
+    modelName: 'user', // We need to choose the model name
   }
 );
 

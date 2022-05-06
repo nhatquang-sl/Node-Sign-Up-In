@@ -31,10 +31,10 @@ const Login = (props: Props) => {
   const dispatch = useDispatch();
 
   const [values, setValues] = useState<State>({
-    emailAddress: 'sunlight01@gmail.com',
+    emailAddress: 'sunlight479@yahoo.com',
     // emailAddress: '',
     emailAddressError: undefined,
-    password: '1234567x@X',
+    password: '123456x@X',
     // password: '',
     passwordError: undefined,
     showPassword: false,
@@ -45,7 +45,7 @@ const Login = (props: Props) => {
 
   useEffect(() => {
     if (accessToken && emailConfirmed) navigate('/');
-    else if (accessToken) navigate('/request-activate-email');
+    // else if (accessToken) navigate('/request-activate-email');
     else dispatch(closeSidebarAndHeader());
   }, [accessToken, emailConfirmed, navigate, dispatch]);
 

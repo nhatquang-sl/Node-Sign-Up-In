@@ -4,12 +4,25 @@ import jwt from 'jsonwebtoken';
 import { UserLoginDto } from '@libs/user/dto';
 
 import User from '@database/models/user';
+import Role from '@database/models/role';
 
 const handleLogin = async (request: Request, response: Response) => {
   const req: UserLoginDto = request.body;
   if (!req.emailAddress || !req.password)
     return response.status(400).json({ message: 'Username and password are required.' });
-  const foundUser = await User.findOne({ where: { emailAddress: req.emailAddress } });
+  const foundUser = await User.findOne({
+    where: { emailAddress: req.emailAddress },
+    include: [
+      {
+        model: Role,
+        attributes: ['code'],
+        through: {
+          attributes: [],
+        },
+      },
+    ],
+  });
+  console.log({ roles: foundUser?.roles?.map((r) => r.code) });
   if (!foundUser) return response.status(401).json({ message: 'Username or password invalid.' }); // Unauthorized
 
   // Evaluate password
@@ -18,7 +31,11 @@ const handleLogin = async (request: Request, response: Response) => {
 
   // Create JWTs
   const accessToken = jwt.sign(
-    { emailAddress: foundUser.emailAddress, emailConfirmed: foundUser.emailConfirmed },
+    {
+      emailAddress: foundUser.emailAddress,
+      emailConfirmed: foundUser.emailConfirmed,
+      roles: foundUser?.roles?.map((r) => r.code),
+    },
     process.env.ACCESS_TOKEN_SECRET as string,
     { expiresIn: '30s' }
   );

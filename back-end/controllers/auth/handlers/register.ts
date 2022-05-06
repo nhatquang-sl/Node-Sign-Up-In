@@ -5,6 +5,8 @@ import jwt from 'jsonwebtoken';
 
 import { validateUserRegister } from '@libs/user/validate';
 import User from '@database/models/user';
+import Role from '@database/models/role';
+import UserRole from '@database/models/user-role';
 
 import { sendActivateEmail } from '../utils';
 
@@ -22,7 +24,19 @@ const handleRegister = async (request: Request, response: Response) => {
 
   // Check for duplicate usernames in the db
   // https://sequelize.org/docs/v6/core-concepts/model-querying-finders/#findone
-  const duplicate = await User.findOne({ where: { emailAddress: req.emailAddress } });
+  const duplicate = await User.findOne({
+    where: { emailAddress: req.emailAddress },
+    include: [
+      {
+        model: Role,
+        attributes: ['code'],
+        through: {
+          attributes: [],
+        },
+      },
+    ],
+  });
+  console.log(duplicate?.toJSON(), duplicate?.id, duplicate?.firstName);
   if (duplicate)
     return response.status(409).json({ emailAddressError: 'Duplicated email address!' }); // Conflict
 
@@ -37,7 +51,7 @@ const handleRegister = async (request: Request, response: Response) => {
     process.env.REFRESH_TOKEN_SECRET as string,
     { expiresIn: '1d' }
   );
-  console.log(req.id);
+
   // Create and store the new user
   const result = await User.create({
     emailAddress: req.emailAddress,
@@ -49,6 +63,11 @@ const handleRegister = async (request: Request, response: Response) => {
     securityStamp: req.securityStamp,
   });
 
+  var userRole = await UserRole.bulkCreate([
+    // { userId: result.id, roleCode: 'admin' },
+    { userId: result.id, roleCode: 'user' },
+  ]);
+  console.log(userRole);
   await sendActivateEmail(result, req.securityStamp);
 
   response.cookie('jwt', req.refreshToken, {

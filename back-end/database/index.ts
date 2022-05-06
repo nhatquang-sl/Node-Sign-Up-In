@@ -9,7 +9,7 @@ class DbContext {
     this.sequelize = new Sequelize(ENV.DB_NAME, ENV.DB_USERNAME, ENV.DB_PASSWORD, {
       host: ENV.DB_HOST,
       dialect: 'mssql' /* one of 'mysql' | 'mariadb' | 'postgres' | 'mssql' */,
-      query: { raw: true },
+      // query: { raw: true },
     });
   }
 
