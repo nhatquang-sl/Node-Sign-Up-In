@@ -11,6 +11,8 @@ import Register from 'pages/auth/register';
 import Login from 'pages/auth/login';
 // import RequestActivateEmail from 'pages/auth/request-activate-email';
 import Dashboard from 'pages/dashboard';
+import RequestActivateEmail from 'pages/auth/request-activate-email';
+import RegisterConfirm from 'pages/auth/register-confirm';
 
 function Main(props: Props) {
   return (
@@ -20,6 +22,9 @@ function Main(props: Props) {
         {/*  />
         <Route path="/register" element={<SignUp />} />
         <Route path="/request-activate-email" element={<RequestActivateEmail />} /> */}
+
+        <Route path="/register-confirm/:activateCode" element={<RegisterConfirm />} />
+        <Route path="/request-activate-email" element={<RequestActivateEmail />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/" element={<Dashboard />} />

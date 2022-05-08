@@ -43,6 +43,7 @@
     "@services": "./services",
     "@database": "./database",
     "@controllers": "./controllers",
+    "@middleware": "./middleware",
     "@libs": "../front-end/src/shared"
   }
 }

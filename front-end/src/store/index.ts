@@ -30,6 +30,7 @@ axios.interceptors.response.use(
   },
   function (error: AxiosError) {
     if (error.code === 'ERR_NETWORK') store.dispatch(showSnackbar(error.message, 'error'));
+    console.log(error.response);
     return Promise.reject(error);
   }
 );

@@ -45,7 +45,7 @@ const Login = (props: Props) => {
 
   useEffect(() => {
     if (accessToken && emailConfirmed) navigate('/');
-    // else if (accessToken) navigate('/request-activate-email');
+    else if (accessToken) navigate('/request-activate-email');
     else dispatch(closeSidebarAndHeader());
   }, [accessToken, emailConfirmed, navigate, dispatch]);
 

@@ -14,7 +14,7 @@ export const sendActivateEmail = async (user: UserDto, securityStamp: string) =>
   await sendEmail(
     user.emailAddress,
     'Welcome to QNN! Confirm Your Email',
-    getActiveEmailMessage(`${ENV.APP_HOST}/auth/register-confirm/${emailActiveCode}`)
+    getActiveEmailMessage(`${ENV.FE_ENDPOINT}/register-confirm/${emailActiveCode}`)
   );
 };
 

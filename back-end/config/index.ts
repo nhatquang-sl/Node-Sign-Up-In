@@ -10,6 +10,8 @@ const ENV = {
   APP_HOST: process.env.APP_HOST ?? '',
   PORT: process.env.PORT || 3500,
 
+  FE_ENDPOINT: 'http://localhost:3000',
+
   DB_NAME: process.env.DB_NAME ?? '',
   DB_USERNAME: process.env.DB_USERNAME ?? '',
   DB_PASSWORD: process.env.DB_PASSWORD,

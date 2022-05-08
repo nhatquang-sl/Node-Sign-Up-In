@@ -14,6 +14,11 @@ const register = (request: UserRegisterDto) => ({
   payload: axios.post(`${API_ENDPOINT}/auth/register`, request),
 });
 
+const registerConfirm = (activateCode: string) => ({
+  type: AUTH_TYPE.REGISTER_CONFIRM,
+  payload: axios.get(`${API_ENDPOINT}/auth/register-confirm/${activateCode}`),
+});
+
 const logOut = () => ({
   type: AUTH_TYPE.LOG_OUT,
 });
@@ -22,4 +27,9 @@ const updateAuth = (userAuth: UserAuthDto) => ({
   type: AUTH_TYPE.UPDATE,
   payload: userAuth,
 });
-export { login, register, logOut, updateAuth };
+
+const sendActivateLink = () => ({
+  type: AUTH_TYPE.SEND_ACTIVATE_LINK,
+  payload: axios.post(`${API_ENDPOINT}/auth/send-activate-link`),
+});
+export { login, register, registerConfirm, logOut, updateAuth, sendActivateLink };

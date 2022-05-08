@@ -15,11 +15,15 @@ if (localStorage.auth) {
 
 const reducer: Reducer<AuthState> = (state = initialState, action) => {
   const newState: AuthState = cloneDeep(state);
-
+  const status = action.payload?.response?.status;
   switch (action.type) {
     case `${AUTH_TYPE.REGISTER}_PENDING`:
     case `${AUTH_TYPE.LOGIN}_PENDING`:
       newState.error = new AuthError();
+      newState.pendingTypes.push(action.type.replace('_PENDING', ''));
+      break;
+    case `${AUTH_TYPE.SEND_ACTIVATE_LINK}_PENDING`:
+    case `${AUTH_TYPE.REGISTER_CONFIRM}_PENDING`:
       newState.pendingTypes.push(action.type.replace('_PENDING', ''));
       break;
     case `${AUTH_TYPE.REGISTER}_FULFILLED`:
@@ -38,6 +42,10 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
       });
       newState.removePending(action.type.replace('_FULFILLED', ''));
       break;
+    case `${AUTH_TYPE.SEND_ACTIVATE_LINK}_FULFILLED`:
+    case `${AUTH_TYPE.REGISTER_CONFIRM}_FULFILLED`:
+      newState.removePending(action.type.replace('_FULFILLED', ''));
+      break;
     case `${AUTH_TYPE.REGISTER}_REJECTED`:
       newState.removePending(action.type.replace('_REJECTED', ''));
       const data = action.payload.response.data;
@@ -52,10 +60,21 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
       }
       break;
     case `${AUTH_TYPE.LOGIN}_REJECTED`:
-      const status = action.payload.response.status;
       console.log(action.payload.response);
       if (status === 400 || status === 401) {
         newState.error.login = action.payload.response.data.message;
+      }
+      newState.removePending(action.type.replace('_REJECTED', ''));
+      break;
+    case `${AUTH_TYPE.SEND_ACTIVATE_LINK}_REJECTED`:
+      console.log(status);
+      if (status === 403) {
+        newState.accessToken = '';
+        newState.firstName = '';
+        newState.lastName = '';
+        newState.emailAddress = '';
+        newState.emailConfirmed = false;
+        localStorage.clear();
       }
       newState.removePending(action.type.replace('_REJECTED', ''));
       break;
