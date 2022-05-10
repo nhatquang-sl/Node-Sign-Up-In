@@ -210,7 +210,7 @@ const Register = (props: Props) => {
             sx={{ mt: 3, mb: 2 }}
             loading={props.auth.pendingRegister()}
           >
-            Sign Up
+            Submit
           </LoadingButton>
           <Grid container justifyContent="flex-end">
             <Grid item>

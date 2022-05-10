@@ -18,12 +18,12 @@ const handleRegisterConfirm = async (request: Request, response: Response) => {
 
   // update email confirmed property
   await User.update({ emailConfirmed: true }, { where: { id: id } });
-  return response
-    .writeHead(301, {
-      Location: `http://localhost:3000/login`,
-    })
-    .end();
-  //   response.status(201).json({ message: `Account Email Address Confirmation Success` });
+  // return response
+  //   .writeHead(301, {
+  //     Location: `http://localhost:3000/login`,
+  //   })
+  //   .end();
+  return response.sendStatus(204);
 };
 
 const validate = (user: User, securityStamp: string, timestamp: number) => {
