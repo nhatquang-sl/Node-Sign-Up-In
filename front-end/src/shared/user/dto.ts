@@ -20,4 +20,13 @@ interface UserRegisterDto extends UserLoginDto {
   lastName: string;
 }
 
+export interface UserSession {
+  id: number;
+  userId: number;
+  ipAddress: string;
+  userAgent: string | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+}
+
 export type { UserDto, UserAuthDto, UserLoginDto, UserRegisterDto };

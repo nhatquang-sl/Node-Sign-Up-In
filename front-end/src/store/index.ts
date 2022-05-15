@@ -6,11 +6,12 @@ import axios, { AxiosRequestConfig, AxiosError } from 'axios';
 
 import settings from './settings/reducer';
 import auth from './auth/reducer';
+import user from './user/reducer';
 import snackbar from './snackbar/reducer';
 import { showSnackbar } from './snackbar/actions';
 
 // Combine Reducers
-var reducer = combineReducers({ settings, auth, snackbar });
+var reducer = combineReducers({ settings, auth, user, snackbar });
 
 let middleWare = applyMiddleware(promiseMiddleware, logger, thunk);
 // middleWare = applyMiddleware(promiseMiddleware, thunk);

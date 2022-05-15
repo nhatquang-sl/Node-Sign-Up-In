@@ -24,7 +24,6 @@ class User
   declare password: string;
   declare firstName: string;
   declare lastName: string;
-  declare refreshToken?: string;
   declare securityStamp: string;
   declare emailConfirmed: boolean | false;
   declare roles?: NonAttribute<Role[]>;
@@ -62,9 +61,6 @@ User.init(
       allowNull: false, // allowNull defaults to true
     },
     lastName: {
-      type: DataTypes.STRING,
-    },
-    refreshToken: {
       type: DataTypes.STRING,
     },
     securityStamp: {

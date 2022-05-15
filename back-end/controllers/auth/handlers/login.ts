@@ -5,6 +5,7 @@ import { UserLoginDto } from '@libs/user/dto';
 
 import User from '@database/models/user';
 import Role from '@database/models/role';
+import UserLoginHistory from '@database/models/user-login-history';
 
 const handleLogin = async (request: Request, response: Response) => {
   const req: UserLoginDto = request.body;
@@ -30,15 +31,22 @@ const handleLogin = async (request: Request, response: Response) => {
   const match = await bcrypt.compare(req.password, foundUser.password);
   if (!match) return response.status(401).json({ message: 'Username or password invalid.' }); // Unauthorized
 
+  const loginHistory = await UserLoginHistory.create({
+    userId: foundUser.id,
+    ipAddress: request.ip,
+    userAgent: request.get('User-Agent'),
+  });
+
   // Create JWTs
   const accessToken = jwt.sign(
     {
-      emailAddress: foundUser.emailAddress,
+      userId: foundUser.id,
       emailConfirmed: foundUser.emailConfirmed,
+      sessionId: loginHistory.id,
       roles: foundUser?.roles?.map((r) => r.code),
     },
     process.env.ACCESS_TOKEN_SECRET as string,
-    { expiresIn: '30s' }
+    { expiresIn: '3d' } // 30s
   );
   const refreshToken = jwt.sign(
     {
@@ -48,9 +56,8 @@ const handleLogin = async (request: Request, response: Response) => {
     { expiresIn: '1d' }
   );
 
-  // Saving refreshToken with current user
-  foundUser.refreshToken = refreshToken;
-  await User.update({ refreshToken }, { where: { id: foundUser.id } });
+  // Saving accessToken, refreshToken
+  await UserLoginHistory.update({ accessToken, refreshToken }, { where: { id: loginHistory.id } });
 
   response.cookie('jwt', refreshToken, {
     httpOnly: true,

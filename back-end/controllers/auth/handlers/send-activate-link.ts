@@ -5,7 +5,7 @@ import { UserDto } from '@libs/user/dto';
 
 const handleSendActivateLink = async (request: Request, response: Response) => {
   // https://sequelize.org/docs/v6/core-concepts/model-querying-finders/#findone
-  const user = await User.findOne({ where: { emailAddress: request.headers.emailAddress } });
+  const user = await User.findOne({ where: { id: request.headers.userId } });
   console.log(user);
   if (user != null) await sendActivateEmail(user as UserDto, user.securityStamp);
 

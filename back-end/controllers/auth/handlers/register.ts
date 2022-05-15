@@ -7,6 +7,7 @@ import { validateUserRegister } from '@libs/user/validate';
 import User from '@database/models/user';
 import Role from '@database/models/role';
 import UserRole from '@database/models/user-role';
+import UserLoginHistory from '@database/models/user-login-history';
 
 import { sendActivateEmail } from '../utils';
 
@@ -36,7 +37,7 @@ const handleRegister = async (request: Request, response: Response) => {
       },
     ],
   });
-  console.log(duplicate?.toJSON(), duplicate?.id, duplicate?.firstName);
+
   if (duplicate)
     return response.status(409).json({ emailAddressError: 'Duplicated email address!' }); // Conflict
 
@@ -44,13 +45,6 @@ const handleRegister = async (request: Request, response: Response) => {
   // encrypt the password
   req.password = await bcrypt.hash(req.password, 10);
   req.securityStamp = uuid();
-  req.refreshToken = jwt.sign(
-    {
-      emailAddress: req.emailAddress,
-    },
-    process.env.REFRESH_TOKEN_SECRET as string,
-    { expiresIn: '1d' }
-  );
 
   // Create and store the new user
   const result = await User.create({
@@ -59,7 +53,6 @@ const handleRegister = async (request: Request, response: Response) => {
     lastName: req.lastName,
     password: req.password,
     emailConfirmed: false,
-    refreshToken: req.refreshToken,
     securityStamp: req.securityStamp,
   });
 
@@ -70,42 +63,43 @@ const handleRegister = async (request: Request, response: Response) => {
   console.log(userRole);
   await sendActivateEmail(result, req.securityStamp);
 
-  response.cookie('jwt', req.refreshToken, {
+  const loginHistory = await UserLoginHistory.create({
+    userId: result.id,
+    ipAddress: request.ip,
+    userAgent: request.get('User-Agent'),
+  });
+
+  // Create JWTs
+  const accessToken = jwt.sign(
+    {
+      userId: result.id,
+      emailConfirmed: req.emailConfirmed,
+      sessionId: loginHistory.id,
+    },
+    process.env.ACCESS_TOKEN_SECRET as string,
+    { expiresIn: '1d' }
+  );
+  const refreshToken = jwt.sign(
+    {
+      emailAddress: req.emailAddress,
+    },
+    process.env.REFRESH_TOKEN_SECRET as string,
+    { expiresIn: '1d' }
+  );
+
+  // Saving accessToken, refreshToken
+  await UserLoginHistory.update({ accessToken, refreshToken }, { where: { id: loginHistory.id } });
+
+  response.cookie('jwt', refreshToken, {
     httpOnly: true,
     // sameSite: 'None',
     // secure: true,
     maxAge: 24 * 60 * 60 * 1000,
   });
 
-  // Create JWTs
-  const accessToken = jwt.sign(
-    { emailAddress: req.emailAddress, emailConfirmed: req.emailConfirmed },
-    process.env.ACCESS_TOKEN_SECRET as string,
-    { expiresIn: '1d' }
-  );
   response.status(201).json({
     ...User.getAuthDto(result, accessToken),
   });
-};
-
-const validateRequest = (req: User) => {
-  let errors = [];
-
-  if (!req.firstName) errors.push('First Name is required!');
-
-  // Validate Email address
-  if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(req.emailAddress))
-    errors.push('Email Address is invalid!');
-
-  // Validate Password
-  if (!/[a-z]/.test(req.password)) errors.push('Password contains at least one lower character');
-  if (!/[A-Z]/.test(req.password)) errors.push('Password contains at least one upper character');
-  if (!/\d/.test(req.password)) errors.push('Password contains at least one digit character');
-  if (!/[-+_!@#$%^&*.,?]/.test(req.password))
-    errors.push('Password contains at least one special character');
-  if (req.password?.length < 8) errors.push('Password contains at least 8 characters');
-
-  return errors;
 };
 
 export default handleRegister;

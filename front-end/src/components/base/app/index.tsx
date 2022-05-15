@@ -11,6 +11,7 @@ import Header from 'components/base/header';
 import { theme } from './theme';
 
 function App() {
+  console.log('App');
   return (
     <div style={{ display: 'flex' }}>
       <ThemeProvider theme={theme}>
