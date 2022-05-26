@@ -32,4 +32,10 @@ const sendActivateLink = () => ({
   type: AUTH_TYPE.SEND_ACTIVATE_LINK,
   payload: axios.post(`${API_ENDPOINT}/auth/send-activate-link`),
 });
-export { login, register, registerConfirm, logOut, updateAuth, sendActivateLink };
+
+const getProfile = () => ({
+  type: AUTH_TYPE.GET_USER_PROFILE,
+  payload: axios.get(`${API_ENDPOINT}/auth/profile`),
+});
+
+export { login, register, registerConfirm, logOut, updateAuth, sendActivateLink, getProfile };

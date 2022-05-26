@@ -7,6 +7,8 @@ let initialState: UserState = new UserState();
 
 const reducer: Reducer<UserState> = (state = initialState, action) => {
   const newState: UserState = cloneDeep(state);
+  const status = action.payload?.response?.status;
+
   switch (action.type) {
     case `${USER_TYPE.GET_USER_SESSIONS}_PENDING`:
       newState.pendingTypes.push(action.type.replace('_PENDING', ''));

@@ -56,6 +56,9 @@ function Header(props: Props) {
       case 'logout':
         props.logOut();
         break;
+      case 'profile':
+        navigate('/profile');
+        break;
     }
     setAnchorElUser(null);
   };

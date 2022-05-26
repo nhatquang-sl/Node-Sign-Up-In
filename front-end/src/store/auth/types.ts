@@ -7,6 +7,7 @@ export enum AUTH_TYPE {
   LOG_OUT = 'LOG_OUT',
   UPDATE = 'UPDATE_AUTH',
   SEND_ACTIVATE_LINK = 'SEND_ACTIVATE_LINK',
+  GET_USER_PROFILE = 'GET_USER_PROFILE',
 }
 
 // interface Dictionary<T> {
@@ -47,6 +48,10 @@ export class AuthState implements UserAuthDto {
   pendingSendActivateLink(): boolean {
     return this.pendingTypes.includes(AUTH_TYPE.SEND_ACTIVATE_LINK);
   }
+  pendingGetProfile(): boolean {
+    return this.pendingTypes.includes(AUTH_TYPE.GET_USER_PROFILE);
+  }
+
   removePending(pendingType: string): void {
     this.pendingTypes = this.pendingTypes.filter((pt) => pt !== pendingType);
   }

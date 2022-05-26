@@ -10,7 +10,7 @@ const verifyJWT = (req: any, res: Response, next: NextFunction) => {
   const token = authHeader.split(' ')[1];
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string, async (err: any, decoded: any) => {
     console.log({ err, decoded });
-    if (err) return res.sendStatus(403); // Invalid token
+    if (err) return res.sendStatus(401); // Invalid token
     console.log({
       sessionId: decoded.sessionId,
       method: req.method,

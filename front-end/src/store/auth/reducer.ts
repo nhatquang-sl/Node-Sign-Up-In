@@ -10,7 +10,7 @@ if (localStorage.auth) {
   initialState.emailAddress = localAuth.emailAddress;
   initialState.emailConfirmed = localAuth.emailConfirmed;
   initialState.firstName = localAuth.firstName;
-  initialState.lastName = localAuth.lastNam;
+  initialState.lastName = localAuth.lastName;
 }
 
 const reducer: Reducer<AuthState> = (state = initialState, action) => {
@@ -24,12 +24,27 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
       break;
     case `${AUTH_TYPE.SEND_ACTIVATE_LINK}_PENDING`:
     case `${AUTH_TYPE.REGISTER_CONFIRM}_PENDING`:
+    case `${AUTH_TYPE.GET_USER_PROFILE}_PENDING`:
       newState.pendingTypes.push(action.type.replace('_PENDING', ''));
       break;
     case `${AUTH_TYPE.REGISTER}_FULFILLED`:
     case `${AUTH_TYPE.LOGIN}_FULFILLED`:
       newState.accessToken = action.payload.data.accessToken;
-      newState.firstName = action.payload.data.accessToken;
+      newState.firstName = action.payload.data.firstName;
+      newState.lastName = action.payload.data.lastName;
+      newState.emailAddress = action.payload.data.emailAddress;
+      newState.emailConfirmed = action.payload.data.emailConfirmed;
+      localStorage.auth = JSON.stringify({
+        accessToken: newState.accessToken,
+        emailAddress: newState.emailAddress,
+        emailConfirmed: newState.emailConfirmed,
+        firstName: newState.firstName,
+        lastName: newState.lastName,
+      });
+      newState.removePending(action.type.replace('_FULFILLED', ''));
+      break;
+    case `${AUTH_TYPE.GET_USER_PROFILE}_FULFILLED`:
+      newState.firstName = action.payload.data.firstName;
       newState.lastName = action.payload.data.lastName;
       newState.emailAddress = action.payload.data.emailAddress;
       newState.emailConfirmed = action.payload.data.emailConfirmed;
@@ -67,7 +82,6 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
       newState.removePending(action.type.replace('_REJECTED', ''));
       break;
     case `${AUTH_TYPE.SEND_ACTIVATE_LINK}_REJECTED`:
-      console.log(status);
       if (status === 403) {
         newState.accessToken = '';
         newState.firstName = '';

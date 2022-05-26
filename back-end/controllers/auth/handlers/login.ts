@@ -26,7 +26,7 @@ const handleLogin = async (request: Request, response: Response) => {
   });
   console.log({ roles: foundUser?.roles?.map((r) => r.code) });
   if (!foundUser) return response.status(401).json({ message: 'Username or password invalid.' }); // Unauthorized
-
+  console.log(foundUser);
   // Evaluate password
   const match = await bcrypt.compare(req.password, foundUser.password);
   if (!match) return response.status(401).json({ message: 'Username or password invalid.' }); // Unauthorized
@@ -46,7 +46,7 @@ const handleLogin = async (request: Request, response: Response) => {
       roles: foundUser?.roles?.map((r) => r.code),
     },
     process.env.ACCESS_TOKEN_SECRET as string,
-    { expiresIn: '3d' } // 30s
+    { expiresIn: '1d' } // 30s
   );
   const refreshToken = jwt.sign(
     {
