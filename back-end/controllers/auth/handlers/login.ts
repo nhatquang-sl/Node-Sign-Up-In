@@ -9,7 +9,7 @@ import UserLoginHistory from '@database/models/user-login-history';
 
 const handleLogin = async (request: Request, response: Response) => {
   const req: UserLoginDto = request.body;
-  response.header('Access-Control-Request-Private-Network', 'true');
+  // response.header('Access-Control-Request-Private-Network', 'true');
   if (!req.emailAddress || !req.password)
     return response.status(400).json({ message: 'Username and password are required.' });
   const foundUser = await User.findOne({

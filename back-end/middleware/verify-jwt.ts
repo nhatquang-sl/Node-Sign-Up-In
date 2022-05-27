@@ -19,7 +19,10 @@ const verifyJWT = (req: any, res: Response, next: NextFunction) => {
     });
     req.headers.userId = decoded.userId;
     const start = new Date().getTime();
+
+    // execute action
     next();
+
     const end = new Date().getTime() - start;
     await UserActivity.create({
       userId: decoded.userId,

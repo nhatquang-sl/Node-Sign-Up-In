@@ -68,7 +68,10 @@ const Profile = (props: Props) => {
   return (
     <Grid container spacing={2} justifyContent="center">
       <Grid item>
-        <Avatar src={`https://joeschmoe.io/api/v1/jess`} sx={{ width: 156, height: 156 }} />
+        <Avatar
+          src={`https://joeschmoe.io/api/v1/male/${values.firstName}`}
+          sx={{ width: 156, height: 156 }}
+        />
       </Grid>
       <Grid item xs={12} sm={8}>
         <Box component="form" noValidate sx={{ mt: 3 }}>
@@ -116,7 +119,6 @@ const Profile = (props: Props) => {
         </Box>
       </Grid>
     </Grid>
-    // </Container>
   );
 };
 

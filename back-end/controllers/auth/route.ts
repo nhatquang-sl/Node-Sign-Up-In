@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import verifyJWT from '@middleware/verify-jwt';
 import handleRegister from './handlers/register';
 import handleRegisterConfirm from './handlers/register-confirm';
@@ -15,7 +15,17 @@ router.post('/login', handleLogin);
 // router.post('/refresh-token', handleRefreshToken);
 // router.post('/logout', handleLogout);
 router.use(verifyJWT);
-router.post('/send-activate-link', handleSendActivateLink);
-router.get('/profile', handleGetProfile);
+router.post('/send-activate-link', async (request: Request, response: Response) => {
+  const userId = parseInt(request.headers.userId as string);
+  await handleSendActivateLink(userId);
+  response.sendStatus(204); //No Content
+});
+
+router.get('/profile', async (request: Request, response: Response) => {
+  const userId = parseInt(request.headers.userId as string);
+  const user = await handleGetProfile(userId);
+  if (!user) return response.sendStatus(404);
+  response.json(user);
+});
 
 export default router;
