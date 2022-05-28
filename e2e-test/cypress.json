@@ -1,1 +1,5 @@
-{}
+{
+    "env": {
+        "MAILOSAUR_API_KEY": "NwAmFOYXPVp6JAr3"
+    }
+}

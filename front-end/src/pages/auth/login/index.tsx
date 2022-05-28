@@ -119,9 +119,9 @@ const Login = (props: Props) => {
             </Grid>
             <Grid item xs={12}>
               <FormControl variant="outlined" required fullWidth error={!!values.passwordError}>
-                <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                <InputLabel htmlFor="password">Password</InputLabel>
                 <OutlinedInput
-                  id="outlined-adornment-password"
+                  id="password"
                   type={values.showPassword ? 'text' : 'password'}
                   value={values.password}
                   onChange={handleChange('password')}

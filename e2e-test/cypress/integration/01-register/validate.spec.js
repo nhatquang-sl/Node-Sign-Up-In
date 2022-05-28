@@ -1,4 +1,4 @@
-describe('example to-do app', () => {
+describe('Register Validate Form', () => {
   beforeEach(() => {
     cy.visit('http://localhost:3000/register');
     cy.get('#firstName').clear();
