@@ -1,5 +1,7 @@
 # Scripts
+
 ## Back End
+
 - `npm init -y`: generate `package.json`
 - `npm i typescript -D`: install TypeScript
 - `npx tsc --init`: create `tsconfig.json` for typescript compiler
@@ -22,7 +24,9 @@
     "@config/*": ["config/*"]
   }
   ```
+
 ### Deploy
+
 - `npm install -g vercel`: Installing vercel cli to global
 - `vercel login`: Login to Vercel
 - Update `package.json`
@@ -50,28 +54,30 @@
     ]
   }
   ```
+
 ## Front End
+
 - `npx create-react-app front-end --template typescript`: start a new Create React App project with TypeScript
 - `npm install @mui/material @mui/styled-engine-sc styled-components`: install MUI with styled-components.
-  - switch to `styled-components` 
-      - update `tsconfig.json`
+  - switch to `styled-components`
+    - update `tsconfig.json`
+      ```
+      {
+        "compilerOptions": {
+          "paths": {
+            "@mui/styled-engine": ["./node_modules/@mui/styled-engine-sc"]
+          }
+        },
+      }
+      ```
+    - update `package.json`
+      - replace `"@mui/styled-engine-sc": "^5.6.1"` to `"@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"`
+      - add
         ```
-        {
-          "compilerOptions": {
-            "paths": {
-              "@mui/styled-engine": ["./node_modules/@mui/styled-engine-sc"]
-            }
-          },
-        }
+        "resolutions": {
+          "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"
+        },
         ```
-      - update `package.json`
-        - replace `"@mui/styled-engine-sc": "^5.6.1"` to `"@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"`
-        - add
-          ```
-          "resolutions": {
-            "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"
-          },
-          ```
 - add front and icons to index.html
   ```
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />

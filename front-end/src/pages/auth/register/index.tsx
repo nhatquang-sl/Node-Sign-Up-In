@@ -177,9 +177,9 @@ const Register = (props: Props) => {
                 fullWidth
                 error={!!values.passwordError.length}
               >
-                <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                <InputLabel htmlFor="password">Password</InputLabel>
                 <OutlinedInput
-                  id="outlined-adornment-password"
+                  id="password"
                   type={values.showPassword ? 'text' : 'password'}
                   value={values.password}
                   onChange={handleChange('password')}
