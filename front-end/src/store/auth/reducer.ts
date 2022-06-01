@@ -11,11 +11,17 @@ if (localStorage.auth) {
   initialState.emailConfirmed = localAuth.emailConfirmed;
   initialState.firstName = localAuth.firstName;
   initialState.lastName = localAuth.lastName;
+  initialState.lastDateResetPassword = localAuth.lastDateResetPassword ?? 0;
 }
 
 const reducer: Reducer<AuthState> = (state = initialState, action) => {
   const newState: AuthState = cloneDeep(state);
   const status = action.payload?.response?.status;
+  const data = action.payload?.data ?? action.payload?.response?.data;
+  if (data?.code === 'ERR_NETWORK') {
+    newState.removePending(action.type);
+    return newState;
+  }
   switch (action.type) {
     case `${AUTH_TYPE.REGISTER}_PENDING`:
     case `${AUTH_TYPE.LOGIN}_PENDING`:
@@ -27,6 +33,11 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
     case `${AUTH_TYPE.GET_USER_PROFILE}_PENDING`:
       newState.pendingTypes.push(action.type.replace('_PENDING', ''));
       break;
+    case `${AUTH_TYPE.SEND_EMAIL_RESET_PASSWORD}_PENDING`:
+      newState.emailAddressError = '';
+      // newState.lastDateResetPassword = new Date().getTime();
+      newState.pendingTypes.push(action.type.replace('_PENDING', ''));
+      break;
     case `${AUTH_TYPE.REGISTER}_FULFILLED`:
     case `${AUTH_TYPE.LOGIN}_FULFILLED`:
       newState.accessToken = action.payload.data.accessToken;
@@ -34,13 +45,6 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
       newState.lastName = action.payload.data.lastName;
       newState.emailAddress = action.payload.data.emailAddress;
       newState.emailConfirmed = action.payload.data.emailConfirmed;
-      localStorage.auth = JSON.stringify({
-        accessToken: newState.accessToken,
-        emailAddress: newState.emailAddress,
-        emailConfirmed: newState.emailConfirmed,
-        firstName: newState.firstName,
-        lastName: newState.lastName,
-      });
       newState.removePending(action.type.replace('_FULFILLED', ''));
       break;
     case `${AUTH_TYPE.GET_USER_PROFILE}_FULFILLED`:
@@ -48,22 +52,18 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
       newState.lastName = action.payload.data.lastName;
       newState.emailAddress = action.payload.data.emailAddress;
       newState.emailConfirmed = action.payload.data.emailConfirmed;
-      localStorage.auth = JSON.stringify({
-        accessToken: newState.accessToken,
-        emailAddress: newState.emailAddress,
-        emailConfirmed: newState.emailConfirmed,
-        firstName: newState.firstName,
-        lastName: newState.lastName,
-      });
       newState.removePending(action.type.replace('_FULFILLED', ''));
       break;
     case `${AUTH_TYPE.SEND_ACTIVATE_LINK}_FULFILLED`:
     case `${AUTH_TYPE.REGISTER_CONFIRM}_FULFILLED`:
       newState.removePending(action.type.replace('_FULFILLED', ''));
       break;
+    case `${AUTH_TYPE.SEND_EMAIL_RESET_PASSWORD}_FULFILLED`:
+      newState.lastDateResetPassword = data.lastDate;
+      newState.removePending(action.type);
+      break;
     case `${AUTH_TYPE.REGISTER}_REJECTED`:
       newState.removePending(action.type.replace('_REJECTED', ''));
-      const data = action.payload.response.data;
       if (action.payload.response.status === 409) {
         newState.emailAddressError = data.emailAddressError;
       }
@@ -88,9 +88,13 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
         newState.lastName = '';
         newState.emailAddress = '';
         newState.emailConfirmed = false;
-        localStorage.clear();
       }
       newState.removePending(action.type.replace('_REJECTED', ''));
+      break;
+    case `${AUTH_TYPE.SEND_EMAIL_RESET_PASSWORD}_REJECTED`:
+      newState.emailAddressError = data.emailAddressError;
+      newState.lastDateResetPassword = data.lastDate ?? 0;
+      newState.removePending(action.type);
       break;
     case AUTH_TYPE.LOG_OUT:
       newState.accessToken = '';
@@ -98,19 +102,25 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
       newState.lastName = '';
       newState.emailAddress = '';
       newState.emailConfirmed = false;
-      localStorage.clear();
       break;
     case AUTH_TYPE.UPDATE:
       newState.id = action.payload.id;
       newState.accessToken = action.payload.accessToken;
-      newState.firstName = action.payload.accessToken;
+      newState.firstName = action.payload.firstName;
       newState.lastName = action.payload.lastName;
       newState.emailAddress = action.payload.emailAddress;
       newState.emailConfirmed = action.payload.emailConfirmed;
-      localStorage.auth = JSON.stringify(action.payload);
       break;
     default:
   }
+  localStorage.auth = JSON.stringify({
+    accessToken: newState.accessToken,
+    emailAddress: newState.emailAddress,
+    emailConfirmed: newState.emailConfirmed,
+    firstName: newState.firstName,
+    lastName: newState.lastName,
+    lastDateResetPassword: newState.lastDateResetPassword,
+  });
   return newState;
 };
 

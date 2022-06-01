@@ -38,4 +38,30 @@ const getProfile = () => ({
   payload: axios.get(`${API_ENDPOINT}/auth/profile`),
 });
 
-export { login, register, registerConfirm, logOut, updateAuth, sendActivateLink, getProfile };
+const getLastDateResetPassword = (emailAddress: string) => ({
+  type: AUTH_TYPE.GET_RESET_PASSWORD_LAST_DATE,
+  payload: axios.post(`${API_ENDPOINT}/auth/reset-password/last-date`, { emailAddress }),
+});
+
+const getSendEmailResetPassword = (emailAddress: string) => ({
+  type: AUTH_TYPE.SEND_EMAIL_RESET_PASSWORD,
+  payload: axios.post(`${API_ENDPOINT}/auth/reset-password/send-email`, { emailAddress }),
+});
+
+const getSetNewPassword = (emailAddress: string) => ({
+  type: AUTH_TYPE.SET_NEW_PASSWORD,
+  payload: axios.post(`${API_ENDPOINT}/auth/reset-password/set-new`, { emailAddress }),
+});
+
+export {
+  login,
+  register,
+  registerConfirm,
+  logOut,
+  updateAuth,
+  sendActivateLink,
+  getProfile,
+  getLastDateResetPassword,
+  getSendEmailResetPassword,
+  getSetNewPassword,
+};

@@ -154,7 +154,7 @@ const Login = (props: Props) => {
           </LoadingButton>
           <Grid container justifyContent="space-between">
             <Grid item md="auto" xs={12}>
-              <Link href="#" variant="body2">
+              <Link href="forgot-password" variant="body2">
                 Forgot password?
               </Link>
             </Grid>
