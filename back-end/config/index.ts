@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 import path from 'path';
 
-console.log(process.env.NODE_ENV);
+console.log({ NODE_ENV: process.env.NODE_ENV });
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 if (process.env.NODE_ENV?.trim() == 'development')
   dotenv.config({ path: path.join(__dirname, '..', '.development.env'), override: true });
@@ -19,6 +19,9 @@ const ENV = {
 
   MJ_APIKEY_PUBLIC: process.env.MJ_APIKEY_PUBLIC ?? '',
   MJ_APIKEY_PRIVATE: process.env.MJ_APIKEY_PRIVATE ?? '',
+
+  ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET ?? '',
+  REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET ?? '',
 };
 
 export default ENV;

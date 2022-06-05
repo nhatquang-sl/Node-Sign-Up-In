@@ -29,4 +29,15 @@ export interface UserSession {
   refreshToken: string | null;
 }
 
+export interface UserForgotPasswordDto {
+  id: number;
+  userId: number;
+  ipAddress: string | null;
+  userAgent: string | null;
+  password: string | null;
+  token: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type { UserDto, UserAuthDto, UserLoginDto, UserRegisterDto };

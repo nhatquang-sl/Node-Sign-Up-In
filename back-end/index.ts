@@ -4,10 +4,8 @@ import path from 'path';
 import cors from 'cors';
 import ENV from '@config';
 import corsOptions from '@config/cors-options';
-import dbContext from '@database';
-import User from '@database/models/user';
-import Role from '@database/models/role';
-import UserRole from '@database/models/user-role';
+import { dbContext, initializeDb } from '@database';
+
 import authRoute from '@controllers/auth/route';
 import userRoute from '@controllers/user/route';
 
@@ -42,23 +40,6 @@ app.use('/auth', authRoute);
 app.use('/user', userRoute);
 
 dbContext.connect().then(async () => {
-  // https://sequelize.org/docs/v6/core-concepts/model-basics/#model-synchronization
-  // await User.sync();
-  // await User.drop();
-  // await Role.drop();
-  // await User.sync({ force: true });
-  // await Role.sync({ force: true });
-  // await UserRole.drop();
-  // await dbContext.sequelize.sync({ force: true });
-  // await UserRole.sync({ force: true });
-  const roles = await Role.findAll();
-  if (!roles.length) {
-    Role.bulkCreate([
-      { code: 'admin', name: 'Admin' },
-      { code: 'support', name: 'Support' },
-      { code: 'user', name: 'User' },
-    ]);
-  }
-  // console.log(roles);
+  await initializeDb();
   app.listen(ENV.PORT, () => console.log(`Server running on port ${ENV.PORT}`));
 });

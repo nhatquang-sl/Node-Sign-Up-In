@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
 import User from './user';
 import Role from './role';
-import dbContext from '..';
+import dbContext from '../db-context';
 
 const UserRole = dbContext.sequelize.define(
   'userRole',

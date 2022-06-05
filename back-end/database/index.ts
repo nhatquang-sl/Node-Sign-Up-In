@@ -1,32 +1,22 @@
-import ENV from '@config';
-import { Sequelize } from 'sequelize';
+import User from '@database/models/user';
+import UserForgotPassword from '@database/models/user-forgot-password';
+import Role from '@database/models/role';
+import UserRole from '@database/models/user-role';
+import dbContext from './db-context';
 
-class DbContext {
-  sequelize: Sequelize;
-
-  constructor() {
-    // Option 3: Passing parameters separately (other dialects)
-    this.sequelize = new Sequelize(ENV.DB_NAME, ENV.DB_USERNAME, ENV.DB_PASSWORD, {
-      host: ENV.DB_HOST,
-      dialect: 'mssql' /* one of 'mysql' | 'mariadb' | 'postgres' | 'mssql' */,
-      // query: { raw: true },
-    });
+const initializeDb = async () => {
+  // https://sequelize.org/docs/v6/core-concepts/model-basics/#model-synchronization
+  // await UserRole.drop();
+  // await UserForgotPassword.drop();
+  await dbContext.sequelize.sync({ force: true });
+  // await UserRole.sync({ force: true });
+  const roles = await Role.findAll();
+  if (!roles.length) {
+    Role.bulkCreate([
+      { code: 'admin', name: 'Admin' },
+      { code: 'support', name: 'Support' },
+      { code: 'user', name: 'User' },
+    ]);
   }
-
-  /**
-   * Connects to database
-   */
-  async connect() {
-    try {
-      await this.sequelize.authenticate();
-
-      console.log('Connected to database');
-    } catch (e: any) {
-      console.log('Occured error when connecting to database. Error:', e.message);
-    }
-  }
-}
-
-const dbContext = new DbContext();
-
-export default dbContext;
+};
+export { User, UserForgotPassword, UserRole, Role, dbContext, initializeDb };

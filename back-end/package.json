@@ -7,7 +7,7 @@
     "dev": "set NODE_ENV=development&& tsnd --respawn index.ts",
     "start": "vercel dev",
     "deploy": "cd ../front-end && npm run build && cd ../back-end && vercel deploy --prod",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -29,12 +29,16 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
     "@types/cors": "^2.8.12",
+    "@types/jest": "^27.5.1",
     "@types/jsonwebtoken": "^8.5.8",
     "@types/node-mailjet": "^3.3.8",
     "@types/tedious": "^4.0.7",
     "@types/uuid": "^8.3.4",
+    "jest": "^28.1.0",
     "module-alias": "^2.2.2",
     "prettier": "^2.6.2",
+    "sqlite3": "^5.0.8",
+    "ts-jest": "^28.0.3",
     "ts-node": "^10.7.0",
     "ts-node-dev": "^1.1.8"
   },

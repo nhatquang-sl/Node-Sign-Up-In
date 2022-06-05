@@ -1,8 +1,6 @@
 import express, { Request, Response } from 'express';
 import verifyJWT from '@middleware/verify-jwt';
 
-import { validateEmailAddress } from '@libs/user/validate';
-
 import handleRegister from './handlers/register';
 import handleRegisterConfirm from './handlers/register-confirm';
 import handleLogin from './handlers/login';
@@ -17,12 +15,12 @@ router.post('/login', handleLogin);
 
 router.post('/reset-password/send-email', async (request: Request, response: Response) => {
   const { emailAddress } = request.body;
-  const emailAddressError = validateEmailAddress(emailAddress);
-  if (emailAddressError) return response.status(400).json({ emailAddressError });
-  response.json(await handleSendEmail(request.body.emailAddress));
+  response.json(await handleSendEmail(emailAddress));
 });
+
 router.post('/reset-password/set-new', async (request: Request, response: Response) => {
-  response.json(await handleSetNew(request.body.emailAddress));
+  const { token, newPassword } = request.body;
+  response.json(await handleSetNew(token, newPassword));
 });
 
 // router.post('/refresh-token', handleRefreshToken);

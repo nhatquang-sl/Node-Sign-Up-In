@@ -18,6 +18,57 @@ export const sendActivateEmail = async (user: UserDto, securityStamp: string) =>
   );
 };
 
+export const sendResetPasswordEmail = async (emailAddress: string, resetPasswordToken: string) => {
+  await sendEmail(
+    emailAddress,
+    'You Had Requested To Reset Your Password On QNN',
+    getResetPasswordEmailMessage(`${ENV.FE_ENDPOINT}/reset-password/${resetPasswordToken}`)
+  );
+};
+
+export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const getResetPasswordEmailMessage = (
+  resetPasswordLink: string
+) => `<table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse: collapse;background-color: #17202A;">
+<tr></tr>
+<tr>
+  <td colspan="2" align="center">
+    <div style="padding-left: 15px; padding-right: 15px; padding-top: 15px; padding-bottom: 0px; color: #fff; margin-top: 5px;border-radius: 8px 8px 0 0; font-family: 'Ubuntu';">
+      <div style="padding-bottom: 15px; font-size: 26px; font-weight: bold; position: relative;"> Forgot your password <span style="position: absolute; display: block; overflow: hidden; width: 114px; height: 5px; border-radius: 5px; bottom: 0; left: 50%; background-color: #EFCA2D; transform: translateX(-50%);"></span>
+      </div>
+    </div>
+  </td>
+</tr>
+<tr>
+  <td colspan="2">
+    <div style="padding-top: 20px; padding-bottom: 20px; padding-left: 25px; padding-right: 25px; color: rgba(255, 255, 255, 0.7); ">
+      <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
+        <tr>
+          <td>
+            <div>
+              <table>
+                <tr>
+                  <td style="padding-top: 5px; padding-bottom: 5px;"> Thank you for your request. </td>
+                </tr>
+                <tr>
+                  <td style="padding-top: 5px; padding-bottom: 5px;"> You have requested to reset your password. Click below button to change it. </td>
+                </tr>
+              </table>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding-top: 10px; padding-bottom: 10px;">
+            <a href="${resetPasswordLink}" style="text-align:center; padding: 0 20px; line-height: 50px; overflow: hidden; border-radius: 8px; text-decoration: none; background-color: #EFCA2D; color: #17202A; font-size: 18px; margin-bottom: 10px; display: inline-block;">Change password</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </td>
+</tr>
+<tr> `;
+
 const getActiveEmailMessage = (
   activeLink: string
 ) => `<table style="box-sizing:border-box;width:100%;border-spacing:0;border-collapse:separate!important" width="100%">

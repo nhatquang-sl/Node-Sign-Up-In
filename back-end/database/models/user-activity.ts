@@ -5,7 +5,7 @@ import {
   InferCreationAttributes,
   CreationOptional,
 } from 'sequelize';
-import dbContext from '..';
+import dbContext from '../db-context';
 
 // https://sequelize.org/docs/v6/other-topics/typescript/
 class UserActivity extends Model<

@@ -1,5 +1,6 @@
 import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import ENV from '@config';
 import UserActivity from '@database/models/user-activity';
 
 const verifyJWT = (req: any, res: Response, next: NextFunction) => {
@@ -8,7 +9,7 @@ const verifyJWT = (req: any, res: Response, next: NextFunction) => {
   if (!authHeader?.startsWith('Bearer ')) return res.sendStatus(401);
   console.log(authHeader); // Bearer token
   const token = authHeader.split(' ')[1];
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string, async (err: any, decoded: any) => {
+  jwt.verify(token, ENV.ACCESS_TOKEN_SECRET, async (err: any, decoded: any) => {
     console.log({ err, decoded });
     if (err) return res.sendStatus(401); // Invalid token
     console.log({
