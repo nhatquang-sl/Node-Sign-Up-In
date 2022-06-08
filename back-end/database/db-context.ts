@@ -12,6 +12,7 @@ class DbContext {
         host: ENV.DB_HOST,
         dialect: 'mssql' /* one of 'mysql' | 'mariadb' | 'postgres' | 'mssql' */,
         // query: { raw: true },
+        logging: false,
       });
   }
 

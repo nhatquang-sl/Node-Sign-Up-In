@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import ENV from '@config';
+import { TIMESTAMP } from '@libs/constant';
 import { User, UserForgotPassword } from '@database';
 import { NotFoundError, BadRequestError } from '@controllers/exceptions';
 import { validateEmailAddress } from '@libs/user/validate';
@@ -11,15 +12,22 @@ const handleSendEmail = async (
   ipAddress: string | null = null,
   userAgent: string | null = null
 ) => {
+  validateEmail(emailAddress);
   const user = await User.findOne({
     where: { emailAddress },
     attributes: ['id', 'emailAddress', 'emailConfirmed'],
   });
-
   validate(emailAddress, user);
+
   const userId = user?.id ?? -1;
   let ufp = await UserForgotPassword.findOne({
-    where: { userId, password: { [Op.is]: null } },
+    where: {
+      userId,
+      password: { [Op.is]: null },
+      createdAt: {
+        [Op.gt]: new Date(new Date().getTime() - 5 * TIMESTAMP.MINUTE),
+      },
+    },
     attributes: ['createdAt'],
   });
   if (ufp != null) return { lastDate: new Date(ufp.createdAt).getTime() };
@@ -31,7 +39,7 @@ const handleSendEmail = async (
       resetPassword: true,
     },
     ENV.ACCESS_TOKEN_SECRET,
-    { expiresIn: '1h' } // 30s
+    { expiresIn: '1h' } // one hour
   );
 
   await sendResetPasswordEmail(emailAddress, resetPasswordToken);
@@ -45,9 +53,11 @@ const handleSendEmail = async (
   return { lastDate: new Date(ufp.createdAt).getTime() };
 };
 
-const validate = (emailAddress: string, user: User | null) => {
+const validateEmail = (emailAddress: string) => {
   const emailAddressError = validateEmailAddress(emailAddress);
   if (emailAddressError != undefined) throw new BadRequestError(emailAddressError);
+};
+const validate = (emailAddress: string, user: User | null) => {
   if (user === null) throw new NotFoundError(`${emailAddress} not found!`);
   if (!user.emailConfirmed) throw new BadRequestError(`${emailAddress} not confirm!`);
 };

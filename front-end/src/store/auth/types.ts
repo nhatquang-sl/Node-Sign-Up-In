@@ -23,6 +23,7 @@ export class AuthError {
   emailAddress: string | undefined;
   password: string[] = [];
   login: string | undefined;
+  message: string | undefined;
 }
 
 export class AuthState implements UserAuthDto {
@@ -63,5 +64,8 @@ export class AuthState implements UserAuthDto {
   }
   pendingSendEmailResetPassword(): boolean {
     return this.pendingTypes.includes(AUTH_TYPE.SEND_EMAIL_RESET_PASSWORD);
+  }
+  pendingSetNewPassword(): boolean {
+    return this.pendingTypes.includes(AUTH_TYPE.SET_NEW_PASSWORD);
   }
 }

@@ -15,7 +15,7 @@ import { logOut } from './auth/actions';
 var reducer = combineReducers({ settings, auth, user, snackbar });
 
 let middleWare = applyMiddleware(promiseMiddleware, logger, thunk);
-// middleWare = applyMiddleware(promiseMiddleware, thunk);
+middleWare = applyMiddleware(promiseMiddleware, thunk);
 const store = createStore(reducer, middleWare);
 
 axios.interceptors.request.use((config: AxiosRequestConfig<any>) => {

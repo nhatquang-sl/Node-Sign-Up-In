@@ -14,7 +14,7 @@ import Login from 'pages/auth/login';
 import Profile from 'pages/auth/profile';
 import RequestActivateEmail from 'pages/auth/request-activate-email';
 import RegisterConfirm from 'pages/auth/register-confirm';
-import ForgotPassword from 'pages/auth/forgot-password';
+import { ForgotPassword, ResetPassword } from 'pages/auth/password';
 
 function Main(props: Props) {
   return (
@@ -24,6 +24,7 @@ function Main(props: Props) {
         <Route path="/register-confirm/:activateCode" element={<RegisterConfirm />} />
         <Route path="/request-activate-email" element={<RequestActivateEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />

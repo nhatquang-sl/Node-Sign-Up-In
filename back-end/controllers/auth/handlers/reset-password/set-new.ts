@@ -8,12 +8,12 @@ import { validatePassword } from '@libs/user/validate';
 import { UnauthorizedError, BadRequestError } from '@controllers/exceptions';
 
 const handleSetNew = async (token: string, newPassword: string) => {
-  const passwordError = validatePassword(newPassword);
-  if (passwordError.length) throw new BadRequestError(passwordError[0]);
+  const passwordError = validatePassword(newPassword ?? '');
+  if (passwordError.length) throw new BadRequestError({ passwordError });
 
   await jwt.verify(token, ENV.ACCESS_TOKEN_SECRET, async (err: any, decoded: any) => {
     // console.log({ err, decoded });
-    if (err) throw new UnauthorizedError();
+    await validate(err, token);
 
     const userId = decoded.userId as number;
     const password = await bcrypt.hash(newPassword, 10);
@@ -26,6 +26,15 @@ const handleSetNew = async (token: string, newPassword: string) => {
     ]);
   });
   return { lastDate: new Date().getTime() };
+};
+
+const validate = async (err: any, token: string) => {
+  if (err) throw new UnauthorizedError();
+  const ufp = await UserForgotPassword.findOne({
+    where: { token, password: { [Op.is]: null } },
+    attributes: ['createdAt'],
+  });
+  if (ufp === null) throw new UnauthorizedError();
 };
 
 export default handleSetNew;

@@ -8,7 +8,7 @@ import { validateEmailAddress } from 'shared/user/validate';
 import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
 
 const ForgotPassword = (props: Props) => {
-  const THRESHOLD_SECONDS = 10;
+  const THRESHOLD_SECONDS = 120;
   const DEFAULT_COUNTDOWN = -1;
 
   const { lastDateResetPassword } = props.auth;

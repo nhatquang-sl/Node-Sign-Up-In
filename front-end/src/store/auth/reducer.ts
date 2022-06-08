@@ -18,6 +18,7 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
   const newState: AuthState = cloneDeep(state);
   const status = action.payload?.response?.status;
   const data = action.payload?.data ?? action.payload?.response?.data;
+
   if (data?.code === 'ERR_NETWORK') {
     newState.removePending(action.type);
     return newState;
@@ -38,6 +39,12 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
       // newState.lastDateResetPassword = new Date().getTime();
       newState.pendingTypes.push(action.type.replace('_PENDING', ''));
       break;
+    case `${AUTH_TYPE.SET_NEW_PASSWORD}_PENDING`:
+      newState.error.password = [];
+      newState.error.message = '';
+      newState.pendingTypes.push(action.type.replace('_PENDING', ''));
+      break;
+
     case `${AUTH_TYPE.REGISTER}_FULFILLED`:
     case `${AUTH_TYPE.LOGIN}_FULFILLED`:
       newState.accessToken = action.payload.data.accessToken;
@@ -60,6 +67,11 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
       break;
     case `${AUTH_TYPE.SEND_EMAIL_RESET_PASSWORD}_FULFILLED`:
       newState.lastDateResetPassword = data.lastDate;
+      newState.removePending(action.type);
+      break;
+    case `${AUTH_TYPE.SET_NEW_PASSWORD}_FULFILLED`:
+      newState.error.password = [];
+      newState.error.message = '';
       newState.removePending(action.type);
       break;
     case `${AUTH_TYPE.REGISTER}_REJECTED`:
@@ -94,6 +106,13 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
     case `${AUTH_TYPE.SEND_EMAIL_RESET_PASSWORD}_REJECTED`:
       newState.emailAddressError = data.emailAddressError;
       newState.lastDateResetPassword = data.lastDate ?? 0;
+      newState.removePending(action.type);
+      break;
+    case `${AUTH_TYPE.SET_NEW_PASSWORD}_REJECTED`:
+      newState.error.password = [];
+      newState.error.message = '';
+      if (status === 400) newState.error.password = data.passwordError;
+      newState.error.message = data.message;
       newState.removePending(action.type);
       break;
     case AUTH_TYPE.LOG_OUT:
