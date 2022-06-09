@@ -52,7 +52,8 @@ const ResetPassword = (props: Props) => {
       loading &&
       !password.length &&
       !message &&
-      !props.auth.pendingSetNewPassword()
+      !props.auth.pendingSetNewPassword() &&
+      !props.global.errNetwork
     )
       navigate('/login');
   }, [props.auth, values.submitted, values.loading, navigate]);

@@ -1,8 +1,8 @@
-import { loading } from 'store/settings/actions';
 import { bindActionCreators, Dispatch } from 'redux';
 import { setNewPassword } from 'store/auth/actions';
 import { SettingsState } from 'store/settings/types';
 import { AuthState } from 'store/auth/types';
+import { GlobalState } from 'store/global/types';
 
 interface PropsFromDispatch {
   setNewPassword: typeof setNewPassword;
@@ -11,6 +11,7 @@ interface PropsFromDispatch {
 interface PropsFromState {
   settings: SettingsState;
   auth: AuthState;
+  global: GlobalState;
 }
 
 export interface Props extends PropsFromDispatch, PropsFromState {}
@@ -26,6 +27,7 @@ export class State {
 export const mapStateToProps = (store: any) => ({
   settings: store.settings,
   auth: store.auth,
+  global: store.global,
 });
 
 export const mapDispatchToProps = (dispatch: Dispatch) =>

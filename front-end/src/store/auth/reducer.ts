@@ -101,7 +101,7 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
         newState.emailAddress = '';
         newState.emailConfirmed = false;
       }
-      newState.removePending(action.type.replace('_REJECTED', ''));
+      newState.removePending(action.type);
       break;
     case `${AUTH_TYPE.SEND_EMAIL_RESET_PASSWORD}_REJECTED`:
       newState.emailAddressError = data.emailAddressError;
@@ -112,7 +112,7 @@ const reducer: Reducer<AuthState> = (state = initialState, action) => {
       newState.error.password = [];
       newState.error.message = '';
       if (status === 400) newState.error.password = data.passwordError;
-      newState.error.message = data.message;
+      newState.error.message = data?.message;
       newState.removePending(action.type);
       break;
     case AUTH_TYPE.LOG_OUT:
