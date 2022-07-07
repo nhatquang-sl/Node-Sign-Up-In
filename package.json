@@ -1,0 +1,30 @@
+{
+  "name": "Node-Sign-Up-In",
+  "version": "1.0.0",
+  "description": "- `npm init -y`: generate `package.json`\r - `npm i typescript -D`: install TypeScript\r - `npx tsc --init`: create `tsconfig.json` for typescript compiler\r - `npm i ts-node -D`: allow us compile and run the typescript file\r - `npm i ts-node-dev -D`: allow auto reload\r   - `\"start\": \"tsnd --respawn src/server.ts\"`\r - `npm install express -S`, `npm install @types/express -D`\r - `npm i prettier -D`\r - `npm i module-alias -D`: Create aliases of directories and register custom module paths in NodeJS\r   - Update `package.json`\r   ```\r   \"_moduleAliases\": {\r     \"@config\": \"./config\"\r   }\r   ```\r   - Update `tsconfig.json`\r   ```\r   \"paths\": {\r     \"@config\": [\"config\"],\r     \"@config/*\": [\"config/*\"]\r   }\r   ```",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "commitizen": "^4.2.4",
+    "cz-conventional-changelog": "^3.3.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nhatquang-sl/Node-Sign-Up-In.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nhatquang-sl/Node-Sign-Up-In/issues"
+  },
+  "homepage": "https://github.com/nhatquang-sl/Node-Sign-Up-In#readme",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
