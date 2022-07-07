@@ -66,6 +66,4 @@ test('input email address password valid', async () => {
 
   expect(screen.queryByText('Email address is invalid')).toBeNull();
   expect(screen.queryByText('Password is required')).toBeNull();
-
-  expect(await screen.findByText(/Username and password are required./)).toBeInTheDocument();
 });

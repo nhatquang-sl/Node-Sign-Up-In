@@ -31,11 +31,11 @@ const Login = (props: Props) => {
   const dispatch = useDispatch();
 
   const [values, setValues] = useState<State>({
-    emailAddress: 'sunlight479@yahoo.com',
-    // emailAddress: '',
+    // emailAddress: 'sunlight479@yahoo.com',
+    emailAddress: '',
     emailAddressError: undefined,
-    password: '123456x@X',
-    // password: '',
+    // password: '12i3456x@X',
+    password: '',
     passwordError: undefined,
     showPassword: false,
   });
@@ -154,7 +154,7 @@ const Login = (props: Props) => {
           </LoadingButton>
           <Grid container justifyContent="space-between">
             <Grid item md="auto" xs={12}>
-              <Link href="#" variant="body2">
+              <Link href="forgot-password" variant="body2">
                 Forgot password?
               </Link>
             </Grid>

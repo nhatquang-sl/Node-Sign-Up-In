@@ -56,11 +56,12 @@ const handleRegister = async (request: Request, response: Response) => {
     securityStamp: req.securityStamp,
   });
 
-  var userRole = await UserRole.bulkCreate([
-    // { userId: result.id, roleCode: 'admin' },
-    { userId: result.id, roleCode: 'user' },
-  ]);
-  console.log(userRole);
+  let userRoles = [{ userId: result.id, roleCode: 'user' }];
+  if (req.emailAddress === 'sunlight479@yahoo.com')
+    userRoles.push({ userId: result.id, roleCode: 'admin' });
+
+  const userRole = await UserRole.bulkCreate(userRoles);
+
   await sendActivateEmail(result, req.securityStamp);
 
   const loginHistory = await UserLoginHistory.create({

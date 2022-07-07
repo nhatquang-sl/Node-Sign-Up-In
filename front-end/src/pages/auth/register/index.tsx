@@ -47,13 +47,17 @@ const Register = (props: Props) => {
   }, [firstNameError, lastNameError, emailAddressError, passwordError]);
 
   const [values, setValues] = useState<State>({
-    firstName: 'quang',
+    // firstName: 'quang',
+    firstName: '',
     firstNameError: '',
-    lastName: 'nguyen',
+    // lastName: 'nguyen',
+    lastName: '',
     lastNameError: '',
-    emailAddress: 'sunlight479@yahoo.com',
+    // emailAddress: 'sunlight479@yahoo.com',
+    emailAddress: '',
     emailAddressError: '',
-    password: '123456x@X',
+    // password: '123456x@X',
+    password: '',
     passwordError: [],
     showPassword: false,
     submitted: false,

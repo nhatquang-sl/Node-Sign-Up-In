@@ -8,6 +8,9 @@ export enum AUTH_TYPE {
   UPDATE = 'UPDATE_AUTH',
   SEND_ACTIVATE_LINK = 'SEND_ACTIVATE_LINK',
   GET_USER_PROFILE = 'GET_USER_PROFILE',
+  GET_RESET_PASSWORD_LAST_DATE = 'GET_RESET_PASSWORD_LAST_DATE',
+  SEND_EMAIL_RESET_PASSWORD = 'SEND_EMAIL_RESET_PASSWORD',
+  SET_NEW_PASSWORD = 'SET_NEW_PASSWORD',
 }
 
 // interface Dictionary<T> {
@@ -20,6 +23,7 @@ export class AuthError {
   emailAddress: string | undefined;
   password: string[] = [];
   login: string | undefined;
+  message: string | undefined;
 }
 
 export class AuthState implements UserAuthDto {
@@ -35,6 +39,13 @@ export class AuthState implements UserAuthDto {
   lastNameError: string | undefined;
   emailAddressError: string | undefined;
   passwordError: string[] = [];
+  lastDateResetPassword: number = 0;
+
+  removePending(pendingType: string): void {
+    this.pendingTypes = this.pendingTypes.filter(
+      (pt) => pt !== pendingType.replace('_REJECTED', '').replace('_FULFILLED', '')
+    );
+  }
 
   pendingRegister(): boolean {
     return this.pendingTypes.includes(AUTH_TYPE.REGISTER);
@@ -51,8 +62,10 @@ export class AuthState implements UserAuthDto {
   pendingGetProfile(): boolean {
     return this.pendingTypes.includes(AUTH_TYPE.GET_USER_PROFILE);
   }
-
-  removePending(pendingType: string): void {
-    this.pendingTypes = this.pendingTypes.filter((pt) => pt !== pendingType);
+  pendingSendEmailResetPassword(): boolean {
+    return this.pendingTypes.includes(AUTH_TYPE.SEND_EMAIL_RESET_PASSWORD);
+  }
+  pendingSetNewPassword(): boolean {
+    return this.pendingTypes.includes(AUTH_TYPE.SET_NEW_PASSWORD);
   }
 }

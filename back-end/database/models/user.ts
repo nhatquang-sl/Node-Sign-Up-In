@@ -9,7 +9,7 @@ import {
 } from 'sequelize';
 import { UserDto, UserAuthDto } from '@libs/user/dto';
 import Role from './role';
-import dbContext from '..';
+import dbContext from '../db-context';
 
 // https://sequelize.org/docs/v6/other-topics/typescript/
 class User
