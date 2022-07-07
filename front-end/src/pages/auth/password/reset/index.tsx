@@ -25,7 +25,8 @@ const ResetPassword = (props: Props) => {
   const dispatch = useDispatch();
   const { token } = useParams();
   const [values, setValues] = useState<State>({
-    password: '123456x@X',
+    password: '',
+    // password: '123456x@X',
     passwordError: [],
     showPassword: false,
     submitted: false,

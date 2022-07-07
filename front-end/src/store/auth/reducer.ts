@@ -17,7 +17,7 @@ if (localStorage.auth) {
 const reducer: Reducer<AuthState> = (state = initialState, action) => {
   const newState: AuthState = cloneDeep(state);
   const status = action.payload?.response?.status;
-  const data = action.payload?.data ?? action.payload?.response?.data;
+  const data = action.payload?.response?.data ?? action.payload?.data ?? action.payload;
 
   if (data?.code === 'ERR_NETWORK') {
     newState.removePending(action.type);

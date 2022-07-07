@@ -16,7 +16,8 @@ console.log(ENV);
 const app = express();
 
 // Cross Origin Resource Sharing
-app.use(cors(corsOptions));
+app.use(cors());
+// app.use(cors(corsOptions));
 
 // built-in middleware to handle urlencoded data
 // in other words, form data:
