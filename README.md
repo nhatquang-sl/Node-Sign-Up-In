@@ -1,3 +1,11 @@
+# Table of contents
+
+- [Scripts](#scripts)
+  - [Back End](#back-end)
+  - [Front End](#front-end)
+- [Features](#features)
+  - [Forgot Password](#forgot-password)
+
 # Scripts
 
 ## Back End
@@ -84,3 +92,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
   ```
 - `npm i shx -D`: is a wrapper around ShellJS Unix commands, providing an easy solution for simple Unix-like, cross-platform commands in npm package scripts.
+
+# Features
+
+## [Forgot Password](https://www.notion.so/nhat-quang/Forgot-Password-2eb55da1b8d64a2985f85e17c2cf0ea4)
