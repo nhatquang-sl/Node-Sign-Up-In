@@ -10,9 +10,12 @@ import { dbContext, initializeDb } from '@database';
 import authRoute from '@controllers/auth/route';
 import userRoute from '@controllers/user/route';
 import { BadRequestError, UnauthorizedError, NotFoundError } from '@controllers/exceptions';
+import { MContainer } from './mediator/container';
+import SimpleHandler from './mediator/simple-handler';
 
 console.log(ENV);
-
+console.log(MContainer.container);
+console.log(new SimpleHandler().handle('request'));
 const app = express();
 
 // Cross Origin Resource Sharing
