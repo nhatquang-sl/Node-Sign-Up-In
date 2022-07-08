@@ -1,0 +1,3 @@
+[submodule "back-end/node-sign-up-in-credentials"]
+	path = back-end/node-sign-up-in-credentials
+	url = git@github.com:nhatquang-sl/node-sign-up-in-credentials.git
