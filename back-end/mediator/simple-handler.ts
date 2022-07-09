@@ -1,12 +1,12 @@
-import { MContainer, ICommandHandler } from './index';
+import { MContainer, ICommandHandler, ICommand, Result } from './index';
+
+export class SimpleCommand implements ICommand {
+  declare partyId: number;
+}
 
 @MContainer.RegisterHandler
-export default class SimpleHandler implements ICommandHandler<string, string> {
-  constructor() {
-    console.log('Registering Simple_Handler');
-  }
-
-  handle(payload: string): string {
-    return `handle: ${payload}`;
+export class SimpleCommandHandler implements ICommandHandler<SimpleCommand, Result> {
+  handle(command: SimpleCommand): Result {
+    console.log({ partyId: command.partyId });
   }
 }

@@ -1,4 +1,4 @@
-import { IContainer, ICommandHandler } from './interfaces';
+import { IContainer } from './interfaces';
 
 export namespace MContainer {
   export const container: IContainer = {
@@ -6,11 +6,12 @@ export namespace MContainer {
   };
 
   export function RegisterHandler<T>(handler: { new (): T }): void {
-    console.log('===========================================');
-    console.log(handler);
-    console.log(handler.prototype);
-    var h: any = new handler();
-    console.log(h.handle('==============in container'));
-    container.handlers[handler.prototype.name] = handler;
+    const handlerName = handler.name.toString();
+    if (handlerName) container.handlers[handlerName] = handler;
+
+    // console.log(handler);
+    // console.log({ handlerName });
+    // console.log(`${handlerName}Handler`);
+    // console.log({ handlerCode: handler.toString() });
   }
 }

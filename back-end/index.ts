@@ -10,17 +10,17 @@ import { dbContext, initializeDb } from '@database';
 import authRoute from '@controllers/auth/route';
 import userRoute from '@controllers/user/route';
 import { BadRequestError, UnauthorizedError, NotFoundError } from '@controllers/exceptions';
-import { MContainer } from './mediator/container';
-import SimpleHandler from './mediator/simple-handler';
+
+import { Mediator } from './mediator';
+import { SimpleCommand } from './mediator/simple-handler';
 
 console.log(ENV);
-console.log(MContainer.container);
-console.log(new SimpleHandler().handle('request'));
+
 const app = express();
 
 // Cross Origin Resource Sharing
 app.use(cors());
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 // built-in middleware to handle urlencoded data
 // in other words, form data:
@@ -74,3 +74,8 @@ dbContext.connect().then(async () => {
   // await initializeDb();
   app.listen(ENV.PORT, () => console.log(`Server running on port ${ENV.PORT}`));
 });
+
+const mediator = new Mediator();
+const command = new SimpleCommand();
+command.partyId = 10;
+mediator.send(command);
