@@ -1,26 +1,11 @@
+import { ICommand, Result } from './interfaces';
+import { MContainer } from './container';
+
 export class Mediator {
-  public Send(command: string, payload: any): any {
-    return this.Process(command, payload);
-  }
-
-  public Use(middleware: IMediatorMiddleware): void {
-    this.middlewares.push(middleware);
-  }
-
-  private Process(msg: string, payload: any): any {
-    let handler: any = super.Resolve(msg);
-    this.middlewares.forEach((m) => m.PreProcess(payload));
-
-    try {
-      if (handler.Validate) handler.Validate(payload);
-    } catch (ex) {
-      throw ex;
-    }
-
-    if (handler.Log) handler.Log();
-
-    let response: any = handler.Handle(payload);
-    this.middlewares.reverse().forEach((m) => m.PostProcess(payload, response));
-    return response;
+  public send(command: ICommand): Result {
+    const cmdName = command.constructor.name;
+    const handlerClass: any = MContainer.container.handlers[`${cmdName}Handler`];
+    const handler: any = new handlerClass();
+    if (handler.handle) handler.handle(command);
   }
 }
