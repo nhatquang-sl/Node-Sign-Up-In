@@ -1,17 +1,25 @@
 import { IContainer } from './interfaces';
 
-export namespace MContainer {
-  export const container: IContainer = {
-    handlers: {},
+export const container: IContainer = {
+  handlers: {},
+};
+
+// https://www.typescriptlang.org/docs/handbook/decorators.html#class-decorators
+export function RegisterHandler<T>(handler: { new (): T }): void {
+  const handlerName = handler.name.toString();
+  if (handlerName) container.handlers[handlerName] = handler;
+
+  // console.log(handler);
+  // console.log({ handlerName });
+  // console.log(`${handlerName}Handler`);
+  // console.log({ handlerCode: handler.toString() });
+}
+
+// https://dev.to/danywalls/decorators-in-typescript-with-example-part-1-m0f
+export function Authorize(roles: string[]) {
+  return function (constructor: Function) {
+    const handlerName = constructor.name.toString();
+    if (handlerName) container.handlers[handlerName] = constructor;
+    constructor.prototype.authorizeRoles = roles;
   };
-
-  export function RegisterHandler<T>(handler: { new (): T }): void {
-    const handlerName = handler.name.toString();
-    if (handlerName) container.handlers[handlerName] = handler;
-
-    // console.log(handler);
-    // console.log({ handlerName });
-    // console.log(`${handlerName}Handler`);
-    // console.log({ handlerCode: handler.toString() });
-  }
 }

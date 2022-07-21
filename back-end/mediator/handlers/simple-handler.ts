@@ -1,10 +1,10 @@
-import { MContainer, ICommandHandler, ICommand, Result } from './index';
+import { Authorize, RegisterHandler, ICommandHandler, ICommand, Result } from '../index';
 
 export class SimpleCommand implements ICommand {
   declare partyId: number;
 }
 
-@MContainer.RegisterHandler
+@RegisterHandler
 export class SimpleCommandHandler implements ICommandHandler<SimpleCommand, Result> {
   handle(command: SimpleCommand): Result {
     console.log({ partyId: command.partyId });
