@@ -11,8 +11,9 @@ import authRoute from '@controllers/auth/route';
 import userRoute from '@controllers/user/route';
 import { BadRequestError, UnauthorizedError, NotFoundError } from '@controllers/exceptions';
 
-import { Mediator } from './mediator';
-import { SimpleCommand } from './mediator/simple-handler';
+import { mediator } from './mediator';
+import { SimpleCommand, ExampleAuthorizeCommand } from './mediator/handlers';
+import { AuthorizationBehavior } from './application/common/behaviours/authorization';
 
 console.log(ENV);
 
@@ -69,13 +70,9 @@ const errorLogger = (error: Error, request: Request, response: Response, next: N
   return response.sendStatus(500);
 };
 app.use(errorLogger);
-
-dbContext.connect().then(async () => {
-  // await initializeDb();
-  app.listen(ENV.PORT, () => console.log(`Server running on port ${ENV.PORT}`));
-});
-
-const mediator = new Mediator();
+mediator.use(new AuthorizationBehavior());
 const command = new SimpleCommand();
 command.partyId = 10;
-mediator.send(command);
+
+const authCommand = new ExampleAuthorizeCommand();
+mediator.send(authCommand);
