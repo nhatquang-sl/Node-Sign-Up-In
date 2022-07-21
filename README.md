@@ -5,6 +5,7 @@
   - [Front End](#front-end)
 - [Features](#features)
   - [Forgot Password](#forgot-password)
+  - [Salt Password](/back-end/docs/salt-password.md)
 
 # Scripts
 
