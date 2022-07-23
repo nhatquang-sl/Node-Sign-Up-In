@@ -22,10 +22,11 @@ class User
   declare id: CreationOptional<number>;
   declare emailAddress: string;
   declare password: string;
+  declare salt: string;
   declare firstName: string;
   declare lastName: string;
   declare securityStamp: string;
-  declare emailConfirmed: boolean | false;
+  emailConfirmed: boolean = false;
   declare roles?: NonAttribute<Role[]>;
   declare static associations: {
     roles: Association<User, Role>;
@@ -56,6 +57,7 @@ User.init(
     },
     emailAddress: { type: DataTypes.STRING, allowNull: false },
     password: { type: DataTypes.STRING, allowNull: false },
+    salt: { type: DataTypes.STRING(8), allowNull: false },
     firstName: {
       type: DataTypes.STRING,
       allowNull: false, // allowNull defaults to true
