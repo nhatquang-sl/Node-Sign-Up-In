@@ -47,21 +47,28 @@ const Register = (props: Props) => {
   }, [firstNameError, lastNameError, emailAddressError, passwordError]);
 
   const [values, setValues] = useState<State>({
-    // firstName: 'quang',
     firstName: '',
     firstNameError: '',
-    // lastName: 'nguyen',
     lastName: '',
     lastNameError: '',
-    // emailAddress: 'sunlight479@yahoo.com',
     emailAddress: '',
     emailAddressError: '',
-    // password: '123456x@X',
     password: '',
     passwordError: [],
     showPassword: false,
     submitted: false,
   });
+  // useEffect(() => {
+  //   if (!values.firstName && !values.lastName && !values.emailAddress && !values.password) {
+  //     setValues((v) => ({
+  //       ...v,
+  //       firstName: 'quang',
+  //       lastName: 'nguyen',
+  //       emailAddress: 'sunlight479@yahoo.com',
+  //       password: '123456x@X',
+  //     }));
+  //   }
+  // }, [values.firstName, values.lastName, values.emailAddress, values.password]);
 
   const handleChange = (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [prop]: event.target.value });

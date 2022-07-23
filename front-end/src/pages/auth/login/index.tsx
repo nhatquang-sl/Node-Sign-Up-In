@@ -31,14 +31,21 @@ const Login = (props: Props) => {
   const dispatch = useDispatch();
 
   const [values, setValues] = useState<State>({
-    // emailAddress: 'sunlight479@yahoo.com',
     emailAddress: '',
     emailAddressError: undefined,
-    // password: '12i3456x@X',
     password: '',
     passwordError: undefined,
     showPassword: false,
   });
+  // useEffect(() => {
+  //   if (!values.emailAddress && !values.password) {
+  //     setValues((v) => ({
+  //       ...v,
+  //       emailAddress: 'sunlight479@yahoo.com',
+  //       password: '123456x@X',
+  //     }));
+  //   }
+  // }, [values.emailAddress, values.password]);
 
   const { accessToken, emailConfirmed } = props.auth;
   const loginError = props.auth.error.login;

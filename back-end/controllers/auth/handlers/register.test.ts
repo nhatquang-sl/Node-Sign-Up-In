@@ -112,4 +112,6 @@ const validateTokens = async (regUser: any) => {
   const lhUser = await UserLoginHistory.findOne({ where: { userId: id } });
   expect(lhUser?.accessToken).toBe(accessToken);
   expect(lhUser?.refreshToken).toBe(refreshToken);
+
+  // TODO: need to decode and validate access and refresh tokens.
 };
