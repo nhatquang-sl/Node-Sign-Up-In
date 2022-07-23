@@ -25,7 +25,20 @@ router.post('/register', async (request: Request, response: Response) => {
   response.status(201).json(dto);
 });
 router.get('/register-confirm/:emailActiveCode', handleRegisterConfirm);
-router.post('/login', handleLogin);
+
+router.post('/login', async (request: Request, response: Response) => {
+  const req = request.body;
+  const ipAddress = request.ip;
+  const userAgent = request.get('User-Agent');
+  const { refreshToken, ...dto } = await handleLogin(req, ipAddress, userAgent);
+  response.cookie('jwt', refreshToken, {
+    httpOnly: true,
+    // sameSite: 'None',
+    // secure: true,
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+  response.status(201).json(dto);
+});
 
 router.post('/reset-password/send-email', async (request: Request, response: Response) => {
   const { emailAddress } = request.body;
