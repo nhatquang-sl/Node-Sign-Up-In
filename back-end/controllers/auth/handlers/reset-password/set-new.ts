@@ -16,13 +16,15 @@ const handleSetNew = async (token: string, newPassword: string) => {
     await validate(err, token);
 
     const userId = decoded.userId as number;
-    const password = await bcrypt.hash(newPassword, 10);
+    const ufp = await UserForgotPassword.findOne({
+      where: { userId, token, password: { [Op.is]: null } },
+      attributes: ['id', 'salt'],
+    });
+
+    const password = await bcrypt.hash(newPassword + ufp?.salt, 10);
     await Promise.all([
-      UserForgotPassword.update(
-        { password },
-        { where: { userId, token, password: { [Op.is]: null } } }
-      ),
-      User.update({ password }, { where: { id: userId } }),
+      UserForgotPassword.update({ password }, { where: { id: ufp?.id } }),
+      User.update({ password, salt: ufp?.salt }, { where: { id: userId } }),
     ]);
   });
   return { lastDate: new Date().getTime() };
