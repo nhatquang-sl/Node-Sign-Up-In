@@ -10,6 +10,7 @@ const userConfirmedEmail = {
   firstName: 'email',
   lastName: 'confirmed',
   password: '123456x@X',
+  salt: '12345678',
   emailConfirmed: true,
   securityStamp: '',
 };
@@ -20,6 +21,7 @@ const userNotConfirmEmail = {
   firstName: 'email',
   lastName: 'notConfirm',
   password: '123456x@X',
+  salt: '12345678',
   emailConfirmed: false,
   securityStamp: '',
 };

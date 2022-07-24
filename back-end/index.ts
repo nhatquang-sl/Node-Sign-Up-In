@@ -57,6 +57,7 @@ app.use('/user', userRoute);
 
 // https://medium.com/@utkuu/error-handling-in-express-js-and-express-async-errors-package-639c91ba3aa2
 const errorLogger = (error: Error, request: Request, response: Response, next: NextFunction) => {
+  console.log(error);
   const { message } = error;
   const data = JSON.parse(message);
   if (error instanceof BadRequestError) return response.status(400).json(data);
