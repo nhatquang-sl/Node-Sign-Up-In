@@ -5,6 +5,7 @@
   - [Front End](#front-end)
 - [Features](#features)
   - [Forgot Password](#forgot-password)
+  - [Salt Password](/back-end/docs/salt-password.md)
 
 # Scripts
 
@@ -96,3 +97,4 @@
 # Features
 
 ## [Forgot Password](https://www.notion.so/nhat-quang/Forgot-Password-2eb55da1b8d64a2985f85e17c2cf0ea4)
+## [Salt Password](/back-end/docs/salt-password.md)

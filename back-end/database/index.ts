@@ -3,6 +3,7 @@ import UserForgotPassword from '@database/models/user-forgot-password';
 import Role from '@database/models/role';
 import UserRole from '@database/models/user-role';
 import dbContext from './db-context';
+import UserLoginHistory from '@database/models/user-login-history';
 
 const initializeDb = async () => {
   // https://sequelize.org/docs/v6/core-concepts/model-basics/#model-synchronization
@@ -19,4 +20,4 @@ const initializeDb = async () => {
     ]);
   }
 };
-export { User, UserForgotPassword, UserRole, Role, dbContext, initializeDb };
+export { User, UserLoginHistory, UserForgotPassword, Role, UserRole, dbContext, initializeDb };

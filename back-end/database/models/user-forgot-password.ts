@@ -19,6 +19,7 @@ class UserForgotPassword
   declare ipAddress: string | null;
   declare userAgent: string | null;
   declare password: string | null;
+  declare salt: string;
   declare token: string;
   declare createdAt: CreationOptional<string>;
   declare updatedAt: CreationOptional<string>;
@@ -47,6 +48,7 @@ UserForgotPassword.init(
     password: {
       type: DataTypes.STRING,
     },
+    salt: { type: DataTypes.STRING(8), allowNull: false },
     token: {
       type: DataTypes.STRING,
     },

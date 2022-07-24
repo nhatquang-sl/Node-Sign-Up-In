@@ -11,6 +11,7 @@ let userConfirmedEmail = {
   firstName: 'email',
   lastName: 'confirmed',
   password: '123456x@X',
+  salt: '12345678',
   emailConfirmed: true,
   securityStamp: '',
 };
@@ -18,7 +19,7 @@ let userConfirmedEmail = {
 beforeAll(async () => {
   await dbContext.connect();
   await initializeDb();
-  userConfirmedEmail = await User.create(userConfirmedEmail);
+  userConfirmedEmail = await User.create(userConfirmedEmail as User);
 });
 
 test('validate new password', async () => {
@@ -45,11 +46,12 @@ test('set new password success', async () => {
     where: { userId: id, password: { [Op.is]: null } },
   });
   await handleSetNew(ufp?.token ?? '', 'P@ssw0rd1234');
-  const user = await User.findOne({ where: { id }, attributes: ['password'] });
+  const user = await User.findOne({ where: { id }, attributes: ['password', 'salt'] });
 
   // assert
+  expect(ufp?.salt).toBe(user?.salt);
   expect(lastDate).toBeGreaterThanOrEqual(startedAt);
   expect(lastDate).toBeLessThanOrEqual(endedAt);
-  const match = await bcrypt.compare('P@ssw0rd1234', user?.password ?? '');
+  const match = await bcrypt.compare('P@ssw0rd1234' + ufp?.salt, user?.password ?? '');
   expect(match).toBe(true);
 });

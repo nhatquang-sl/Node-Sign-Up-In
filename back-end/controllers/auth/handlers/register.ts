@@ -1,26 +1,24 @@
 import bcrypt from 'bcrypt';
-import { Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
 import jwt from 'jsonwebtoken';
 
 import { validateUserRegister } from '@libs/user/validate';
-import User from '@database/models/user';
-import Role from '@database/models/role';
-import UserRole from '@database/models/user-role';
-import UserLoginHistory from '@database/models/user-login-history';
+import { UserRegisterDto } from '@libs/user/dto';
+import { User, Role, UserRole, UserLoginHistory } from '@database';
+import { BadRequestError, ConflictError } from '@controllers/exceptions';
 
 import { sendActivateEmail } from '../utils';
 
-const handleRegister = async (request: Request, response: Response) => {
-  const req: User = request.body;
-
-  const { firstNameError, lastNameError, emailAddressError, passwordError } = validateUserRegister(
-    request.body
-  );
+const handleRegister = async (
+  req: UserRegisterDto,
+  ipAddress: string = '',
+  userAgent: string = ''
+) => {
+  const { firstNameError, lastNameError, emailAddressError, passwordError } =
+    validateUserRegister(req);
   if (firstNameError || lastNameError || emailAddressError || passwordError.length) {
-    return response
-      .status(400)
-      .json({ firstNameError, lastNameError, emailAddressError, passwordError });
+    const error = { firstNameError, lastNameError, emailAddressError };
+    throw new BadRequestError(passwordError.length > 0 ? { ...error, passwordError } : error);
   }
 
   // Check for duplicate usernames in the db
@@ -38,23 +36,22 @@ const handleRegister = async (request: Request, response: Response) => {
     ],
   });
 
-  if (duplicate)
-    return response.status(409).json({ emailAddressError: 'Duplicated email address!' }); // Conflict
+  if (duplicate) throw new ConflictError({ emailAddressError: 'Duplicated email address!' });
 
-  req.emailConfirmed = false;
   // encrypt the password
-  req.password = await bcrypt.hash(req.password, 10);
-  req.securityStamp = uuid();
+  const salt = uuid().split('-')[0];
+  const password = await bcrypt.hash(req.password + salt, 10);
+  const securityStamp = uuid();
 
   // Create and store the new user
   const result = await User.create({
     emailAddress: req.emailAddress,
     firstName: req.firstName,
     lastName: req.lastName,
-    password: req.password,
-    emailConfirmed: false,
-    securityStamp: req.securityStamp,
-  });
+    password,
+    salt,
+    securityStamp,
+  } as User);
 
   let userRoles = [{ userId: result.id, roleCode: 'user' }];
   if (req.emailAddress === 'sunlight479@yahoo.com')
@@ -62,19 +59,18 @@ const handleRegister = async (request: Request, response: Response) => {
 
   const userRole = await UserRole.bulkCreate(userRoles);
 
-  await sendActivateEmail(result, req.securityStamp);
+  await sendActivateEmail(result, securityStamp);
 
   const loginHistory = await UserLoginHistory.create({
     userId: result.id,
-    ipAddress: request.ip,
-    userAgent: request.get('User-Agent'),
+    ipAddress,
+    userAgent,
   });
 
   // Create JWTs
   const accessToken = jwt.sign(
     {
       userId: result.id,
-      emailConfirmed: req.emailConfirmed,
       sessionId: loginHistory.id,
     },
     process.env.ACCESS_TOKEN_SECRET as string,
@@ -91,16 +87,10 @@ const handleRegister = async (request: Request, response: Response) => {
   // Saving accessToken, refreshToken
   await UserLoginHistory.update({ accessToken, refreshToken }, { where: { id: loginHistory.id } });
 
-  response.cookie('jwt', refreshToken, {
-    httpOnly: true,
-    // sameSite: 'None',
-    // secure: true,
-    maxAge: 24 * 60 * 60 * 1000,
-  });
-
-  response.status(201).json({
+  return {
     ...User.getAuthDto(result, accessToken),
-  });
+    refreshToken,
+  };
 };
 
 export default handleRegister;

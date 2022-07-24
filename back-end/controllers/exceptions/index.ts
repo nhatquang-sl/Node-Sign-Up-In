@@ -18,3 +18,10 @@ export class UnauthorizedError extends Error {
     else super(JSON.stringify(err));
   }
 }
+
+export class ConflictError extends Error {
+  constructor(err: any) {
+    if (typeof err === 'string') super(JSON.stringify({ message: err }));
+    else super(JSON.stringify(err));
+  }
+}

@@ -1,17 +1,15 @@
-import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { UserLoginDto } from '@libs/user/dto';
 
-import User from '@database/models/user';
-import Role from '@database/models/role';
-import UserLoginHistory from '@database/models/user-login-history';
+import { User, Role, UserLoginHistory } from '@database';
+import { BadRequestError, UnauthorizedError } from '@controllers/exceptions';
 
-const handleLogin = async (request: Request, response: Response) => {
-  const req: UserLoginDto = request.body;
+const handleLogin = async (req: UserLoginDto, ipAddress: string = '', userAgent: string = '') => {
   // response.header('Access-Control-Request-Private-Network', 'true');
   if (!req.emailAddress || !req.password)
-    return response.status(400).json({ message: 'Username and password are required.' });
+    throw new BadRequestError({ message: 'Username and password are required.' });
+
   const foundUser = await User.findOne({
     where: { emailAddress: req.emailAddress },
     include: [
@@ -25,16 +23,16 @@ const handleLogin = async (request: Request, response: Response) => {
     ],
   });
   console.log({ roles: foundUser?.roles?.map((r) => r.code) });
-  if (!foundUser) return response.status(401).json({ message: 'Username or password invalid.' }); // Unauthorized
-  console.log(foundUser);
+  if (!foundUser) throw new UnauthorizedError({ message: 'Username or password invalid.' });
+
   // Evaluate password
-  const match = await bcrypt.compare(req.password, foundUser.password);
-  if (!match) return response.status(401).json({ message: 'Username or password invalid.' }); // Unauthorized
+  const match = await bcrypt.compare(req.password + foundUser.salt, foundUser.password);
+  if (!match) throw new UnauthorizedError({ message: 'Username or password invalid.' });
 
   const loginHistory = await UserLoginHistory.create({
     userId: foundUser.id,
-    ipAddress: request.ip,
-    userAgent: request.get('User-Agent'),
+    ipAddress,
+    userAgent,
   });
 
   // Create JWTs
@@ -59,16 +57,10 @@ const handleLogin = async (request: Request, response: Response) => {
   // Saving accessToken, refreshToken
   await UserLoginHistory.update({ accessToken, refreshToken }, { where: { id: loginHistory.id } });
 
-  response.cookie('jwt', refreshToken, {
-    httpOnly: true,
-    // sameSite: 'None',
-    // secure: true,
-    maxAge: 24 * 60 * 60 * 1000,
-  });
-
-  response.json({
+  return {
     ...User.getAuthDto(foundUser, accessToken),
-  });
+    refreshToken,
+  };
 };
 
 export default handleLogin;
