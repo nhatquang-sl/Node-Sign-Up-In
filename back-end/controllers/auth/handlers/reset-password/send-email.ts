@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { v4 as uuid } from 'uuid';
 import ENV from '@config';
 import { TIMESTAMP } from '@libs/constant';
 import { User, UserForgotPassword } from '@database';
@@ -48,6 +49,7 @@ const handleSendEmail = async (
     token: resetPasswordToken,
     ipAddress,
     userAgent,
+    salt: uuid().split('-')[0],
   });
 
   return { lastDate: new Date(ufp.createdAt).getTime() };

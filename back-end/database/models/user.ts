@@ -26,7 +26,7 @@ class User
   declare firstName: string;
   declare lastName: string;
   declare securityStamp: string;
-  emailConfirmed: boolean = false;
+  declare emailConfirmed: boolean;
   declare roles?: NonAttribute<Role[]>;
   declare static associations: {
     roles: Association<User, Role>;
