@@ -1,6 +1,6 @@
 import { ICommand, ICommandHandler, Result, IMediatorMiddleware } from './interfaces';
 import { container } from './container';
-import { UnauthorizedError } from '../application/common/exceptions';
+import { UnauthorizedError } from '../common/exceptions';
 
 export class Mediator {
   private middlewares: IMediatorMiddleware[] = [];

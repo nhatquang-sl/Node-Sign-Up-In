@@ -7,27 +7,14 @@
       "@config": [
         "config"
       ],
-      "@config/*": [
-        "config/*"
-      ],
-      "@services/*": [
-        "services/*"
-      ],
-      "@database": [
-        "database"
-      ],
-      "@database/*": [
-        "database/*"
-      ],
-      "@controllers/*": [
-        "controllers/*"
-      ],
-      "@middleware/*": [
-        "middleware/*"
-      ],
-      "@libs/*": [
-        "../front-end/src/shared/*"
-      ]
+      "@config/*": ["config/*"],
+      "@application/*": ["application/*"],
+      "@services/*": ["services/*"],
+      "@database": ["database"],
+      "@database/*": ["database/*"],
+      "@controllers/*": ["controllers/*"],
+      "@middleware/*": ["middleware/*"],
+      "@libs/*": ["../front-end/src/shared/*"]
     },
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

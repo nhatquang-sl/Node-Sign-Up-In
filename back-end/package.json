@@ -45,6 +45,7 @@
   },
   "_moduleAliases": {
     "@config": "./config",
+    "@application": "./application",
     "@services": "./services",
     "@database": "./database",
     "@controllers": "./controllers",

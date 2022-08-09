@@ -6,14 +6,16 @@ import cors from 'cors';
 import ENV from '@config';
 import corsOptions from '@config/cors-options';
 import { dbContext, initializeDb } from '@database';
+import jwt from 'jsonwebtoken';
 
 import authRoute from '@controllers/auth/route';
 import userRoute from '@controllers/user/route';
 import { BadRequestError, UnauthorizedError, NotFoundError } from '@controllers/exceptions';
 
-import { mediator } from './mediator';
-import { SimpleCommand, ExampleAuthorizeCommand } from './mediator/handlers';
-import { AuthorizationBehavior } from './application/common/behaviours/authorization';
+import { mediator } from '@application/mediator';
+import { SimpleCommand, ExampleAuthorizeCommand } from '@application/mediator/handlers';
+import { AuthorizeBehavior } from '@application/common/behaviours/authorize';
+import { LogBehavior } from '@application/common/behaviours/log';
 
 console.log(ENV);
 
@@ -70,9 +72,22 @@ const errorLogger = (error: Error, request: Request, response: Response, next: N
   return response.sendStatus(500);
 };
 app.use(errorLogger);
-mediator.use(new AuthorizationBehavior());
+mediator.use(new LogBehavior());
+mediator.use(new AuthorizeBehavior());
 const command = new SimpleCommand();
 command.partyId = 10;
 
 const authCommand = new ExampleAuthorizeCommand();
+
+const accessToken = jwt.sign(
+  {
+    userId: 1,
+    emailConfirmed: false,
+    sessionId: 10,
+    roles: [],
+  },
+  process.env.ACCESS_TOKEN_SECRET as string,
+  { expiresIn: '1d' } // 30s
+);
+authCommand.accessToken = accessToken;
 mediator.send(authCommand);
