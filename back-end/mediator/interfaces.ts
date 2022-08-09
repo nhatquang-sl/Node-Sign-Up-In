@@ -12,6 +12,6 @@ export interface IContainer {
 }
 
 export interface IMediatorMiddleware {
-  preProcess: (request: ICommand) => Promise<void>;
+  preProcess: (request: ICommand) => Promise<any>;
   postProcess: (request: ICommand, response: Result) => Promise<void>;
 }

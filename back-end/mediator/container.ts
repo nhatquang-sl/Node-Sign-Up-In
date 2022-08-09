@@ -16,7 +16,7 @@ export function RegisterHandler<T>(handler: { new (): T }): void {
 }
 
 // https://dev.to/danywalls/decorators-in-typescript-with-example-part-1-m0f
-export function Authorize(roles: string[]) {
+export function Authorize(roles: string[] = []) {
   return function (constructor: Function) {
     const handlerName = constructor.name.toString();
     if (handlerName) container.handlers[handlerName] = constructor;

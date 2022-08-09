@@ -15,7 +15,10 @@ export class Mediator {
     const handler: ICommandHandler<ICommand, Result> = new handlerClass();
 
     try {
-      this.middlewares.forEach(async (m) => await m.preProcess(command));
+      for (const m of this.middlewares) {
+        const result = await m.preProcess(command);
+        if (result !== undefined) console.log({ result });
+      }
     } catch (err) {
       console.log('---------------------------');
       if (err instanceof UnauthorizedError) {
