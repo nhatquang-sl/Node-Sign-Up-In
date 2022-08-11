@@ -4,14 +4,13 @@ export class AuthorizeCommand implements ICommand {
 }
 export type Result = void | string | {};
 export interface ICommandHandler<T extends ICommand, Result> {
-  handle: (command: T) => Result;
+  handle: (command: T) => Promise<Result>;
 }
 
 export interface IContainer {
   readonly handlers: { [id: string]: Function };
 }
 
-export interface IMediatorMiddleware {
-  preProcess: (request: ICommand) => Promise<any>;
-  postProcess: (request: ICommand, response: Result) => Promise<void>;
+export interface IPipelineBehavior {
+  handle: (request: ICommand, next: () => Promise<any>) => Promise<any>;
 }

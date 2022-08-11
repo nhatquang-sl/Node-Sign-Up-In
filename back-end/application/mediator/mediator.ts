@@ -1,12 +1,23 @@
-import { ICommand, ICommandHandler, Result, IMediatorMiddleware } from './interfaces';
+import { ICommand, ICommandHandler, Result, IPipelineBehavior } from './interfaces';
 import { container } from './container';
 import { UnauthorizedError } from '../common/exceptions';
 
 export class Mediator {
-  private middlewares: IMediatorMiddleware[] = [];
+  private pipelineBehaviors: IPipelineBehavior[] = [];
 
-  public use(middleware: IMediatorMiddleware): void {
-    this.middlewares.push(middleware);
+  public addPipelineBehavior(pipelineBehavior: IPipelineBehavior): void {
+    this.pipelineBehaviors.push(pipelineBehavior);
+  }
+
+  private async executePipeline(
+    i: number,
+    command: ICommand,
+    next: () => Promise<any>
+  ): Promise<any> {
+    const behaviors = this.pipelineBehaviors;
+    if (i == 0) return await next();
+    const next1 = async () => await behaviors[i - 1].handle(command, next);
+    return await this.executePipeline(i - 1, command, next1);
   }
 
   public async send(command: ICommand): Promise<Result> {
@@ -15,21 +26,16 @@ export class Mediator {
     const handler: ICommandHandler<ICommand, Result> = new handlerClass();
 
     try {
-      for (const m of this.middlewares) {
-        const result = await m.preProcess(command);
-        if (result !== undefined) console.log({ result });
-      }
+      const behaviors = this.pipelineBehaviors;
+      const next = async () => await handler.handle(command);
+      return await this.executePipeline(behaviors.length, command, next);
     } catch (err) {
-      console.log('---------------------------');
+      console.log('--------------------------- EXCEPTION ---------------------------');
+      console.log({ err });
       if (err instanceof UnauthorizedError) {
         console.log('---error instanceof UnauthorizedError');
       }
     }
-
-    if (handlerClass.prototype.authorizeRoles?.length > 0)
-      console.log({ authorizeRoles: handlerClass.prototype.authorizeRoles });
-
-    if (handler.handle) handler.handle(command);
   }
 }
 

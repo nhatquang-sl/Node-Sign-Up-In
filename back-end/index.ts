@@ -15,7 +15,6 @@ import { BadRequestError, UnauthorizedError, NotFoundError } from '@controllers/
 import { mediator } from '@application/mediator';
 import { SimpleCommand, ExampleAuthorizeCommand } from '@application/mediator/handlers';
 import { AuthorizeBehavior } from '@application/common/behaviours/authorize';
-import { LogBehavior } from '@application/common/behaviours/log';
 
 console.log(ENV);
 
@@ -72,8 +71,7 @@ const errorLogger = (error: Error, request: Request, response: Response, next: N
   return response.sendStatus(500);
 };
 app.use(errorLogger);
-mediator.use(new LogBehavior());
-mediator.use(new AuthorizeBehavior());
+mediator.addPipelineBehavior(new AuthorizeBehavior());
 const command = new SimpleCommand();
 command.partyId = 10;
 
