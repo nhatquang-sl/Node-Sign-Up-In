@@ -35,6 +35,7 @@ export class Mediator {
       if (err instanceof UnauthorizedError) {
         console.log('---error instanceof UnauthorizedError');
       }
+      throw err;
     }
   }
 }

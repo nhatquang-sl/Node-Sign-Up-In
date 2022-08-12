@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import ENV from '@config';
 import UserActivity from '@database/models/user-activity';
 import { ICommand, Result, container, IPipelineBehavior } from '@application/mediator';
-import { UnauthorizedError } from '../exceptions';
+import { UnauthorizedError, ForbiddenError } from '../exceptions';
 
 export class AuthorizeBehavior implements IPipelineBehavior {
   handle = async (request: ICommand, next: () => Promise<any>): Promise<any> => {
@@ -25,7 +25,7 @@ export class AuthorizeBehavior implements IPipelineBehavior {
           requiredRoles?.length &&
           !requiredRoles.filter((r: string) => decoded.roles.includes(r)).length
         ) {
-          reject(new UnauthorizedError());
+          reject(new ForbiddenError());
         }
         console.log({ decoded });
         resolve(decoded);
