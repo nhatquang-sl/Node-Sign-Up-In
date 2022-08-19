@@ -1,4 +1,10 @@
-import { ICommand, ICommandHandler, Result, IPipelineBehavior } from './interfaces';
+import {
+  ICommand,
+  ICommandValidator,
+  ICommandHandler,
+  Result,
+  IPipelineBehavior,
+} from './interfaces';
 import { container } from './container';
 import { UnauthorizedError } from '../common/exceptions';
 
@@ -25,9 +31,15 @@ export class Mediator {
     const handlerClass: any = container.handlers[`${cmdName}Handler`];
     const handler: ICommandHandler<ICommand, Result> = new handlerClass();
 
+    const validatorClass: any = container.validators[`${cmdName}Validator`];
+    const validator: ICommandValidator<ICommand> = new validatorClass();
+
     try {
       const behaviors = this.pipelineBehaviors;
-      const next = async () => await handler.handle(command);
+      const next = async () => {
+        await validator.validate(command);
+        return await handler.handle(command);
+      };
       return await this.executePipeline(behaviors.length, command, next);
     } catch (err) {
       console.log('--------------------------- EXCEPTION ---------------------------');
