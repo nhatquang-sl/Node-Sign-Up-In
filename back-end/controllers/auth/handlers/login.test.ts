@@ -1,6 +1,6 @@
 import { UserLoginDto } from '@libs/user/dto';
 import { dbContext, initializeDb, User, UserLoginHistory, Role } from '@database';
-import { BadRequestError, UnauthorizedError } from '@application/exceptions';
+import { BadRequestError, UnauthorizedError } from '@application/common/exceptions';
 import handleRegister from './register';
 import handleLogin from './login';
 

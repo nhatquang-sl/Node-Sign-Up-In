@@ -5,7 +5,7 @@ import ENV from '@config';
 import { User, UserForgotPassword } from '@database';
 import { validatePassword } from '@libs/user/validate';
 
-import { UnauthorizedError, BadRequestError } from '@application/exceptions';
+import { UnauthorizedError, BadRequestError } from '@application/common/exceptions';
 
 const handleSetNew = async (token: string, newPassword: string) => {
   const passwordError = validatePassword(newPassword ?? '');

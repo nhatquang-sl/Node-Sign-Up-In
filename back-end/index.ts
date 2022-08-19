@@ -6,15 +6,10 @@ import cors from 'cors';
 import ENV from '@config';
 import corsOptions from '@config/cors-options';
 import { dbContext, initializeDb } from '@database';
-import jwt from 'jsonwebtoken';
 
 import authRoute from '@controllers/auth/route';
 import userRoute from '@controllers/user/route';
-import { BadRequestError, UnauthorizedError, NotFoundError } from '@application/exceptions';
-
-import { mediator } from '@application/mediator';
-import { SimpleCommand, ExampleAuthorizeCommand } from '@application/mediator/handlers';
-import { AuthorizeBehavior } from '@application/common/behaviours/authorize';
+import { BadRequestError, UnauthorizedError, NotFoundError } from '@application/common/exceptions';
 
 console.log(ENV);
 
@@ -71,21 +66,8 @@ const errorLogger = (error: Error, request: Request, response: Response, next: N
   return response.sendStatus(500);
 };
 app.use(errorLogger);
-mediator.addPipelineBehavior(new AuthorizeBehavior());
-const command = new SimpleCommand();
-command.partyId = 10;
 
-const authCommand = new ExampleAuthorizeCommand();
-
-const accessToken = jwt.sign(
-  {
-    userId: 1,
-    emailConfirmed: false,
-    sessionId: 10,
-    roles: [],
-  },
-  process.env.ACCESS_TOKEN_SECRET as string,
-  { expiresIn: '1d' } // 30s
-);
-authCommand.accessToken = accessToken;
-mediator.send(authCommand);
+dbContext.connect().then(async () => {
+  // await initializeDb();
+  app.listen(ENV.PORT, () => console.log(`Server running on port ${ENV.PORT}`));
+});

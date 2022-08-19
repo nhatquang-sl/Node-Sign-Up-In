@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { UserLoginDto } from '@libs/user/dto';
 
 import { User, Role, UserLoginHistory } from '@database';
-import { BadRequestError, UnauthorizedError } from '@application/exceptions';
+import { BadRequestError, UnauthorizedError } from '@application/common/exceptions';
 
 const handleLogin = async (req: UserLoginDto, ipAddress: string = '', userAgent: string = '') => {
   // response.header('Access-Control-Request-Private-Network', 'true');

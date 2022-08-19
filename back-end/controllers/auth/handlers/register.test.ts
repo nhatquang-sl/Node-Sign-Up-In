@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { dbContext, initializeDb, User, UserLoginHistory, Role } from '@database';
-import { BadRequestError, ConflictError } from '@application/exceptions';
+import { BadRequestError, ConflictError } from '@application/common/exceptions';
 import handleRegister from './register';
 
 const user = {
