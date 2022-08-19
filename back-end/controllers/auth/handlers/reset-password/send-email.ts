@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid';
 import ENV from '@config';
 import { TIMESTAMP } from '@libs/constant';
 import { User, UserForgotPassword } from '@database';
-import { NotFoundError, BadRequestError } from '@controllers/exceptions';
+import { NotFoundError, BadRequestError } from '@application/exceptions';
 import { validateEmailAddress } from '@libs/user/validate';
 import { sendResetPasswordEmail } from '../../utils';
 import { Op } from 'sequelize';

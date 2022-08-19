@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import { validateUserRegister } from '@libs/user/validate';
 import { UserRegisterDto } from '@libs/user/dto';
 import { User, Role, UserRole, UserLoginHistory } from '@database';
-import { BadRequestError, ConflictError } from '@controllers/exceptions';
+import { BadRequestError, ConflictError } from '@application/exceptions';
 
 import { sendActivateEmail } from '../utils';
 

@@ -10,7 +10,7 @@ import jwt from 'jsonwebtoken';
 
 import authRoute from '@controllers/auth/route';
 import userRoute from '@controllers/user/route';
-import { BadRequestError, UnauthorizedError, NotFoundError } from '@controllers/exceptions';
+import { BadRequestError, UnauthorizedError, NotFoundError } from '@application/exceptions';
 
 import { mediator } from '@application/mediator';
 import { SimpleCommand, ExampleAuthorizeCommand } from '@application/mediator/handlers';

@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { dbContext, initializeDb, User, UserForgotPassword } from '@database';
-import { UnauthorizedError, BadRequestError } from '@controllers/exceptions';
+import { UnauthorizedError, BadRequestError } from '@application/exceptions';
 import handleSendEmail from './send-email';
 import handleSetNew from './set-new';
 import { Op } from 'sequelize';

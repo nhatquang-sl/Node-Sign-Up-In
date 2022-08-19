@@ -1,6 +1,6 @@
 import { Op } from 'sequelize';
 import { dbContext, initializeDb, User, UserForgotPassword } from '@database';
-import { NotFoundError, BadRequestError } from '@controllers/exceptions';
+import { NotFoundError, BadRequestError } from '@application/exceptions';
 import { TIMESTAMP } from '@libs/constant';
 import handleSendEmail from './send-email';
 
