@@ -7,7 +7,7 @@ export class TestCommand implements ICommand {
   }
   declare partyId: number;
 }
-// console.log('test handler');
+
 @RegisterHandler
 export class TestCommandHandler implements ICommandHandler<TestCommand, Result> {
   async handle(command: TestCommand): Promise<Result> {
