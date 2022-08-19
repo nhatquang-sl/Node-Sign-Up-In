@@ -10,14 +10,14 @@ interface UserAuthDto extends UserDto {
   accessToken: string;
 }
 
-interface UserLoginDto {
-  emailAddress: string;
-  password: string;
+class UserLoginDto {
+  declare emailAddress: string;
+  declare password: string;
 }
 
-interface UserRegisterDto extends UserLoginDto {
-  firstName: string;
-  lastName: string;
+export class UserRegisterDto extends UserLoginDto {
+  declare firstName: string;
+  declare lastName: string;
 }
 
 export interface UserSession {
@@ -40,4 +40,4 @@ export interface UserForgotPasswordDto {
   updatedAt: string;
 }
 
-export type { UserDto, UserAuthDto, UserLoginDto, UserRegisterDto };
+export type { UserDto, UserAuthDto, UserLoginDto };

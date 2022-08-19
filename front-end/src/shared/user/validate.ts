@@ -1,10 +1,10 @@
 import { UserRegisterDto } from './dto';
 
-const validateFirstName = (firstName: string) => {
+const validateFirstName = (firstName: string = '') => {
   if (firstName?.length < 2) return 'First name must be at least 2 characters';
 };
 
-const validateLastName = (lastName: string) => {
+const validateLastName = (lastName: string = '') => {
   if (lastName?.length < 2) return 'Last name must be at least 2 characters';
 };
 
@@ -13,7 +13,7 @@ const validateEmailAddress = (emailAddress: string) => {
     return 'Email address is invalid';
 };
 
-const validatePassword = (password: string) => {
+const validatePassword = (password: string = '') => {
   let errors = [];
   if (!/[a-z]/.test(password)) errors.push('Password contains at least one lower character');
   if (!/[A-Z]/.test(password)) errors.push('Password contains at least one upper character');
