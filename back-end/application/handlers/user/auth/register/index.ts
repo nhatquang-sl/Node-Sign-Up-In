@@ -1,6 +1,9 @@
+import bcrypt from 'bcrypt';
+import { v4 as uuid } from 'uuid';
+import jwt from 'jsonwebtoken';
 import { validateUserRegister } from '@libs/user/validate';
-import { UserRegisterDto } from '@libs/user/dto';
-import { delay } from '@application/common/utils';
+import { UserRegisterDto, UserAuthDto } from '@libs/user/dto';
+import { delay, sendActivateEmail } from '@application/common/utils';
 import { BadRequestError, ConflictError } from '@application/common/exceptions';
 import {
   RegisterHandler,
@@ -17,11 +20,69 @@ export class UserRegisterCommand extends UserRegisterDto implements ICommand {
   ipAddress: string = '';
   userAgent: string = '';
 }
-console.log('=======================================================register');
+
+export class UserRegisterResult extends UserAuthDto {
+  declare refreshToken: string;
+}
+
 @RegisterHandler
-export class UserRegisterCommandHandler implements ICommandHandler<UserRegisterCommand, Result> {
-  async handle(command: UserRegisterCommand): Promise<Result> {
-    await delay(0);
+export class UserRegisterCommandHandler
+  implements ICommandHandler<UserRegisterCommand, UserRegisterResult>
+{
+  async handle(command: UserRegisterCommand): Promise<UserRegisterResult> {
+    const { ipAddress, userAgent } = command;
+    // encrypt the password
+    const salt = uuid().split('-')[0];
+    const password = await bcrypt.hash(command.password + salt, 10);
+    const securityStamp = uuid();
+
+    // Create and store the new user
+    const result = await User.create({
+      emailAddress: command.emailAddress,
+      firstName: command.firstName,
+      lastName: command.lastName,
+      password,
+      salt,
+      securityStamp,
+    } as User);
+
+    let userRoles = [{ userId: result.id, roleCode: 'user' }];
+    if (command.emailAddress === 'sunlight479@yahoo.com')
+      userRoles.push({ userId: result.id, roleCode: 'admin' });
+    await UserRole.bulkCreate(userRoles);
+
+    // Create JWTs
+    const accessToken = jwt.sign(
+      {
+        userId: result.id,
+      },
+      process.env.ACCESS_TOKEN_SECRET as string,
+      { expiresIn: '1d' }
+    );
+
+    const refreshToken = jwt.sign(
+      {
+        userId: result.id,
+      },
+      process.env.REFRESH_TOKEN_SECRET as string,
+      { expiresIn: '1d' }
+    );
+
+    await Promise.all([
+      UserLoginHistory.create({
+        userId: result.id,
+        ipAddress,
+        userAgent,
+        accessToken,
+        refreshToken,
+      }),
+      sendActivateEmail(result, securityStamp),
+    ]);
+
+    return {
+      ...User.getAuthDto(result, accessToken),
+      refreshToken,
+    } as UserRegisterResult;
   }
 }
 

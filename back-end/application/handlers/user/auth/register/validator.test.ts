@@ -1,5 +1,4 @@
-import bcrypt from 'bcrypt';
-import { dbContext, initializeDb, User, UserLoginHistory, Role } from '@database';
+import { dbContext, initializeDb, User } from '@database';
 import { BadRequestError, ConflictError } from '@application/common/exceptions';
 import { mediator } from '@application/mediator';
 import { UserRegisterCommand } from '.';
