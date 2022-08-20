@@ -11,7 +11,7 @@ import {
   ICommand,
 } from '@application/mediator';
 
-import { User, Role, UserRole, UserLoginHistory } from '@database';
+import { User, Role, UserLoginHistory } from '@database';
 
 export class UserLoginCommand extends UserLoginDto implements ICommand {
   ipAddress: string = '';
