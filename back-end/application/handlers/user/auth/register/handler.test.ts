@@ -21,6 +21,8 @@ test('create a new user success', async () => {
   command.firstName = user.firstName;
   command.lastName = user.lastName;
   command.password = user.password;
+  command.ipAddress = 'ipAddress';
+  command.userAgent = 'userAgent';
   const regUser = (await mediator.send(command)) as UserRegisterResult;
 
   const { id, firstName, lastName, emailAddress, emailConfirmed } = regUser;
@@ -31,7 +33,7 @@ test('create a new user success', async () => {
   expect(emailAddress).toBe(user.emailAddress);
   expect(emailConfirmed).toBe(false);
 
-  await Promise.all([validateUser(regUser), validateTokens(regUser)]);
+  await Promise.all([validateUser(regUser), validateTokens(command, regUser)]);
 });
 
 const validateUser = async (regUser: UserRegisterResult) => {
@@ -65,11 +67,13 @@ const validateUser = async (regUser: UserRegisterResult) => {
 };
 
 // validate tokens in database
-const validateTokens = async (regUser: any) => {
+const validateTokens = async (command: UserRegisterCommand, regUser: UserRegisterResult) => {
   const { id, accessToken, refreshToken } = regUser;
   const lhUser = await UserLoginHistory.findOne({ where: { userId: id } });
   expect(lhUser?.accessToken).toBe(accessToken);
   expect(lhUser?.refreshToken).toBe(refreshToken);
+  expect(lhUser?.ipAddress).toBe(command.ipAddress);
+  expect(lhUser?.userAgent).toBe(command.userAgent);
 
   // TODO: need to decode and validate access and refresh tokens.
 };
