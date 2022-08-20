@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid';
 import jwt from 'jsonwebtoken';
 import { validateUserRegister } from '@libs/user/validate';
 import { UserRegisterDto, UserAuthDto } from '@libs/user/dto';
-import { delay, sendActivateEmail } from '@application/common/utils';
+import { sendActivateEmail } from '@application/common/utils';
 import { BadRequestError, ConflictError } from '@application/common/exceptions';
 import {
   RegisterHandler,
@@ -11,10 +11,9 @@ import {
   ICommandHandler,
   ICommandValidator,
   ICommand,
-  Result,
 } from '@application/mediator';
 
-import { User, Role, UserRole, UserLoginHistory } from '@database';
+import { User, UserRole, UserLoginHistory } from '@database';
 
 export class UserRegisterCommand extends UserRegisterDto implements ICommand {
   ipAddress: string = '';

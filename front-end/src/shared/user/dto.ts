@@ -10,7 +10,7 @@ export class UserAuthDto extends UserDto {
   declare accessToken: string;
 }
 
-class UserLoginDto {
+export class UserLoginDto {
   declare emailAddress: string;
   declare password: string;
 }

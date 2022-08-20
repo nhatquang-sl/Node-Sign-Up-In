@@ -2,6 +2,8 @@ import ENV from '@config';
 import { sendEmail } from '@services/email';
 import { UserDto } from '@libs/user/dto';
 
+export * from './jwt';
+
 export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const sendActivateEmail = async (user: UserDto, securityStamp: string) => {
