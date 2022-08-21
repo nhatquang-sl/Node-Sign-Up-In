@@ -28,27 +28,26 @@ beforeAll(async () => {
   } as User);
 });
 
-test('missing email address', async () => {
-  let invalidUser = new UserLoginCommand();
-  invalidUser.emailAddress = user.emailAddress;
+test('email address missing', async () => {
+  let command = new UserLoginCommand(user);
+  command.emailAddress = '';
 
-  const rejects = expect(mediator.send(invalidUser)).rejects;
+  const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(BadRequestError);
   await rejects.toThrow(JSON.stringify({ message: 'Username and password are required' }));
 });
 
-test('missing password', async () => {
-  let invalidUser = new UserLoginCommand();
-  invalidUser.password = user.password;
+test('password missing', async () => {
+  let loginCommand = new UserLoginCommand(user);
+  loginCommand.password = '';
 
-  const rejects = expect(mediator.send(invalidUser)).rejects;
+  const rejects = expect(mediator.send(loginCommand)).rejects;
   await rejects.toThrow(BadRequestError);
   await rejects.toThrow(JSON.stringify({ message: 'Username and password are required' }));
 });
 
-test('user does not exist', async () => {
-  let loginCommand = new UserLoginCommand();
-  loginCommand.password = user.password;
+test('user not found', async () => {
+  let loginCommand = new UserLoginCommand(user);
   loginCommand.emailAddress = 'a@b.c';
 
   const rejects = expect(mediator.send(loginCommand)).rejects;
@@ -57,8 +56,7 @@ test('user does not exist', async () => {
 });
 
 test('password invalid', async () => {
-  let loginCommand = new UserLoginCommand();
-  loginCommand.emailAddress = user.emailAddress;
+  let loginCommand = new UserLoginCommand(user);
   loginCommand.password = user.password + '1';
 
   const rejects = expect(mediator.send(loginCommand)).rejects;
@@ -67,9 +65,7 @@ test('password invalid', async () => {
 });
 
 test('login success', async () => {
-  let loginCommand = new UserLoginCommand();
-  loginCommand.emailAddress = user.emailAddress;
-  loginCommand.password = user.password;
+  let loginCommand = new UserLoginCommand(user);
   const res = (await mediator.send(loginCommand)) as UserLoginResult;
   const { id, firstName, lastName, emailAddress, emailConfirmed } = res;
 
