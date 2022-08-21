@@ -32,12 +32,14 @@ export class Mediator {
     const handler: ICommandHandler<ICommand, Result> = new handlerClass();
 
     const validatorClass: any = container.validators[`${cmdName}Validator`];
-    const validator: ICommandValidator<ICommand> = new validatorClass();
 
     try {
       const behaviors = this.pipelineBehaviors;
       const next = async () => {
-        await validator.validate(command);
+        if (validatorClass) {
+          const validator: ICommandValidator<ICommand> = new validatorClass();
+          await validator.validate(command);
+        }
         return await handler.handle(command);
       };
       return await this.executePipeline(behaviors.length, command, next);
