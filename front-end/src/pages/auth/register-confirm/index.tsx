@@ -10,20 +10,20 @@ import { closeSidebarAndHeader } from 'store/settings/actions';
 import { Props, mapStateToProps, mapDispatchToProps } from './types';
 
 const RegisterConfirm = (props: Props) => {
-  const { activateCode } = useParams();
+  const { activationCode } = useParams();
   const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  console.log(activateCode);
+  console.log(activationCode);
   useEffect(() => {
-    if (activateCode) {
+    if (activationCode) {
       dispatch(logOut());
       dispatch(closeSidebarAndHeader());
       setSubmitted(true);
-      dispatch(registerConfirm(activateCode));
+      dispatch(registerConfirm(activationCode));
     }
-  }, [activateCode, navigate, dispatch]);
+  }, [activationCode, navigate, dispatch]);
 
   useEffect(() => {
     console.log({ init: submitted, pending: props.auth.pendingRegisterConfirm() });

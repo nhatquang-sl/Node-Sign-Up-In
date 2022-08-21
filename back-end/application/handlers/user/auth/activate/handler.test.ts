@@ -30,7 +30,7 @@ beforeAll(async () => {
 });
 
 test('activation code missing', async () => {
-  const command = new UserActivateCommand();
+  const command = new UserActivateCommand('');
 
   const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(BadRequestError);
@@ -38,22 +38,22 @@ test('activation code missing', async () => {
 });
 
 test('user not found', async () => {
-  const command = new UserActivateCommand();
-  command.emailActiveCode = '123';
+  const command = new UserActivateCommand('123');
+
   const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(BadRequestError);
   await rejects.toThrow(JSON.stringify({ message: 'Activation code is invalid format' }));
 });
 
 test('user not found', async () => {
-  const command = new UserActivateCommand();
-  command.emailActiveCode = Buffer.from(
+  const activationCode = Buffer.from(
     JSON.stringify({
       id: 0,
       securityStamp: user.securityStamp,
       timestamp: new Date().getTime(),
     })
   ).toString('base64');
+  const command = new UserActivateCommand(activationCode);
 
   const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(NotFoundError);
@@ -61,14 +61,14 @@ test('user not found', async () => {
 });
 
 test('token invalid', async () => {
-  const command = new UserActivateCommand();
-  command.emailActiveCode = Buffer.from(
+  const activationCode = Buffer.from(
     JSON.stringify({
       id: 1,
       securityStamp: user.securityStamp + '1',
       timestamp: new Date().getTime(),
     })
   ).toString('base64');
+  const command = new UserActivateCommand(activationCode);
 
   const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(BadRequestError);
@@ -76,14 +76,14 @@ test('token invalid', async () => {
 });
 
 test('token expired', async () => {
-  const command = new UserActivateCommand();
-  command.emailActiveCode = Buffer.from(
+  const activationCode = Buffer.from(
     JSON.stringify({
       id: 1,
       securityStamp: user.securityStamp,
       timestamp: new Date().getTime() - 1000 * 60 * 6,
     })
   ).toString('base64');
+  const command = new UserActivateCommand(activationCode);
 
   const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(BadRequestError);
@@ -91,14 +91,14 @@ test('token expired', async () => {
 });
 
 test('activate success', async () => {
-  const command = new UserActivateCommand();
-  command.emailActiveCode = Buffer.from(
+  const activationCode = Buffer.from(
     JSON.stringify({
       id: 1,
       securityStamp: user.securityStamp,
       timestamp: new Date().getTime(),
     })
   ).toString('base64');
+  const command = new UserActivateCommand(activationCode);
 
   const userNotActivated = await User.findOne({ where: { id: 1 } });
   expect(userNotActivated?.emailConfirmed).toBe(false);
