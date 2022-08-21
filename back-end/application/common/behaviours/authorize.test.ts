@@ -5,7 +5,9 @@ import {
   mediator,
   Authorize,
   AuthorizeCommand,
+  ICommand,
   ICommandHandler,
+  RegisterHandler,
   Result,
 } from '@application/mediator';
 import { AuthorizeBehavior } from './authorize';
@@ -45,23 +47,33 @@ export class TestRolesCommandHandler implements ICommandHandler<TestRolesCommand
   }
 }
 
+class TestAnonymousCommand implements ICommand {}
+
+@RegisterHandler
+class TestAnonymousCommandHandler implements ICommandHandler<TestAnonymousCommand, Result> {
+  async handle(command: TestAnonymousCommand): Promise<Result> {
+    await delay(0);
+    return `message from TestAnonymousCommand`;
+  }
+}
+
 beforeAll(() => {
   mediator.addPipelineBehavior(new AuthorizeBehavior());
 });
 
-test('missing access token', async () => {
+test('access token missing', async () => {
   const rejects = expect(mediator.send(new TestCommand(10))).rejects;
   await rejects.toThrow(UnauthorizedError);
   await rejects.toThrow(JSON.stringify({ message: 'Invalid Token' }));
 });
 
-test('invalid access token', async () => {
+test('access token invalid', async () => {
   const rejects = expect(mediator.send(new TestCommand(10, 'fake access token'))).rejects;
   await rejects.toThrow(UnauthorizedError);
   await rejects.toThrow(JSON.stringify({ message: 'Invalid Token' }));
 });
 
-test('valid access token', async () => {
+test('access token valid', async () => {
   const accessToken = jwt.sign(
     {
       userId: 1,
@@ -77,7 +89,7 @@ test('valid access token', async () => {
   expect(result).toEqual('message from TestCommandHandler with partyId: 10');
 });
 
-test('missing role', async () => {
+test('role missing', async () => {
   const accessToken = jwt.sign(
     {
       userId: 1,
@@ -94,7 +106,7 @@ test('missing role', async () => {
   await rejects.toThrow(JSON.stringify({ message: 'Forbidden' }));
 });
 
-test('invalid role', async () => {
+test('role invalid', async () => {
   const accessToken = jwt.sign(
     {
       userId: 1,
@@ -111,7 +123,7 @@ test('invalid role', async () => {
   await rejects.toThrow(JSON.stringify({ message: 'Forbidden' }));
 });
 
-test('valid admin role', async () => {
+test('role admin valid', async () => {
   const accessToken = jwt.sign(
     {
       userId: 1,
@@ -127,7 +139,7 @@ test('valid admin role', async () => {
   expect(result).toEqual('message from TestRolesCommandHandler with partyId: 10');
 });
 
-test('valid user role', async () => {
+test('role user valid', async () => {
   const accessToken = jwt.sign(
     {
       userId: 1,
@@ -141,4 +153,9 @@ test('valid user role', async () => {
 
   const result = await mediator.send(new TestRolesCommand(10, accessToken));
   expect(result).toEqual('message from TestRolesCommandHandler with partyId: 10');
+});
+
+test('anonymous command', async () => {
+  const result = await mediator.send(new TestAnonymousCommand());
+  expect(result).toEqual(`message from TestAnonymousCommand`);
 });
