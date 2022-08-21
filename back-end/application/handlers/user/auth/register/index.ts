@@ -17,11 +17,7 @@ import { User, UserRole, UserLoginHistory } from '@database';
 
 export class UserRegisterCommand extends UserRegisterDto implements ICommand {
   constructor(obj: any) {
-    super();
-    this.emailAddress = obj?.emailAddress;
-    this.firstName = obj?.firstName;
-    this.lastName = obj?.lastName;
-    this.password = obj?.password;
+    super(obj);
     this.ipAddress = obj?.ipAddress;
     this.userAgent = obj?.userAgent;
   }
