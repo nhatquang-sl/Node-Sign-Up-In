@@ -1,13 +1,15 @@
 import { sendActivateEmail } from '@application/common/utils';
-import { RegisterHandler, ICommandHandler, ICommand } from '@application/mediator';
+import { Authorize, ICommandHandler, AuthorizeCommand } from '@application/mediator';
 
 import { User } from '@database';
 
-export class UserSendActivationEmailCommand implements ICommand {
-  declare userId: number;
+export class UserSendActivationEmailCommand extends AuthorizeCommand {
+  constructor(accessToken: string) {
+    super(accessToken);
+  }
 }
 
-@RegisterHandler
+@Authorize()
 export class UserSendActivationEmailCommandHandler
   implements ICommandHandler<UserSendActivationEmailCommand, void>
 {
@@ -16,7 +18,6 @@ export class UserSendActivationEmailCommandHandler
 
     // https://sequelize.org/docs/v6/core-concepts/model-querying-finders/#findone
     const user = await User.findOne({ where: { id: command.userId } });
-
     if (user != null) await sendActivateEmail(user, user.securityStamp);
   }
 }

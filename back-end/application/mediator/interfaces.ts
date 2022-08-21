@@ -1,6 +1,10 @@
 export interface ICommand {}
 export class AuthorizeCommand implements ICommand {
-  accessToken: string = '';
+  constructor(accessToken: string) {
+    this.accessToken = accessToken;
+  }
+  declare userId: number;
+  declare accessToken: string;
 }
 export type Result = void | string | {};
 export interface ICommandHandler<T extends ICommand, Result> {

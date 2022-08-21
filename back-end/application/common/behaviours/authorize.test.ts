@@ -15,8 +15,7 @@ import { UnauthorizedError, ForbiddenError } from '../exceptions';
 
 class TestCommand extends AuthorizeCommand {
   constructor(partyId: number, accessToken: string = '') {
-    super();
-    this.accessToken = accessToken;
+    super(accessToken);
     this.partyId = partyId;
   }
   declare partyId: number;
@@ -32,8 +31,7 @@ export class TestCommandHandler implements ICommandHandler<TestCommand, Result> 
 
 class TestRolesCommand extends AuthorizeCommand {
   constructor(partyId: number, accessToken: string = '') {
-    super();
-    this.accessToken = accessToken;
+    super(accessToken);
     this.partyId = partyId;
   }
   declare partyId: number;

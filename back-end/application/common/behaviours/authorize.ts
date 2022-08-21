@@ -10,13 +10,12 @@ export class AuthorizeBehavior implements IPipelineBehavior {
 
     return await next();
   };
-  verifyToken = async (request: ICommand) => {
+  verifyToken = async (request: AuthorizeCommand) => {
     return new Promise<any>((resolve, reject) => {
       const cmdName = request.constructor.name;
       const handlerClass: any = container.handlers[`${cmdName}Handler`];
 
-      const cmd = request as AuthorizeCommand;
-      const accessToken = cmd.accessToken;
+      const accessToken = request.accessToken;
       const requiredRoles = handlerClass.prototype.authorizeRoles;
 
       jwt.verify(accessToken, ENV.ACCESS_TOKEN_SECRET, (err: any, decoded: any) => {
@@ -28,6 +27,7 @@ export class AuthorizeBehavior implements IPipelineBehavior {
           reject(new ForbiddenError());
         }
         console.log({ decoded });
+        request.userId = decoded.userId;
         resolve(decoded);
       });
     });
