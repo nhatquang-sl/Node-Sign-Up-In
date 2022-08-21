@@ -10,50 +10,42 @@ const user = {
   password: '123456x@X',
 };
 
-test('missing first name', async () => {
-  let invalidUser = new UserRegisterCommand();
-  invalidUser.emailAddress = user.emailAddress;
-  invalidUser.lastName = user.lastName;
-  invalidUser.password = user.password;
+test('first name missing', async () => {
+  let command = new UserRegisterCommand(user);
+  command.firstName = '';
 
-  const rejects = expect(mediator.send(invalidUser)).rejects;
+  const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(BadRequestError);
   await rejects.toThrow(
     JSON.stringify({ firstNameError: 'First name must be at least 2 characters' })
   );
 });
 
-test('missing last name', async () => {
-  let invalidUser = new UserRegisterCommand();
-  invalidUser.emailAddress = user.emailAddress;
-  invalidUser.firstName = user.firstName;
-  invalidUser.password = user.password;
+test('last name missing', async () => {
+  let command = new UserRegisterCommand(user);
+  command.lastName = '';
 
-  const rejects = expect(mediator.send(invalidUser)).rejects;
+  const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(BadRequestError);
   await rejects.toThrow(
     JSON.stringify({ lastNameError: 'Last name must be at least 2 characters' })
   );
 });
 
-test('missing email address', async () => {
-  let invalidUser = new UserRegisterCommand();
-  invalidUser.password = user.password;
-  invalidUser.firstName = user.firstName;
-  invalidUser.lastName = user.lastName;
+test('email address missing', async () => {
+  let command = new UserRegisterCommand(user);
+  command.emailAddress = '';
 
-  const rejects = expect(mediator.send(invalidUser)).rejects;
+  const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(BadRequestError);
   await rejects.toThrow(JSON.stringify({ emailAddressError: 'Email address is invalid' }));
 });
 
-test('missing password', async () => {
-  let invalidUser = new UserRegisterCommand();
-  invalidUser.emailAddress = user.emailAddress;
-  invalidUser.firstName = user.firstName;
-  invalidUser.lastName = user.lastName;
+test('password missing', async () => {
+  let command = new UserRegisterCommand(user);
+  command.password = '';
 
-  const rejects = expect(mediator.send(invalidUser)).rejects;
+  const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(BadRequestError);
   await rejects.toThrow(
     JSON.stringify({
@@ -68,7 +60,7 @@ test('missing password', async () => {
   );
 });
 
-test('conflict email address', async () => {
+test('email address conflict', async () => {
   await dbContext.connect();
   await initializeDb();
   await User.create({
@@ -80,11 +72,7 @@ test('conflict email address', async () => {
     securityStamp: 'securityStamp',
   } as User);
 
-  let validUser = new UserRegisterCommand();
-  validUser.emailAddress = user.emailAddress;
-  validUser.firstName = user.firstName;
-  validUser.lastName = user.lastName;
-  validUser.password = user.password;
+  let validUser = new UserRegisterCommand(user);
 
   const rejects = expect(mediator.send(validUser)).rejects;
   await rejects.toThrow(ConflictError);
