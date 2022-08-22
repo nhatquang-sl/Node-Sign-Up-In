@@ -5,6 +5,7 @@ export class AuthorizeCommand implements ICommand {
   }
   declare userId: number;
   declare accessToken: string;
+  declare accessTokenType: string;
 }
 export type Result = void | string | {};
 export interface ICommandHandler<T extends ICommand, Result> {
