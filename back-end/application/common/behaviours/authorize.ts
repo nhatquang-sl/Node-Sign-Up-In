@@ -5,17 +5,17 @@ import { ICommand, container, IPipelineBehavior } from '@application/mediator';
 import { UnauthorizedError, ForbiddenError } from '../exceptions';
 
 export class AuthorizeBehavior implements IPipelineBehavior {
-  handle = async (request: ICommand, next: () => Promise<any>): Promise<any> => {
-    if (request instanceof AuthorizeCommand) await this.verifyToken(request);
+  handle = async (command: ICommand, next: () => Promise<any>): Promise<any> => {
+    if (command instanceof AuthorizeCommand) await this.verifyToken(command);
 
     return await next();
   };
-  verifyToken = async (request: AuthorizeCommand) => {
+  verifyToken = async (command: AuthorizeCommand) => {
     return new Promise<any>((resolve, reject) => {
-      const cmdName = request.constructor.name;
+      const cmdName = command.constructor.name;
       const handlerClass: any = container.handlers[`${cmdName}Handler`];
 
-      const accessToken = request.accessToken;
+      const accessToken = command.accessToken;
       const requiredRoles = handlerClass.prototype.authorizeRoles;
 
       jwt.verify(accessToken, ENV.ACCESS_TOKEN_SECRET, (err: any, decoded: any) => {
@@ -27,7 +27,8 @@ export class AuthorizeBehavior implements IPipelineBehavior {
           reject(new ForbiddenError());
         }
         console.log({ decoded });
-        request.userId = decoded.userId;
+        command.userId = decoded.userId;
+        command.accessTokenType = decoded.type;
         resolve(decoded);
       });
     });
