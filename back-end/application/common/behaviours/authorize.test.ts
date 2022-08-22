@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import ENV from '@config';
+import { TIMESTAMP } from '@libs/constant';
 import { delay } from '@controllers/auth/utils/index';
 import {
   mediator,
@@ -67,6 +68,22 @@ test('access token missing', async () => {
 
 test('access token invalid', async () => {
   const rejects = expect(mediator.send(new TestCommand(10, 'fake access token'))).rejects;
+  await rejects.toThrow(UnauthorizedError);
+  await rejects.toThrow(JSON.stringify({ message: 'Invalid Token' }));
+});
+
+test('access token expired', async () => {
+  const accessToken = jwt.sign(
+    {
+      userId: 0,
+      type: '',
+    },
+    ENV.ACCESS_TOKEN_SECRET,
+    { expiresIn: '1s' }
+  );
+
+  await delay(2 * TIMESTAMP.SECOND);
+  const rejects = expect(mediator.send(new TestCommand(10, accessToken))).rejects;
   await rejects.toThrow(UnauthorizedError);
   await rejects.toThrow(JSON.stringify({ message: 'Invalid Token' }));
 });
