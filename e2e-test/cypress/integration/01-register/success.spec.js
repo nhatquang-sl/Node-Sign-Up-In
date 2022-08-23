@@ -2,7 +2,7 @@ describe('Register Success', () => {
   const serverId = 'kwtruoig'; // Replace SERVER_ID with an actual Mailosaur Server ID
   const firstName = new Date().getTime().toString().substring(0, 6);
   const lastName = new Date().getTime().toString().substring(6);
-  const email = `${firstName}.${lastName}@${serverId}.mailosaur.net`;
+  const email = `${firstName}.${lastName}@mailinator.com`;
   const password = '123456x@X';
   let passwordResetLink = '';
   beforeEach(() => {});
@@ -22,12 +22,11 @@ describe('Register Success', () => {
 
     cy.get('@submitBtn').should('be.disabled');
     cy.url({ timeout: 10000 }).should('include', '/request-activate-email');
-    cy.mailosaurGetMessage(serverId, {
-      sentTo: email,
-    }).then((email) => {
-      console.log(email);
-      expect(email.subject).to.equal('Welcome to QNN! Confirm Your Email');
-      passwordResetLink = email.html.links[0].href;
+
+    cy.request({
+      url: `http://localhost:3500/auth/activation-link/${email}`,
+    }).then((resp) => {
+      passwordResetLink = resp.body;
     });
   });
 

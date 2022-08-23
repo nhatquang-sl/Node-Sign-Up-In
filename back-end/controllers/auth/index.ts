@@ -6,6 +6,7 @@ import { UserActivateCommand } from '@application/handlers/user/auth/activate';
 import { UserLoginCommand, UserLoginResult } from '@application/handlers/user/auth/login';
 import { UserSendActivationEmailCommand } from '@application/handlers/user/auth/send-activation-email';
 import { UserGetProfileCommand } from '@application/handlers/user/profile/get';
+import { UserGetActivationLinkCommand } from '@application/handlers/user/auth/get-activation-link';
 import {
   UserSendResetPasswordEmailCommand,
   UserSetNewPasswordCommand,
@@ -54,11 +55,15 @@ router.post('/login', async (request: Request, response: Response) => {
   response.status(201).json(dto);
 });
 
-// router.use(verifyJWT);
 router.post('/send-activation-email', async (request: Request, response: Response) => {
   const command = new UserSendActivationEmailCommand(getAccessToken(request));
   await mediator.send(command);
   response.sendStatus(204); //No Content
+});
+
+router.get('/activation-link/:emailAddress', async (request: Request, response: Response) => {
+  const command = new UserGetActivationLinkCommand(request.params.emailAddress);
+  response.json(await mediator.send(command));
 });
 
 router.get('/profile', async (request: Request, response: Response) => {

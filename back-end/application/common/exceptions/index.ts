@@ -1,5 +1,5 @@
 export class NotFoundError extends Error {
-  constructor(err: any) {
+  constructor(err: any = 'Not Found') {
     if (typeof err === 'string') super(JSON.stringify({ message: err }));
     else super(JSON.stringify(err));
   }

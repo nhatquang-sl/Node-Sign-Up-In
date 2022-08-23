@@ -6,19 +6,23 @@ export * from './jwt';
 
 export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const sendActivateEmail = async (user: UserDto, securityStamp: string) => {
+export const generateActivationLink = (userId: number, securityStamp: string) => {
   const emailActiveCode = Buffer.from(
     JSON.stringify({
-      id: user.id,
-      securityStamp: securityStamp,
+      id: userId,
+      securityStamp,
       timestamp: new Date().getTime(),
     })
   ).toString('base64');
 
+  return `${ENV.FE_ENDPOINT}/register-confirm/${emailActiveCode}`;
+};
+
+export const sendActivateEmail = async (user: UserDto, securityStamp: string) => {
   await sendEmail(
     user.emailAddress,
     'Welcome to QNN! Confirm Your Email',
-    getActiveEmailMessage(`${ENV.FE_ENDPOINT}/register-confirm/${emailActiveCode}`)
+    getActiveEmailMessage(generateActivationLink(user.id, securityStamp))
   );
 };
 
