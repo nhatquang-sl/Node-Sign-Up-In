@@ -37,15 +37,16 @@ const Login = (props: Props) => {
     passwordError: undefined,
     showPassword: false,
   });
-  // useEffect(() => {
-  //   if (!values.emailAddress && !values.password) {
-  //     setValues((v) => ({
-  //       ...v,
-  //       emailAddress: 'sunlight479@yahoo.com',
-  //       password: '123456x@X',
-  //     }));
-  //   }
-  // }, [values.emailAddress, values.password]);
+
+  useEffect(() => {
+    if (process.env.REACT_APP_ENV === 'development' && !values.emailAddress && !values.password) {
+      setValues((v) => ({
+        ...v,
+        emailAddress: 'sunlight479@yahoo.com',
+        password: '123456x@X',
+      }));
+    }
+  }, [values.emailAddress, values.password]);
 
   const { accessToken, emailConfirmed } = props.auth;
   const loginError = props.auth.error.login;

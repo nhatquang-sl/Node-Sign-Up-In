@@ -58,17 +58,24 @@ const Register = (props: Props) => {
     showPassword: false,
     submitted: false,
   });
-  // useEffect(() => {
-  //   if (!values.firstName && !values.lastName && !values.emailAddress && !values.password) {
-  //     setValues((v) => ({
-  //       ...v,
-  //       firstName: 'quang',
-  //       lastName: 'nguyen',
-  //       emailAddress: 'sunlight479@yahoo.com',
-  //       password: '123456x@X',
-  //     }));
-  //   }
-  // }, [values.firstName, values.lastName, values.emailAddress, values.password]);
+
+  useEffect(() => {
+    if (
+      process.env.REACT_APP_ENV === 'development' &&
+      !values.firstName &&
+      !values.lastName &&
+      !values.emailAddress &&
+      !values.password
+    ) {
+      setValues((v) => ({
+        ...v,
+        firstName: 'quang',
+        lastName: 'nguyen',
+        emailAddress: 'sunlight479@yahoo.com',
+        password: '123456x@X',
+      }));
+    }
+  }, [values.firstName, values.lastName, values.emailAddress, values.password]);
 
   const handleChange = (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [prop]: event.target.value });
