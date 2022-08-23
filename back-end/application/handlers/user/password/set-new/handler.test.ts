@@ -5,7 +5,7 @@ import { dbContext, initializeDb, User, UserForgotPassword } from '@database';
 
 import { mediator } from '@application/mediator';
 import { generateJwt } from '@application/common/utils';
-import { AuthorizeBehavior } from '@application/common/behaviours';
+import { AuthorizeBehavior } from '@application/common/behaviors';
 import { UserSetNewPasswordCommand } from '.';
 
 const userId = 1;

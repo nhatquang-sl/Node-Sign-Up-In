@@ -3,7 +3,7 @@ import ENV from '@config';
 import { User } from '@database';
 import { mediator } from '@application/mediator';
 import { generateJwt, delay } from '@application/common/utils';
-import { AuthorizeBehavior } from '@application/common/behaviours';
+import { AuthorizeBehavior } from '@application/common/behaviors';
 import { ForbiddenError, UnauthorizedError, BadRequestError } from '@application/common/exceptions';
 import { UserSetNewPasswordCommand } from '.';
 import { TIMESTAMP } from '@libs/constant';
