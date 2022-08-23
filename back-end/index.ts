@@ -9,8 +9,8 @@ import { dbContext, initializeDb } from '@database';
 
 import { mediator } from '@application/mediator';
 import { AuthorizeBehavior } from '@application/common/behaviors/authorize';
-import authRoute from '@controllers/auth/route';
-import userRoute from '@controllers/user/route';
+import authRoute from '@controllers/auth';
+import userRoute from '@controllers/user';
 import {
   BadRequestError,
   UnauthorizedError,

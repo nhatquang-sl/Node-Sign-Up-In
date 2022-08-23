@@ -10,7 +10,7 @@ import {
   UserSendResetPasswordEmailCommand,
   UserSetNewPasswordCommand,
 } from '@application/handlers/user/password';
-import { getAccessToken } from '@controllers/ultils';
+import { getAccessToken } from '@controllers/utils';
 const router = express.Router();
 
 router.post('/register', async (request: Request, response: Response) => {
