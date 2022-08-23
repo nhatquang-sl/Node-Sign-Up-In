@@ -1,21 +1,27 @@
-import { convertToObject } from 'typescript';
-import express, { Request, Response, NextFunction } from 'express';
-import verifyJWT from '@middleware/verify-jwt';
+import express, { Request, Response } from 'express';
 
-import handleRegister from './handlers/register';
-import handleRegisterConfirm from './handlers/register-confirm';
-import handleLogin from './handlers/login';
-import handleSendActivateLink from './handlers/send-activate-link';
-import handleGetProfile from './handlers/get-profile';
-import { handleSendEmail, handleSetNew } from './handlers/reset-password';
-
+import { mediator } from '@application/mediator';
+import { UserRegisterCommand, UserRegisterResult } from '@application/handlers/user/auth/register';
+import { UserActivateCommand } from '@application/handlers/user/auth/activate';
+import { UserLoginCommand, UserLoginResult } from '@application/handlers/user/auth/login';
+import { UserSendActivationEmailCommand } from '@application/handlers/user/auth/send-activation-email';
+import { UserGetProfileCommand } from '@application/handlers/user/profile/get';
+import {
+  UserSendResetPasswordEmailCommand,
+  UserSetNewPasswordCommand,
+} from '@application/handlers/user/password';
+import { getAccessToken } from '@controllers/ultils';
 const router = express.Router();
 
 router.post('/register', async (request: Request, response: Response) => {
-  const req = request.body;
-  const ipAddress = request.ip;
-  const userAgent = request.get('User-Agent');
-  const { refreshToken, ...dto } = await handleRegister(req, ipAddress, userAgent);
+  console.log('UserRegisterCommand');
+  let command = new UserRegisterCommand({
+    ...request.body,
+    ipAddress: request.ip,
+    userAgent: request.get('User-Agent'),
+  });
+
+  const { refreshToken, ...dto } = (await mediator.send(command)) as UserRegisterResult;
   response.cookie('jwt', refreshToken, {
     httpOnly: true,
     // sameSite: 'None',
@@ -24,13 +30,21 @@ router.post('/register', async (request: Request, response: Response) => {
   });
   response.status(201).json(dto);
 });
-router.get('/register-confirm/:emailActiveCode', handleRegisterConfirm);
+
+router.get('/activate/:activationCode', async (request: Request, response: Response) => {
+  const command = new UserActivateCommand(request.params.activationCode);
+  await mediator.send(command);
+  return response.sendStatus(204);
+});
 
 router.post('/login', async (request: Request, response: Response) => {
-  const req = request.body;
-  const ipAddress = request.ip;
-  const userAgent = request.get('User-Agent');
-  const { refreshToken, ...dto } = await handleLogin(req, ipAddress, userAgent);
+  let command = new UserLoginCommand({
+    ...request.body,
+    ipAddress: request.ip,
+    userAgent: request.get('User-Agent'),
+  });
+
+  const { refreshToken, ...dto } = (await mediator.send(command)) as UserLoginResult;
   response.cookie('jwt', refreshToken, {
     httpOnly: true,
     // sameSite: 'None',
@@ -40,31 +54,33 @@ router.post('/login', async (request: Request, response: Response) => {
   response.status(201).json(dto);
 });
 
-router.post('/reset-password/send-email', async (request: Request, response: Response) => {
-  const { emailAddress } = request.body;
-  const result = await handleSendEmail(emailAddress);
-  response.json(result);
-});
-
-router.post('/reset-password/set-new', async (request: Request, response: Response) => {
-  const { token, password } = request.body;
-  response.json(await handleSetNew(token, password));
-});
-
-// router.post('/refresh-token', handleRefreshToken);
-// router.post('/logout', handleLogout);
 // router.use(verifyJWT);
-router.post('/send-activate-link', async (request: Request, response: Response) => {
-  const userId = parseInt(request.headers.userId as string);
-  await handleSendActivateLink(userId);
+router.post('/send-activation-email', async (request: Request, response: Response) => {
+  const command = new UserSendActivationEmailCommand(getAccessToken(request));
+  await mediator.send(command);
   response.sendStatus(204); //No Content
 });
 
 router.get('/profile', async (request: Request, response: Response) => {
-  const userId = parseInt(request.headers.userId as string);
-  const user = await handleGetProfile(userId);
-  if (!user) return response.sendStatus(404);
-  response.json(user);
+  const command = new UserGetProfileCommand(getAccessToken(request));
+  const { ...dto } = (await mediator.send(command)) as UserLoginResult;
+  response.json(dto);
+});
+
+router.post('/reset-password/send-email', async (request: Request, response: Response) => {
+  const { emailAddress } = request.body;
+  const command = new UserSendResetPasswordEmailCommand({
+    emailAddress,
+    ipAddress: request.ip,
+    userAgent: request.get('User-Agent'),
+  });
+  response.json(await mediator.send(command));
+});
+
+router.post('/reset-password/set-new', async (request: Request, response: Response) => {
+  const { token, password } = request.body;
+  const command = new UserSetNewPasswordCommand(token, password);
+  response.json(await mediator.send(command));
 });
 
 export default router;

@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import ENV from '@config';
 import { TIMESTAMP } from '@libs/constant';
-import { delay } from '@controllers/auth/utils/index';
+import { delay } from '@application/common/utils';
 import {
   mediator,
   Authorize,

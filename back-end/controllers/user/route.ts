@@ -1,11 +1,12 @@
 import express, { Request, Response } from 'express';
-import verifyJWT from '@middleware/verify-jwt';
-import handleGetUserSessions from './handlers/get-user-sessions';
+import { mediator } from '@application/mediator';
+import { UserGetAllSessionCommand } from '@application/handlers/user/session/get-all';
+import { getAccessToken } from '@controllers/ultils';
+
 const router = express.Router();
 
-router.use(verifyJWT);
 router.get('/sessions', async (request: Request, response: Response) => {
-  response.json(await handleGetUserSessions());
+  response.json(await mediator.send(new UserGetAllSessionCommand(getAccessToken(request))));
 });
 
 export default router;

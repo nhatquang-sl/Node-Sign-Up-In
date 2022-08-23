@@ -1,4 +1,4 @@
-import { delay } from '@controllers/auth/utils/index';
+import { delay } from '@application/common/utils';
 import {
   RegisterHandler,
   RegisterValidator,

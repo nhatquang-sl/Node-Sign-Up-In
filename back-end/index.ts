@@ -7,12 +7,20 @@ import ENV from '@config';
 import corsOptions from '@config/cors-options';
 import { dbContext, initializeDb } from '@database';
 
+import { mediator } from '@application/mediator';
+import { AuthorizeBehavior } from '@application/common/behaviours/authorize';
 import authRoute from '@controllers/auth/route';
 import userRoute from '@controllers/user/route';
-import { BadRequestError, UnauthorizedError, NotFoundError } from '@application/common/exceptions';
+import {
+  BadRequestError,
+  UnauthorizedError,
+  NotFoundError,
+  ConflictError,
+} from '@application/common/exceptions';
 
 console.log(ENV);
 
+mediator.addPipelineBehavior(new AuthorizeBehavior());
 const app = express();
 
 // Cross Origin Resource Sharing
@@ -49,7 +57,6 @@ const requestLogger = (request: Request, response: Response, next: NextFunction)
 };
 
 app.use(requestLogger);
-
 app.use('/', router);
 
 app.use('/auth', authRoute);
@@ -63,6 +70,7 @@ const errorLogger = (error: Error, request: Request, response: Response, next: N
   if (error instanceof BadRequestError) return response.status(400).json(data);
   if (error instanceof UnauthorizedError) return response.status(401).json(data);
   if (error instanceof NotFoundError) return response.status(404).json(data);
+  if (error instanceof ConflictError) return response.status(409).json(data);
   return response.sendStatus(500);
 };
 app.use(errorLogger);
