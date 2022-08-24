@@ -7,7 +7,7 @@
     "dev": "set NODE_ENV=development&& tsnd --respawn index.ts",
     "start": "vercel dev",
     "deploy": "cd ../front-end && npm run build && cd ../back-end && vercel deploy --prod",
-    "test": "set NODE_ENV=test&& jest"
+    "test": "set NODE_ENV=test&& jest --watchAll"
   },
   "keywords": [],
   "author": "",
@@ -45,6 +45,7 @@
   },
   "_moduleAliases": {
     "@config": "./config",
+    "@application": "./application",
     "@services": "./services",
     "@database": "./database",
     "@controllers": "./controllers",

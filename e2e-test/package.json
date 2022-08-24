@@ -12,7 +12,5 @@
   "dependencies": {
     "cypress": "^9.7.0"
   },
-  "devDependencies": {
-    "cypress-mailosaur": "^2.8.0"
-  }
+  "devDependencies": {}
 }

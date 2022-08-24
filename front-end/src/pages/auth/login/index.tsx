@@ -20,6 +20,7 @@ import {
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
+import LANG from 'shared/lang';
 import { validateEmailAddress } from 'shared/user/validate';
 import { closeSidebarAndHeader } from 'store/settings/actions';
 import { showSnackbar } from 'store/snackbar/actions';
@@ -37,15 +38,16 @@ const Login = (props: Props) => {
     passwordError: undefined,
     showPassword: false,
   });
-  // useEffect(() => {
-  //   if (!values.emailAddress && !values.password) {
-  //     setValues((v) => ({
-  //       ...v,
-  //       emailAddress: 'sunlight479@yahoo.com',
-  //       password: '123456x@X',
-  //     }));
-  //   }
-  // }, [values.emailAddress, values.password]);
+
+  useEffect(() => {
+    if (process.env.REACT_APP_ENV === 'development' && !values.emailAddress && !values.password) {
+      setValues((v) => ({
+        ...v,
+        emailAddress: 'sunlight479@yahoo.com',
+        password: '123456x@X',
+      }));
+    }
+  }, [values.emailAddress, values.password]);
 
   const { accessToken, emailConfirmed } = props.auth;
   const loginError = props.auth.error.login;
@@ -79,7 +81,7 @@ const Login = (props: Props) => {
     event.preventDefault();
 
     const emailAddressError = validateEmailAddress(values.emailAddress);
-    const passwordError = values.password ? undefined : 'Password is required';
+    const passwordError = values.password ? undefined : LANG.USER_PASSWORD_MISSING_ERROR;
     setValues({
       ...values,
       emailAddressError,

@@ -1,23 +1,32 @@
-interface UserDto {
-  id: number;
-  firstName: string;
-  lastName: string;
-  emailAddress: string;
-  emailConfirmed: boolean | false;
+export class UserDto {
+  declare id: number;
+  declare firstName: string;
+  declare lastName: string;
+  declare emailAddress: string;
+  declare emailConfirmed: boolean | false;
 }
 
-interface UserAuthDto extends UserDto {
-  accessToken: string;
+export class UserAuthDto extends UserDto {
+  declare accessToken: string;
 }
 
-interface UserLoginDto {
-  emailAddress: string;
-  password: string;
+export class UserLoginDto {
+  constructor(obj: any) {
+    this.emailAddress = obj?.emailAddress;
+    this.password = obj?.password;
+  }
+  declare emailAddress: string;
+  declare password: string;
 }
 
-interface UserRegisterDto extends UserLoginDto {
-  firstName: string;
-  lastName: string;
+export class UserRegisterDto extends UserLoginDto {
+  constructor(obj: any) {
+    super(obj);
+    this.firstName = obj.firstName;
+    this.lastName = obj.lastName;
+  }
+  declare firstName: string;
+  declare lastName: string;
 }
 
 export interface UserSession {
@@ -40,4 +49,4 @@ export interface UserForgotPasswordDto {
   updatedAt: string;
 }
 
-export type { UserDto, UserAuthDto, UserLoginDto, UserRegisterDto };
+// export type { UserDto, UserAuthDto, UserLoginDto };

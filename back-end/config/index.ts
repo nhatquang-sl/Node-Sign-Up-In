@@ -9,6 +9,7 @@ if (process.env.NODE_ENV?.trim() == 'development')
     override: true,
   });
 const ENV = {
+  NODE_ENV: process.env.NODE_ENV,
   APP_VERSION: process.env.APP_VERSION,
   APP_HOST: process.env.APP_HOST ?? '',
   PORT: process.env.PORT || 3500,

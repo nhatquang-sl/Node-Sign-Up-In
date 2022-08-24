@@ -21,7 +21,7 @@ function Main(props: Props) {
     <Container open={props.settings.sideBarOpen}>
       {props.settings.headerOpen && <DrawerHeader />}
       <Routes>
-        <Route path="/register-confirm/:activateCode" element={<RegisterConfirm />} />
+        <Route path="/register-confirm/:activationCode" element={<RegisterConfirm />} />
         <Route path="/request-activate-email" element={<RequestActivateEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />

@@ -31,16 +31,15 @@ class User
   declare static associations: {
     roles: Association<User, Role>;
   };
-  static getAuthDto(user: User, accessToken: string): UserAuthDto {
-    const dto: UserAuthDto = {
+  static getAuthDto(user: User, accessToken: string | undefined = undefined): UserAuthDto {
+    const dto = {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       emailAddress: user.emailAddress,
       emailConfirmed: user.emailConfirmed,
       accessToken: accessToken,
-    };
-
+    } as UserAuthDto;
     return dto;
   }
 }

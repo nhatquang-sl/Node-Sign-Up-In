@@ -1,3 +1,4 @@
+import LANG from 'shared/lang';
 import { render, screen, fireEvent } from 'test-utils';
 import ResetPassword from './index';
 
@@ -9,11 +10,11 @@ test('show all errors', async () => {
     })
   );
 
-  expect(screen.getByText('Password contains at least one lower character')).toBeInTheDocument();
-  expect(screen.getByText('Password contains at least one upper character')).toBeInTheDocument();
-  expect(screen.getByText('Password contains at least one digit character')).toBeInTheDocument();
-  expect(screen.getByText('Password contains at least one special character')).toBeInTheDocument();
-  expect(screen.getByText('Password contains at least 8 characters')).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_PASSWORD_LOWER_CHAR_ERROR)).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_PASSWORD_UPPER_CHAR_ERROR)).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_PASSWORD_DIGIT_CHAR_ERROR)).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_PASSWORD_SPECIAL_CHAR_ERROR)).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_PASSWORD_LENGTH_ERROR)).toBeInTheDocument();
 });
 
 test('input password number', async () => {
@@ -28,11 +29,11 @@ test('input password number', async () => {
     })
   );
 
-  expect(screen.getByText('Password contains at least one lower character')).toBeInTheDocument();
-  expect(screen.getByText('Password contains at least one upper character')).toBeInTheDocument();
-  expect(screen.queryByText('Password contains at least one digit character')).toBeNull();
-  expect(screen.getByText('Password contains at least one special character')).toBeInTheDocument();
-  expect(screen.getByText('Password contains at least 8 characters')).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_PASSWORD_LOWER_CHAR_ERROR)).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_PASSWORD_UPPER_CHAR_ERROR)).toBeInTheDocument();
+  expect(screen.queryByText(LANG.USER_PASSWORD_DIGIT_CHAR_ERROR)).toBeNull();
+  expect(screen.getByText(LANG.USER_PASSWORD_SPECIAL_CHAR_ERROR)).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_PASSWORD_LENGTH_ERROR)).toBeInTheDocument();
 });
 
 test('input password lower character', async () => {
@@ -47,11 +48,11 @@ test('input password lower character', async () => {
     })
   );
 
-  expect(screen.queryByText('Password contains at least one lower character')).toBeNull();
-  expect(screen.getByText('Password contains at least one upper character')).toBeInTheDocument();
-  expect(screen.getByText('Password contains at least one digit character')).toBeInTheDocument();
-  expect(screen.getByText('Password contains at least one special character')).toBeInTheDocument();
-  expect(screen.getByText('Password contains at least 8 characters')).toBeInTheDocument();
+  expect(screen.queryByText(LANG.USER_PASSWORD_LOWER_CHAR_ERROR)).toBeNull();
+  expect(screen.getByText(LANG.USER_PASSWORD_UPPER_CHAR_ERROR)).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_PASSWORD_DIGIT_CHAR_ERROR)).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_PASSWORD_SPECIAL_CHAR_ERROR)).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_PASSWORD_LENGTH_ERROR)).toBeInTheDocument();
 });
 
 test('input password upper character', async () => {
@@ -66,11 +67,11 @@ test('input password upper character', async () => {
     })
   );
 
-  expect(screen.queryByText('Password contains at least one lower character')).toBeInTheDocument();
-  expect(screen.queryByText('Password contains at least one upper character')).toBeNull();
-  expect(screen.queryByText('Password contains at least one digit character')).toBeInTheDocument();
-  expect(screen.getByText('Password contains at least one special character')).toBeInTheDocument();
-  expect(screen.getByText('Password contains at least 8 characters')).toBeInTheDocument();
+  expect(screen.queryByText(LANG.USER_PASSWORD_LOWER_CHAR_ERROR)).toBeInTheDocument();
+  expect(screen.queryByText(LANG.USER_PASSWORD_UPPER_CHAR_ERROR)).toBeNull();
+  expect(screen.queryByText(LANG.USER_PASSWORD_DIGIT_CHAR_ERROR)).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_PASSWORD_SPECIAL_CHAR_ERROR)).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_PASSWORD_LENGTH_ERROR)).toBeInTheDocument();
 });
 
 test('input password special character', async () => {
@@ -85,11 +86,11 @@ test('input password special character', async () => {
     })
   );
 
-  expect(screen.getByText('Password contains at least one lower character')).toBeInTheDocument();
-  expect(screen.getByText('Password contains at least one upper character')).toBeInTheDocument();
-  expect(screen.getByText('Password contains at least one digit character')).toBeInTheDocument();
-  expect(screen.queryByText('Password contains at least one special character')).toBeNull();
-  expect(screen.getByText('Password contains at least 8 characters')).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_PASSWORD_LOWER_CHAR_ERROR)).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_PASSWORD_UPPER_CHAR_ERROR)).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_PASSWORD_DIGIT_CHAR_ERROR)).toBeInTheDocument();
+  expect(screen.queryByText(LANG.USER_PASSWORD_SPECIAL_CHAR_ERROR)).toBeNull();
+  expect(screen.getByText(LANG.USER_PASSWORD_LENGTH_ERROR)).toBeInTheDocument();
 });
 
 test('input password valid', async () => {
@@ -104,9 +105,9 @@ test('input password valid', async () => {
     })
   );
 
-  expect(screen.queryByText('Password contains at least one lower character')).toBeNull();
-  expect(screen.queryByText('Password contains at least one upper character')).toBeNull();
-  expect(screen.queryByText('Password contains at least one digit character')).toBeNull();
-  expect(screen.queryByText('Password contains at least one special character')).toBeNull();
-  expect(screen.queryByText('Password contains at least 8 characters')).toBeNull();
+  expect(screen.queryByText(LANG.USER_PASSWORD_LOWER_CHAR_ERROR)).toBeNull();
+  expect(screen.queryByText(LANG.USER_PASSWORD_UPPER_CHAR_ERROR)).toBeNull();
+  expect(screen.queryByText(LANG.USER_PASSWORD_DIGIT_CHAR_ERROR)).toBeNull();
+  expect(screen.queryByText(LANG.USER_PASSWORD_SPECIAL_CHAR_ERROR)).toBeNull();
+  expect(screen.queryByText(LANG.USER_PASSWORD_LENGTH_ERROR)).toBeNull();
 });

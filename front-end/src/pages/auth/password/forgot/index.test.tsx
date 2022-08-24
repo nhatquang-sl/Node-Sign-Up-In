@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from 'test-utils';
+import LANG from 'shared/lang';
 import Register from './index';
 
 test('show all errors', async () => {
@@ -9,7 +10,7 @@ test('show all errors', async () => {
     })
   );
 
-  expect(screen.getByText('Email address is invalid')).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_EMAIL_ADDRESS_INVALID_ERROR)).toBeInTheDocument();
 });
 
 test('input email address invalid', async () => {
@@ -24,5 +25,5 @@ test('input email address invalid', async () => {
     })
   );
 
-  expect(screen.getByText('Email address is invalid')).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_EMAIL_ADDRESS_INVALID_ERROR)).toBeInTheDocument();
 });
