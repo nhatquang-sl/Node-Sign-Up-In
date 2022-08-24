@@ -1,3 +1,4 @@
+import LANG from '@libs/lang';
 import { dbContext, initializeDb, User } from '@database';
 import { mediator } from '@application/mediator';
 import { NotFoundError, BadRequestError } from '@application/common/exceptions';
@@ -36,7 +37,7 @@ test('email address invalid', async () => {
   const rejects = expect(mediator.send(command)).rejects;
 
   await rejects.toThrow(BadRequestError);
-  await rejects.toThrow(JSON.stringify({ message: `Email address is invalid` }));
+  await rejects.toThrow(JSON.stringify({ message: LANG.USER_EMAIL_ADDRESS_INVALID_ERROR }));
 });
 
 test('email address not found', async () => {
@@ -44,7 +45,7 @@ test('email address not found', async () => {
   const rejects = expect(mediator.send(command)).rejects;
 
   await rejects.toThrow(NotFoundError);
-  await rejects.toThrow(JSON.stringify({ message: `test.user@gmail.com not found` }));
+  await rejects.toThrow(JSON.stringify({ message: LANG.USER_NOT_FOUND_ERROR }));
 });
 
 test("email address hasn't confirmed", async () => {
@@ -54,5 +55,5 @@ test("email address hasn't confirmed", async () => {
 
   // assert
   await rejects.toThrow(BadRequestError);
-  await rejects.toThrow(JSON.stringify({ message: `${emailAddress} hasn't confirmed` }));
+  await rejects.toThrow(JSON.stringify({ message: LANG.USER_EMAIL_ACTIVATION_ERROR }));
 });

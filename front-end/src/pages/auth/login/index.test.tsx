@@ -1,4 +1,4 @@
-import React from 'react';
+import LANG from 'shared/lang';
 import { render, screen, fireEvent } from 'test-utils';
 import Login from './index';
 
@@ -10,8 +10,8 @@ test('show all errors', async () => {
     })
   );
 
-  expect(screen.getByText('Email address is invalid')).toBeInTheDocument();
-  expect(screen.getByText('Password is required')).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_EMAIL_ADDRESS_INVALID_ERROR)).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_PASSWORD_MISSING_ERROR)).toBeInTheDocument();
   expect(screen.getByText('Forgot password?')).toBeInTheDocument();
   expect(screen.getByText("Don't have an account? Sign Up")).toBeInTheDocument();
 });
@@ -28,8 +28,8 @@ test('input email address invalid', async () => {
     })
   );
 
-  expect(screen.getByText('Email address is invalid')).toBeInTheDocument();
-  expect(screen.getByText('Password is required')).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_EMAIL_ADDRESS_INVALID_ERROR)).toBeInTheDocument();
+  expect(screen.getByText(LANG.USER_PASSWORD_MISSING_ERROR)).toBeInTheDocument();
 });
 
 test('input email address valid', async () => {
@@ -44,8 +44,8 @@ test('input email address valid', async () => {
     })
   );
 
-  expect(screen.queryByText('Email address is invalid')).toBeNull();
-  expect(screen.getByText('Password is required')).toBeInTheDocument();
+  expect(screen.queryByText(LANG.USER_EMAIL_ADDRESS_INVALID_ERROR)).toBeNull();
+  expect(screen.getByText(LANG.USER_PASSWORD_MISSING_ERROR)).toBeInTheDocument();
 });
 
 test('input email address password valid', async () => {
@@ -64,6 +64,6 @@ test('input email address password valid', async () => {
     })
   );
 
-  expect(screen.queryByText('Email address is invalid')).toBeNull();
-  expect(screen.queryByText('Password is required')).toBeNull();
+  expect(screen.queryByText(LANG.USER_EMAIL_ADDRESS_INVALID_ERROR)).toBeNull();
+  expect(screen.queryByText(LANG.USER_PASSWORD_MISSING_ERROR)).toBeNull();
 });

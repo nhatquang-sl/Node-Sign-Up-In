@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import LANG from '@libs/lang';
 import { UserLoginDto, UserAuthDto } from '@libs/user/dto';
 
 import { generateJwt } from '@application/common/utils';
@@ -42,11 +43,11 @@ export class UserLoginCommandHandler implements ICommandHandler<UserLoginCommand
         },
       ],
     });
-    if (!foundUser) throw new UnauthorizedError({ message: 'Username or password invalid' });
+    if (!foundUser) throw new UnauthorizedError({ message: LANG.USER_NAME_PASSWORD_INVALID_ERROR });
 
     // Evaluate password
     const match = await bcrypt.compare(command.password + foundUser.salt, foundUser.password);
-    if (!match) throw new UnauthorizedError({ message: 'Username or password invalid' });
+    if (!match) throw new UnauthorizedError({ message: LANG.USER_NAME_PASSWORD_INVALID_ERROR });
 
     // Create JWTs
     const { accessToken, refreshToken } = generateJwt(foundUser, 'LOGIN');
@@ -69,6 +70,6 @@ export class UserLoginCommandHandler implements ICommandHandler<UserLoginCommand
 export class UserLoginCommandValidator implements ICommandValidator<UserLoginCommand> {
   async validate(command: UserLoginCommand): Promise<void> {
     if (!command.emailAddress || !command.password)
-      throw new BadRequestError({ message: 'Username and password are required' });
+      throw new BadRequestError({ message: LANG.USER_NAME_PASSWORD_MISSING_ERROR });
   }
 }

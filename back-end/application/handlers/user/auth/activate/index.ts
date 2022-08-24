@@ -1,3 +1,4 @@
+import LANG from '@libs/lang';
 import {
   RegisterHandler,
   RegisterValidator,
@@ -29,12 +30,13 @@ export class UserActivateCommandHandler implements ICommandHandler<UserActivateC
 @RegisterValidator
 export class UserActivateCommandValidator implements ICommandValidator<UserActivateCommand> {
   async validate(command: UserActivateCommand): Promise<void> {
-    if (!command.activationCode) throw new BadRequestError({ message: 'Missing activation code' });
+    if (!command.activationCode)
+      throw new BadRequestError({ message: LANG.USER_ACTIVATION_TOKEN_MISSING_ERROR });
 
     try {
       JSON.parse(Buffer.from(command.activationCode, 'base64').toString('ascii'));
     } catch (e) {
-      throw new BadRequestError({ message: 'Activation code is invalid format' });
+      throw new BadRequestError({ message: LANG.USER_ACTIVATION_TOKEN_INVALID_ERROR });
     }
 
     const { id, securityStamp, timestamp } = JSON.parse(
@@ -42,14 +44,14 @@ export class UserActivateCommandValidator implements ICommandValidator<UserActiv
     );
     // get user by id
     let user = await User.findOne({ where: { id: id } });
-    if (user == null) throw new NotFoundError({ message: 'User is not found' });
+    if (user == null) throw new NotFoundError({ message: LANG.USER_NOT_FOUND_ERROR });
 
     // validate token
     const TIME_TO_LIVE = 1000 * 60 * 5;
     if (user.securityStamp != securityStamp)
-      throw new BadRequestError({ message: 'Your confirm token is invalid' });
+      throw new BadRequestError({ message: LANG.USER_ACTIVATION_TOKEN_INVALID_ERROR });
 
     if (new Date().getTime() - timestamp > TIME_TO_LIVE)
-      throw new BadRequestError({ message: 'Your confirm token is expired' });
+      throw new BadRequestError({ message: LANG.USER_ACTIVATION_TOKEN_EXPIRED_ERROR });
   }
 }

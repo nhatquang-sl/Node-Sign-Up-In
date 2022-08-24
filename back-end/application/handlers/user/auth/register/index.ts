@@ -1,8 +1,10 @@
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
 import jwt from 'jsonwebtoken';
-import { validateUserRegister } from '@libs/user/validate';
-import { UserRegisterDto, UserAuthDto } from '@libs/user/dto';
+
+import LANG from '@libs/lang';
+import { UserRegisterDto, UserAuthDto, validateUserRegister } from '@libs/user';
+
 import { sendActivateEmail } from '@application/common/utils';
 import { BadRequestError, ConflictError } from '@application/common/exceptions';
 import {
@@ -108,6 +110,7 @@ export class UserRegisterCommandValidator implements ICommandValidator<UserRegis
       attributes: ['id'],
     });
 
-    if (duplicate) throw new ConflictError({ emailAddressError: 'Duplicated email address' });
+    if (duplicate)
+      throw new ConflictError({ emailAddressError: LANG.USER_EMAIL_ADDRESS_DUPLICATED_ERROR });
   }
 }

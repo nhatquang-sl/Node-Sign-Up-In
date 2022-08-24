@@ -1,3 +1,4 @@
+import LANG from '@libs/lang';
 import { dbContext, initializeDb, User } from '@database';
 import { BadRequestError, ConflictError } from '@application/common/exceptions';
 import { mediator } from '@application/mediator';
@@ -16,9 +17,7 @@ test('first name missing', async () => {
 
   const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(BadRequestError);
-  await rejects.toThrow(
-    JSON.stringify({ firstNameError: 'First name must be at least 2 characters' })
-  );
+  await rejects.toThrow(JSON.stringify({ firstNameError: LANG.USER_FIRST_NAME_ERROR }));
 });
 
 test('last name missing', async () => {
@@ -27,9 +26,7 @@ test('last name missing', async () => {
 
   const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(BadRequestError);
-  await rejects.toThrow(
-    JSON.stringify({ lastNameError: 'Last name must be at least 2 characters' })
-  );
+  await rejects.toThrow(JSON.stringify({ lastNameError: LANG.USER_LAST_NAME_ERROR }));
 });
 
 test('email address missing', async () => {
@@ -38,7 +35,9 @@ test('email address missing', async () => {
 
   const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(BadRequestError);
-  await rejects.toThrow(JSON.stringify({ emailAddressError: 'Email address is invalid' }));
+  await rejects.toThrow(
+    JSON.stringify({ emailAddressError: LANG.USER_EMAIL_ADDRESS_INVALID_ERROR })
+  );
 });
 
 test('password missing', async () => {
@@ -50,11 +49,11 @@ test('password missing', async () => {
   await rejects.toThrow(
     JSON.stringify({
       passwordError: [
-        'Password contains at least one lower character',
-        'Password contains at least one upper character',
-        'Password contains at least one digit character',
-        'Password contains at least one special character',
-        'Password contains at least 8 characters',
+        LANG.USER_PASSWORD_LOWER_CHAR_ERROR,
+        LANG.USER_PASSWORD_UPPER_CHAR_ERROR,
+        LANG.USER_PASSWORD_DIGIT_CHAR_ERROR,
+        LANG.USER_PASSWORD_SPECIAL_CHAR_ERROR,
+        LANG.USER_PASSWORD_LENGTH_ERROR,
       ],
     })
   );
@@ -76,5 +75,7 @@ test('email address conflict', async () => {
 
   const rejects = expect(mediator.send(validUser)).rejects;
   await rejects.toThrow(ConflictError);
-  await rejects.toThrow(JSON.stringify({ emailAddressError: 'Duplicated email address' }));
+  await rejects.toThrow(
+    JSON.stringify({ emailAddressError: LANG.USER_EMAIL_ADDRESS_DUPLICATED_ERROR })
+  );
 });

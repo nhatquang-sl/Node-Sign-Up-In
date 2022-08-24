@@ -1,7 +1,8 @@
 import { v4 as uuid } from 'uuid';
 import { Op } from 'sequelize';
+import LANG from '@libs/lang';
 import { TIMESTAMP } from '@libs/constant';
-import { validateEmailAddress } from '@libs/user/validate';
+import { validateEmailAddress } from '@libs/user';
 
 import { generateJwt, sendResetPasswordEmail } from '@application/common/utils';
 import { BadRequestError, NotFoundError } from '@application/common/exceptions';
@@ -85,9 +86,9 @@ export class UserSendResetPasswordEmailCommandValidator
       attributes: ['id', 'emailAddress', 'emailConfirmed'],
     });
 
-    if (user === null) throw new NotFoundError({ message: `${emailAddress} not found` });
+    if (user === null) throw new NotFoundError({ message: LANG.USER_NOT_FOUND_ERROR });
     if (!user.emailConfirmed)
-      throw new BadRequestError({ message: `${emailAddress} hasn't confirmed` });
+      throw new BadRequestError({ message: LANG.USER_EMAIL_ACTIVATION_ERROR });
     command.userId = user.id;
   }
 }

@@ -1,5 +1,4 @@
 describe('Register Success', () => {
-  const serverId = 'kwtruoig'; // Replace SERVER_ID with an actual Mailosaur Server ID
   const firstName = new Date().getTime().toString().substring(0, 6);
   const lastName = new Date().getTime().toString().substring(6);
   const email = `${firstName}.${lastName}@mailinator.com`;

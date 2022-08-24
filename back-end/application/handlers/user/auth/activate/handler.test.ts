@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import LANG from '@libs/lang';
 import { dbContext, initializeDb, User } from '@database';
 import { mediator } from '@application/mediator';
 import { BadRequestError, NotFoundError } from '@application/common/exceptions';
@@ -34,7 +35,7 @@ test('activation code missing', async () => {
 
   const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(BadRequestError);
-  await rejects.toThrow(JSON.stringify({ message: 'Missing activation code' }));
+  await rejects.toThrow(JSON.stringify({ message: LANG.USER_ACTIVATION_TOKEN_MISSING_ERROR }));
 });
 
 test('user not found', async () => {
@@ -42,7 +43,7 @@ test('user not found', async () => {
 
   const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(BadRequestError);
-  await rejects.toThrow(JSON.stringify({ message: 'Activation code is invalid format' }));
+  await rejects.toThrow(JSON.stringify({ message: LANG.USER_ACTIVATION_TOKEN_INVALID_ERROR }));
 });
 
 test('user not found', async () => {
@@ -57,7 +58,7 @@ test('user not found', async () => {
 
   const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(NotFoundError);
-  await rejects.toThrow(JSON.stringify({ message: 'User is not found' }));
+  await rejects.toThrow(JSON.stringify({ message: LANG.USER_NOT_FOUND_ERROR }));
 });
 
 test('token invalid', async () => {
@@ -72,7 +73,7 @@ test('token invalid', async () => {
 
   const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(BadRequestError);
-  await rejects.toThrow(JSON.stringify({ message: 'Your confirm token is invalid' }));
+  await rejects.toThrow(JSON.stringify({ message: LANG.USER_ACTIVATION_TOKEN_INVALID_ERROR }));
 });
 
 test('token expired', async () => {
@@ -87,7 +88,7 @@ test('token expired', async () => {
 
   const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(BadRequestError);
-  await rejects.toThrow(JSON.stringify({ message: 'Your confirm token is expired' }));
+  await rejects.toThrow(JSON.stringify({ message: LANG.USER_ACTIVATION_TOKEN_EXPIRED_ERROR }));
 });
 
 test('activate success', async () => {

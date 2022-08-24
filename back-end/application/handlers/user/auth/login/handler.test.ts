@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import LANG from '@libs/lang';
 import { dbContext, initializeDb, User, UserLoginHistory } from '@database';
 import { BadRequestError, UnauthorizedError } from '@application/common/exceptions';
 import { mediator } from '@application/mediator';
@@ -34,7 +35,7 @@ test('email address missing', async () => {
 
   const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(BadRequestError);
-  await rejects.toThrow(JSON.stringify({ message: 'Username and password are required' }));
+  await rejects.toThrow(JSON.stringify({ message: LANG.USER_NAME_PASSWORD_MISSING_ERROR }));
 });
 
 test('password missing', async () => {
@@ -43,7 +44,7 @@ test('password missing', async () => {
 
   const rejects = expect(mediator.send(loginCommand)).rejects;
   await rejects.toThrow(BadRequestError);
-  await rejects.toThrow(JSON.stringify({ message: 'Username and password are required' }));
+  await rejects.toThrow(JSON.stringify({ message: LANG.USER_NAME_PASSWORD_MISSING_ERROR }));
 });
 
 test('user not found', async () => {
@@ -52,7 +53,7 @@ test('user not found', async () => {
 
   const rejects = expect(mediator.send(loginCommand)).rejects;
   await rejects.toThrow(UnauthorizedError);
-  await rejects.toThrow(JSON.stringify({ message: 'Username or password invalid' }));
+  await rejects.toThrow(JSON.stringify({ message: LANG.USER_NAME_PASSWORD_INVALID_ERROR }));
 });
 
 test('password invalid', async () => {
@@ -61,7 +62,7 @@ test('password invalid', async () => {
 
   const rejects = expect(mediator.send(loginCommand)).rejects;
   await rejects.toThrow(UnauthorizedError);
-  await rejects.toThrow(JSON.stringify({ message: 'Username or password invalid' }));
+  await rejects.toThrow(JSON.stringify({ message: LANG.USER_NAME_PASSWORD_INVALID_ERROR }));
 });
 
 test('login success', async () => {
