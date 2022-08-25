@@ -10,19 +10,13 @@ class Role extends Model<InferAttributes<Role>, InferCreationAttributes<Role>> {
 // https://sequelize.org/docs/v6/core-concepts/model-basics/#data-types
 Role.init(
   {
-    code: {
-      type: DataTypes.STRING,
-      primaryKey: true,
-      allowNull: false, // allowNull defaults to true
-    },
-    name: {
-      type: DataTypes.STRING,
-    },
+    code: { type: DataTypes.STRING, primaryKey: true, field: 'Code', allowNull: false },
+    name: { type: DataTypes.STRING, field: 'Name', allowNull: false },
   },
   {
     // Other model options go here
     sequelize: dbContext.sequelize, // We need to pass the connection instance
-    modelName: 'role', // We need to choose the model name
+    modelName: 'Role', // We need to choose the model name
     timestamps: false, //https://sequelize.org/docs/v6/core-concepts/model-basics/#timestamps
   }
 );

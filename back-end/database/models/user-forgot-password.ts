@@ -15,7 +15,6 @@ class UserForgotPassword
   implements UserForgotPasswordDto
 {
   declare id: CreationOptional<number>;
-  declare userId: number;
   declare ipAddress: string | null;
   declare userAgent: string | null;
   declare password: string | null;
@@ -23,41 +22,20 @@ class UserForgotPassword
   declare token: string;
   declare createdAt: CreationOptional<string>;
   declare updatedAt: CreationOptional<string>;
+  declare userId: number;
 }
 
 UserForgotPassword.init(
   {
-    id: {
-      type: DataTypes.BIGINT,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    userId: {
-      type: DataTypes.BIGINT,
-      references: {
-        model: User, // 'users' would also work
-        key: 'id',
-      },
-    },
-    ipAddress: {
-      type: DataTypes.STRING,
-    },
-    userAgent: {
-      type: DataTypes.STRING,
-    },
-    password: {
-      type: DataTypes.STRING,
-    },
-    salt: { type: DataTypes.STRING(8), allowNull: false },
-    token: {
-      type: DataTypes.STRING,
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-    },
+    id: { type: DataTypes.BIGINT, autoIncrement: true, primaryKey: true, field: 'Id' },
+    ipAddress: { type: DataTypes.STRING, field: 'IpAddress' },
+    userAgent: { type: DataTypes.STRING, field: 'UserAgent' },
+    password: { type: DataTypes.STRING, field: 'Password' },
+    salt: { type: DataTypes.STRING(8), field: 'EmailAddress', allowNull: false },
+    token: { type: DataTypes.STRING, field: 'Token', allowNull: false },
+    createdAt: { type: DataTypes.DATE, field: 'CreatedAt' },
+    updatedAt: { type: DataTypes.DATE, field: 'UpdatedAt' },
+    userId: { type: DataTypes.BIGINT, field: 'UserId' },
   },
   {
     sequelize: dbContext.sequelize, // We need to pass the connection instance
@@ -66,7 +44,7 @@ UserForgotPassword.init(
 );
 
 // https://sequelize.org/docs/v6/core-concepts/assocs/#one-to-one-relationships
-User.hasOne(UserForgotPassword, { onDelete: 'CASCADE' });
-UserForgotPassword.belongsTo(User, { onDelete: 'CASCADE' });
+User.hasMany(UserForgotPassword);
+UserForgotPassword.belongsTo(User, { foreignKey: { name: 'UserId' } });
 
 export default UserForgotPassword;

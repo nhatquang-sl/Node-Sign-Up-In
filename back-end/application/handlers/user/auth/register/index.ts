@@ -52,9 +52,9 @@ export class UserRegisterCommandHandler
       securityStamp,
     } as User);
 
-    let userRoles = [{ userId: result.id, roleCode: 'user' }];
+    let userRoles = [{ UserId: result.id, RoleCode: 'user' }];
     if (command.emailAddress === 'sunlight479@yahoo.com')
-      userRoles.push({ userId: result.id, roleCode: 'admin' });
+      userRoles.push({ UserId: result.id, RoleCode: 'admin' });
     await UserRole.bulkCreate(userRoles);
 
     // Create JWTs

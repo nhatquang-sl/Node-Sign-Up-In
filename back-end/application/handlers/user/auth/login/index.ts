@@ -36,6 +36,7 @@ export class UserLoginCommandHandler implements ICommandHandler<UserLoginCommand
       include: [
         {
           model: Role,
+          as: 'roles',
           attributes: ['code'],
           through: {
             attributes: [],

@@ -27,6 +27,8 @@ class User
   declare lastName: string;
   declare securityStamp: string;
   declare emailConfirmed: boolean;
+  declare createdAt: CreationOptional<string>;
+  declare updatedAt: CreationOptional<string>;
   declare roles?: NonAttribute<Role[]>;
   declare static associations: {
     roles: Association<User, Role>;
@@ -49,34 +51,21 @@ class User
 // https://sequelize.org/docs/v6/core-concepts/model-basics/#data-types
 User.init(
   {
-    id: {
-      type: DataTypes.BIGINT,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    emailAddress: { type: DataTypes.STRING, allowNull: false },
-    password: { type: DataTypes.STRING, allowNull: false },
-    salt: { type: DataTypes.STRING(8), allowNull: false },
-    firstName: {
-      type: DataTypes.STRING,
-      allowNull: false, // allowNull defaults to true
-    },
-    lastName: {
-      type: DataTypes.STRING,
-    },
-    securityStamp: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    emailConfirmed: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
+    id: { type: DataTypes.BIGINT, autoIncrement: true, primaryKey: true, field: 'Id' },
+    emailAddress: { type: DataTypes.STRING, field: 'EmailAddress', allowNull: false },
+    password: { type: DataTypes.STRING, field: 'Password', allowNull: false },
+    salt: { type: DataTypes.STRING(8), field: 'Salt', allowNull: false },
+    firstName: { type: DataTypes.STRING, field: 'FirstName', allowNull: false },
+    lastName: { type: DataTypes.STRING, field: 'LastName', allowNull: false },
+    securityStamp: { type: DataTypes.STRING, field: 'SecurityStamp', allowNull: false },
+    emailConfirmed: { type: DataTypes.BOOLEAN, field: 'EmailConfirmed', defaultValue: false },
+    createdAt: { type: DataTypes.DATE, field: 'CreatedAt' },
+    updatedAt: { type: DataTypes.DATE, field: 'UpdatedAt' },
   },
   {
     // Other model options go here
     sequelize: dbContext.sequelize, // We need to pass the connection instance
-    modelName: 'user', // We need to choose the model name
+    modelName: 'User', // We need to choose the model name
   }
 );
 

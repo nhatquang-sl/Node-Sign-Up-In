@@ -42,6 +42,7 @@ const validateUser = async (regUser: UserRegisterResult) => {
     include: [
       {
         model: Role,
+        as: 'roles',
         attributes: ['code'],
         through: {
           attributes: [],
