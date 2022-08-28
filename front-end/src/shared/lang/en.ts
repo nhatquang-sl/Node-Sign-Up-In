@@ -11,9 +11,12 @@ export const LANG = {
   USER_PASSWORD_DIGIT_CHAR_ERROR: 'Password contains at least one digit character',
   USER_PASSWORD_SPECIAL_CHAR_ERROR: 'Password contains at least one special character',
   USER_PASSWORD_LENGTH_ERROR: 'Password contains at least 8 characters',
+  USER_ACCESS_TOKEN_INVALID_ERROR: 'Access token is invalid',
   USER_ACTIVATION_TOKEN_INVALID_ERROR: 'Activation token is invalid',
   USER_ACTIVATION_TOKEN_EXPIRED_ERROR: 'Activation token is expired',
   USER_ACTIVATION_TOKEN_MISSING_ERROR: 'Activation token is required',
   USER_NAME_PASSWORD_MISSING_ERROR: 'Username and password are required',
   USER_NAME_PASSWORD_INVALID_ERROR: 'Username or password invalid',
+  SIGNAL_SOURCE_MISSING_ERROR: 'Signal source is required',
+  SIGNAL_STRATEGY_INVALID_ERROR: 'Signal strategy is invalid',
 };

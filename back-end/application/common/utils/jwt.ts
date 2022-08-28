@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import ENV from '@config';
 import { User } from '@database';
 
-export const generateJwt = (user: User, type: string) => {
+export const generateJwt = (user: User, type: string = '') => {
   const accessToken = jwt.sign(
     {
       userId: user.id,

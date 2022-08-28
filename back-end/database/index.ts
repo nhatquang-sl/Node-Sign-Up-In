@@ -9,6 +9,7 @@ import IPlan from '@database/models/i-plan';
 import ISignalSource from './models/i-signal-source';
 import ISignalStrategy from './models/i-signal-strategy';
 import ISignalStrategySource from './models/i-signal-strategy-source';
+import { SIGNAL_TYPE } from '@libs/constant/app-code';
 
 const initializeDb = async () => {
   // https://sequelize.org/docs/v6/core-concepts/model-basics/#model-synchronization
@@ -26,6 +27,14 @@ const initializeDb = async () => {
       { code: 'user', name: 'User' },
     ]);
   }
+
+  const signalSources = await ISignalSource.findAll();
+  if (!signalSources.length) {
+    await ISignalSource.bulkCreate([
+      { type: SIGNAL_TYPE.BOT_AI, name: 'Bot AI 1' } as ISignalSource,
+      { type: SIGNAL_TYPE.BOT_AI, name: 'Bot AI 2' } as ISignalSource,
+    ]);
+  }
 };
 export {
   User,
@@ -34,10 +43,10 @@ export {
   UserActivity,
   Role,
   UserRole,
-  IPlan as IPPlan,
-  ISignalSource as IPSignalSource,
-  ISignalStrategy as IPSignalStrategy,
-  ISignalStrategySource as IPSignalStrategySource,
+  IPlan,
+  ISignalSource,
+  ISignalStrategy,
+  ISignalStrategySource,
   dbContext,
   initializeDb,
 };

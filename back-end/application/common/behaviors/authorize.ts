@@ -26,7 +26,7 @@ export class AuthorizeBehavior implements IPipelineBehavior {
         ) {
           reject(new ForbiddenError());
         }
-        console.log({ decoded });
+        // console.log({ decoded });
         command.userId = decoded.userId;
         command.accessTokenType = decoded.type;
         resolve(decoded);

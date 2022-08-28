@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import ENV from '@config';
+import LANG from '@libs/lang';
 import { User } from '@database';
 import { mediator } from '@application/mediator';
 import { generateJwt, delay } from '@application/common/utils';
@@ -18,7 +19,7 @@ test('token missing', async () => {
   let command = new UserSetNewPasswordCommand('', '');
   const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(UnauthorizedError);
-  await rejects.toThrow(JSON.stringify({ message: `Invalid Token` }));
+  await rejects.toThrow(JSON.stringify({ message: LANG.USER_ACCESS_TOKEN_INVALID_ERROR }));
 });
 
 test('token expired', async () => {
@@ -36,7 +37,7 @@ test('token expired', async () => {
   let command = new UserSetNewPasswordCommand(accessToken, '');
   const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(UnauthorizedError);
-  await rejects.toThrow(JSON.stringify({ message: `Invalid Token` }));
+  await rejects.toThrow(JSON.stringify({ message: LANG.USER_ACCESS_TOKEN_INVALID_ERROR }));
 });
 
 test('token type invalid', async () => {

@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import ENV from '@config';
+import LANG from '@libs/lang';
 import { TIMESTAMP } from '@libs/constant';
 import { delay } from '@application/common/utils';
 import {
@@ -63,13 +64,13 @@ beforeAll(() => {
 test('access token missing', async () => {
   const rejects = expect(mediator.send(new TestCommand(10))).rejects;
   await rejects.toThrow(UnauthorizedError);
-  await rejects.toThrow(JSON.stringify({ message: 'Invalid Token' }));
+  await rejects.toThrow(JSON.stringify({ message: LANG.USER_ACCESS_TOKEN_INVALID_ERROR }));
 });
 
 test('access token invalid', async () => {
   const rejects = expect(mediator.send(new TestCommand(10, 'fake access token'))).rejects;
   await rejects.toThrow(UnauthorizedError);
-  await rejects.toThrow(JSON.stringify({ message: 'Invalid Token' }));
+  await rejects.toThrow(JSON.stringify({ message: LANG.USER_ACCESS_TOKEN_INVALID_ERROR }));
 });
 
 test('access token expired', async () => {
@@ -85,7 +86,7 @@ test('access token expired', async () => {
   await delay(2 * TIMESTAMP.SECOND);
   const rejects = expect(mediator.send(new TestCommand(10, accessToken))).rejects;
   await rejects.toThrow(UnauthorizedError);
-  await rejects.toThrow(JSON.stringify({ message: 'Invalid Token' }));
+  await rejects.toThrow(JSON.stringify({ message: LANG.USER_ACCESS_TOKEN_INVALID_ERROR }));
 });
 
 test('access token valid', async () => {

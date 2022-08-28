@@ -4,26 +4,32 @@ import {
   Model,
   InferAttributes,
   InferCreationAttributes,
+  NonAttribute,
+  Association,
 } from 'sequelize';
 import dbContext from '../db-context';
 import User from './user';
+import ISignalSource from './i-signal-source';
 
 // https://sequelize.org/docs/v6/other-topics/typescript/
 class ISignalStrategy extends Model<
-  InferAttributes<ISignalStrategy>,
-  InferCreationAttributes<ISignalStrategy>
+  InferAttributes<ISignalStrategy, { omit: 'sources' }>,
+  InferCreationAttributes<ISignalStrategy, { omit: 'sources' }>
 > {
   declare id: CreationOptional<number>;
   declare name: string;
   declare type: string;
-  declare strategy: string;
-  declare pattern: string;
+  declare method: string;
   declare copyCode: string;
   declare copyFrom: number;
   declare createdAt: CreationOptional<string>;
   declare updatedAt: CreationOptional<string>;
   declare deletedAt: CreationOptional<string>;
   declare userId: number;
+  declare sources?: NonAttribute<ISignalSource[]>;
+  declare static associations: {
+    sources: Association<ISignalStrategy, ISignalSource>;
+  };
 }
 
 // https://sequelize.org/docs/v6/core-concepts/model-basics/#data-types
@@ -37,8 +43,7 @@ ISignalStrategy.init(
     },
     name: { type: DataTypes.STRING, field: 'Name', allowNull: false },
     type: { type: DataTypes.STRING, field: 'Type', allowNull: false },
-    strategy: { type: DataTypes.STRING, field: 'Strategy', allowNull: false },
-    pattern: { type: DataTypes.STRING, field: 'Pattern' },
+    method: { type: DataTypes.STRING, field: 'Method' },
     copyCode: { type: DataTypes.STRING, field: 'CopyCode' },
     copyFrom: { type: DataTypes.BIGINT, field: 'CopyFrom' },
     createdAt: { type: DataTypes.DATE, field: 'CreatedAt' },

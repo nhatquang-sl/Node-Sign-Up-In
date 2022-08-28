@@ -45,6 +45,7 @@ ISignalSource.init(
     // Other model options go here
     sequelize: dbContext.sequelize, // We need to pass the connection instance
     modelName: 'SignalSource', // We need to choose the model name
+    paranoid: true, // https://sequelize.org/docs/v6/core-concepts/paranoid/
   }
 );
 
