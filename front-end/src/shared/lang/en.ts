@@ -18,5 +18,6 @@ export const LANG = {
   USER_NAME_PASSWORD_MISSING_ERROR: 'Username and password are required',
   USER_NAME_PASSWORD_INVALID_ERROR: 'Username or password invalid',
   SIGNAL_SOURCE_MISSING_ERROR: 'Signal source is required',
+  SIGNAL_SOURCE_PATTERN_MISSING_ERROR: 'Signal pattern is required',
   SIGNAL_STRATEGY_INVALID_ERROR: 'Signal strategy is invalid',
 };
