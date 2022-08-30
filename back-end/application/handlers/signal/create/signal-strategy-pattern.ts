@@ -11,7 +11,7 @@ import {
   AuthorizeCommand,
 } from '@application/mediator';
 
-export class SignalStrategyCreateBotAIStringCommand extends AuthorizeCommand {
+export class SignalStrategyCreateWithPatternCommand extends AuthorizeCommand {
   constructor(accessToken: string, obj: any = {}) {
     super(accessToken);
     this.name = obj?.name;
@@ -22,10 +22,10 @@ export class SignalStrategyCreateBotAIStringCommand extends AuthorizeCommand {
 }
 
 @Authorize()
-export class SignalStrategyCreateBotAIStringCommandHandler
-  implements ICommandHandler<SignalStrategyCreateBotAIStringCommand, ISignalStrategy>
+export class SignalStrategyCreateWithPatternCommandHandler
+  implements ICommandHandler<SignalStrategyCreateWithPatternCommand, ISignalStrategy>
 {
-  async handle(command: SignalStrategyCreateBotAIStringCommand): Promise<ISignalStrategy> {
+  async handle(command: SignalStrategyCreateWithPatternCommand): Promise<ISignalStrategy> {
     // create Signal Strategy
     const signalStrategy = await ISignalStrategy.create({
       name: command.name,
@@ -45,10 +45,10 @@ export class SignalStrategyCreateBotAIStringCommandHandler
 }
 
 @RegisterValidator
-export class SignalStrategyCreateBotAIStringCommandValidator
-  implements ICommandValidator<SignalStrategyCreateBotAIStringCommand>
+export class SignalStrategyCreateWithPatternCommandValidator
+  implements ICommandValidator<SignalStrategyCreateWithPatternCommand>
 {
-  async validate(command: SignalStrategyCreateBotAIStringCommand): Promise<void> {
+  async validate(command: SignalStrategyCreateWithPatternCommand): Promise<void> {
     command.patterns = command.patterns?.filter((p) => REGEX.SIGNAL_SOURCE_PATTERN.test(p));
 
     if (!command.patterns || !command.patterns.length)
