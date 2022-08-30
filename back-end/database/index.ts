@@ -1,3 +1,5 @@
+import bcrypt from 'bcrypt';
+import { v4 as uuid } from 'uuid';
 import User from '@database/models/user';
 import UserForgotPassword from '@database/models/user-forgot-password';
 import Role from '@database/models/role';
@@ -21,11 +23,12 @@ const initializeDb = async () => {
 
   const roles = await Role.findAll();
   if (!roles.length) {
-    Role.bulkCreate([
+    await Role.bulkCreate([
       { code: 'admin', name: 'Admin' },
       { code: 'support', name: 'Support' },
       { code: 'user', name: 'User' },
     ]);
+    await initializeAdmin();
   }
 
   const signalSources = await ISignalSource.findAll();
@@ -35,6 +38,27 @@ const initializeDb = async () => {
       { type: SIGNAL_TYPE.BOT_AI, name: 'Bot AI 2' } as ISignalSource,
     ]);
   }
+};
+
+const initializeAdmin = async () => {
+  const salt = uuid().split('-')[0];
+  const plainPassword = 'qua123x@X';
+  const password = await bcrypt.hash(plainPassword + salt, 10);
+  const securityStamp = uuid();
+
+  const result = await User.create({
+    emailAddress: 'quang.sunlight@gmail.com',
+    firstName: 'Quang',
+    lastName: 'Nguyen',
+    password,
+    salt,
+    securityStamp,
+  } as User);
+
+  await UserRole.bulkCreate([
+    { UserId: result.id, RoleCode: 'user' },
+    { UserId: result.id, RoleCode: 'admin' },
+  ]);
 };
 export {
   User,

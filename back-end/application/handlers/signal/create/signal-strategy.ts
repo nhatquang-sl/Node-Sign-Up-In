@@ -35,6 +35,7 @@ export class SignalStrategyCreateCommandHandler
       name: command.name,
       type: command.type,
       method: command.method,
+      userId: command.userId,
     } as ISignalStrategy);
 
     // create relationship between Signal Strategy and Sources

@@ -31,6 +31,7 @@ export class SignalStrategyCreateWithPatternCommandHandler
       name: command.name,
       type: SIGNAL_TYPE.BOT_AI,
       method: SIGNAL_METHOD.STRING,
+      userId: command.userId,
     } as ISignalStrategy);
 
     // create relationship between Signal Strategy and Sources
