@@ -5,7 +5,7 @@ import { dbContext, initializeDb, User, ISignalStrategy, ISignalSource } from '@
 import { mediator } from '@application/mediator';
 import { generateJwt } from '@application/common/utils';
 import { AuthorizeBehavior } from '@application/common/behaviors';
-import { SignalStrategyCreateBotAICommand } from './bot-ai';
+import { SignalStrategyCreateCommand } from './signal-strategy';
 
 const { accessToken } = generateJwt({ id: 1 } as User);
 
@@ -16,14 +16,14 @@ beforeEach(async () => {
   mediator.addPipelineBehavior(new AuthorizeBehavior());
 });
 
-test('create bot ai belongs to Bot AI 1', async () => {
+test('create signal strategy belongs to source 1', async () => {
   // set new password
-  let command = new SignalStrategyCreateBotAICommand(accessToken, {
-    name: 'Supper Bot 01',
-    type: SIGNAL_TYPE.BOT_AI,
-    method: SIGNAL_METHOD.MIX,
-    sourceIds: [1],
-  });
+  let command = new SignalStrategyCreateCommand(accessToken);
+  command.name = 'Supper Bot 01';
+  command.type = SIGNAL_TYPE.BOT_AI;
+  command.method = SIGNAL_METHOD.MIX;
+  command.sourceIds = [1];
+
   const { id } = (await mediator.send(command)) as ISignalStrategy;
   const ss = await ISignalStrategy.findByPk(id, {
     include: {
@@ -46,14 +46,14 @@ test('create bot ai belongs to Bot AI 1', async () => {
   expect(sources[0].type).toBe(SIGNAL_TYPE.BOT_AI);
 });
 
-test('create bot ai belongs to Bot AI 2', async () => {
+test('create signal strategy belongs to source 2', async () => {
   // set new password
-  let command = new SignalStrategyCreateBotAICommand(accessToken, {
-    name: 'Supper Bot 01',
-    type: SIGNAL_TYPE.BOT_AI,
-    method: SIGNAL_METHOD.MIX,
-    sourceIds: [2],
-  });
+  let command = new SignalStrategyCreateCommand(accessToken);
+  command.name = 'Supper Bot 01';
+  command.type = SIGNAL_TYPE.BOT_AI;
+  command.method = SIGNAL_METHOD.MIX;
+  command.sourceIds = [2];
+
   const { id } = (await mediator.send(command)) as ISignalStrategy;
   const ss = await ISignalStrategy.findByPk(id, {
     include: {
@@ -76,14 +76,14 @@ test('create bot ai belongs to Bot AI 2', async () => {
   expect(sources[0].type).toBe(SIGNAL_TYPE.BOT_AI);
 });
 
-test('create bot ai belongs to two sources', async () => {
+test('create signal strategy belongs to two sources', async () => {
   // set new password
-  let command = new SignalStrategyCreateBotAICommand(accessToken, {
-    name: 'Supper Bot 01',
-    type: SIGNAL_TYPE.BOT_AI,
-    method: SIGNAL_METHOD.MIX,
-    sourceIds: [1, 2],
-  });
+  let command = new SignalStrategyCreateCommand(accessToken);
+  command.name = 'Supper Bot 01';
+  command.type = SIGNAL_TYPE.BOT_AI;
+  command.method = SIGNAL_METHOD.MIX;
+  command.sourceIds = [1, 2];
+
   const { id } = (await mediator.send(command)) as ISignalStrategy;
   const ss = await ISignalStrategy.findByPk(id, {
     include: {
@@ -109,14 +109,13 @@ test('create bot ai belongs to two sources', async () => {
   expect(sources[1].type).toBe(SIGNAL_TYPE.BOT_AI);
 });
 
-test('create bot ai belongs to two sources - first one is deleted', async () => {
+test('create signal strategy belongs to two sources - first one is deleted', async () => {
   await ISignalSource.destroy({ where: { id: 1 } });
-  let command = new SignalStrategyCreateBotAICommand(accessToken, {
-    name: 'Supper Bot 01',
-    type: SIGNAL_TYPE.BOT_AI,
-    method: SIGNAL_METHOD.MIX,
-    sourceIds: [1, 2],
-  });
+  let command = new SignalStrategyCreateCommand(accessToken);
+  command.name = 'Supper Bot 01';
+  command.type = SIGNAL_TYPE.BOT_AI;
+  command.method = SIGNAL_METHOD.MIX;
+  command.sourceIds = [1, 2];
 
   const { id } = (await mediator.send(command)) as ISignalStrategy;
   const ss = await ISignalStrategy.findByPk(id, {
@@ -140,14 +139,13 @@ test('create bot ai belongs to two sources - first one is deleted', async () => 
   expect(sources[0].type).toBe(SIGNAL_TYPE.BOT_AI);
 });
 
-test('create bot ai belongs to two sources - second one is deleted', async () => {
+test('create signal strategy belongs to two sources - second one is deleted', async () => {
   await ISignalSource.destroy({ where: { id: 2 } });
-  let command = new SignalStrategyCreateBotAICommand(accessToken, {
-    name: 'Supper Bot 01',
-    type: SIGNAL_TYPE.BOT_AI,
-    method: SIGNAL_METHOD.MIX,
-    sourceIds: [1, 2],
-  });
+  let command = new SignalStrategyCreateCommand(accessToken);
+  command.name = 'Supper Bot 01';
+  command.type = SIGNAL_TYPE.BOT_AI;
+  command.method = SIGNAL_METHOD.MIX;
+  command.sourceIds = [1, 2];
 
   const { id } = (await mediator.send(command)) as ISignalStrategy;
   const ss = await ISignalStrategy.findByPk(id, {

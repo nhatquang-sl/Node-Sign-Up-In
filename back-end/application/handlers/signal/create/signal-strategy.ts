@@ -11,27 +11,29 @@ import {
   AuthorizeCommand,
 } from '@application/mediator';
 
-export class SignalStrategyCreateBotAICommand extends AuthorizeCommand {
-  constructor(accessToken: string, obj: any) {
+export class SignalStrategyCreateCommand extends AuthorizeCommand {
+  constructor(accessToken: string, obj: any = {}) {
     super(accessToken);
     this.name = obj?.name;
+    this.type = obj?.type;
     this.method = obj?.method;
     this.sourceIds = obj?.sourceIds ?? [];
   }
   declare name: string;
+  declare type: string;
   declare method: string;
   sourceIds: number[] = [];
 }
 
 @Authorize()
-export class SignalStrategyCreateBotAICommandHandler
-  implements ICommandHandler<SignalStrategyCreateBotAICommand, ISignalStrategy>
+export class SignalStrategyCreateCommandHandler
+  implements ICommandHandler<SignalStrategyCreateCommand, ISignalStrategy>
 {
-  async handle(command: SignalStrategyCreateBotAICommand): Promise<ISignalStrategy> {
+  async handle(command: SignalStrategyCreateCommand): Promise<ISignalStrategy> {
     // create Signal Strategy
     const signalStrategy = await ISignalStrategy.create({
       name: command.name,
-      type: SIGNAL_TYPE.BOT_AI,
+      type: command.type,
       method: command.method,
     } as ISignalStrategy);
 
@@ -47,16 +49,20 @@ export class SignalStrategyCreateBotAICommandHandler
 }
 
 @RegisterValidator
-export class SignalStrategyCreateBotAICommandValidator
-  implements ICommandValidator<SignalStrategyCreateBotAICommand>
+export class SignalStrategyCreateCommandValidator
+  implements ICommandValidator<SignalStrategyCreateCommand>
 {
-  async validate(command: SignalStrategyCreateBotAICommand): Promise<void> {
+  async validate(command: SignalStrategyCreateCommand): Promise<void> {
     // Signal Source is required
     if (!command.sourceIds || !command.sourceIds.length)
       throw new BadRequestError(LANG.SIGNAL_SOURCE_MISSING_ERROR);
 
+    // Signal types allowed
+    if ([SIGNAL_TYPE.BOT_AI, SIGNAL_TYPE.EXPERT, SIGNAL_TYPE.TELEGRAM].indexOf(command.type) < 0)
+      throw new BadRequestError(LANG.SIGNAL_TYPE_INVALID_ERROR);
+
     // Signal methods allowed
-    if ([SIGNAL_METHOD.MIX, SIGNAL_METHOD.SINGLE].indexOf(command.method))
+    if ([SIGNAL_METHOD.MIX, SIGNAL_METHOD.SINGLE].indexOf(command.method) < 0)
       throw new BadRequestError(LANG.SIGNAL_STRATEGY_INVALID_ERROR);
 
     const sources = await ISignalSource.findAll({
