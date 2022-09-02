@@ -63,11 +63,14 @@ export class SignalStrategyCreateCommandValidator
       throw new BadRequestError(LANG.SIGNAL_TYPE_INVALID_ERROR);
 
     // Signal methods allowed
-    if ([SIGNAL_METHOD.MIX, SIGNAL_METHOD.SINGLE].indexOf(command.method) < 0)
+    if (
+      [SIGNAL_METHOD.MIX, SIGNAL_METHOD.SINGLE].indexOf(command.method) < 0 &&
+      command.type == SIGNAL_TYPE.BOT_AI
+    )
       throw new BadRequestError(LANG.SIGNAL_STRATEGY_INVALID_ERROR);
 
     const sources = await ISignalSource.findAll({
-      where: { id: { [Op.in]: command.sourceIds }, type: SIGNAL_TYPE.BOT_AI },
+      where: { id: { [Op.in]: command.sourceIds }, type: command.type },
       attributes: ['id'],
     });
 

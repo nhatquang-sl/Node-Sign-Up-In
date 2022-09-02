@@ -36,6 +36,17 @@ test('source missing', async () => {
   await rejects.toThrow(JSON.stringify({ message: LANG.SIGNAL_SOURCE_MISSING_ERROR }));
 });
 
+test('source type invalid', async () => {
+  let command = new SignalStrategyCreateCommand(accessToken);
+  command.name = 'Supper Bot 01';
+  command.type = SIGNAL_TYPE.EXPERT;
+  command.sourceIds = [1];
+
+  const rejects = expect(mediator.send(command)).rejects;
+  await rejects.toThrow(BadRequestError);
+  await rejects.toThrow(JSON.stringify({ message: LANG.SIGNAL_SOURCE_MISSING_ERROR }));
+});
+
 test('source invalid', async () => {
   let command = new SignalStrategyCreateCommand(accessToken);
   command.name = 'Supper Bot 01';
