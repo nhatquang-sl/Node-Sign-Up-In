@@ -12,7 +12,6 @@ import { mediator } from '@application/mediator';
 import { generateJwt } from '@application/common/utils';
 import { AuthorizeBehavior } from '@application/common/behaviors';
 import { SignalStrategyGetByUserCommand } from './by-user';
-import { where } from 'sequelize/types';
 
 const { accessToken } = generateJwt({ id: 1 } as User);
 
