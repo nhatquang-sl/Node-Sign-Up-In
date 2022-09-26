@@ -1,7 +1,9 @@
 name: Unit tests
 
 # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
-on: [push]
+on:
+  push:
+    - 'github-actions'
 
 jobs:
   tests:
