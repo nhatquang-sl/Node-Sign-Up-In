@@ -20,15 +20,10 @@ jobs:
     
     steps:
       - uses: actions/checkout@v2
-      - name: get_subm
-        env:
-          SSHK: ${{ secrets.SUB_CREDENTIALS }}
-        run: |
-          mkdir -p $HOME/.ssh
-          echo "$SSHK" > $HOME/.ssh/ssh.key
-          chmod 600 $HOME/.ssh/ssh.key
-          export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/ssh.key"
-          git submodule update --init --recursive
+        with:
+          repository: nhatquang-sl/node-sign-up-in-credentials
+          token: ${{ secrets.SUB_CREDENTIALS }}
+          path: back-end/node-sign-up-in-credentials
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
