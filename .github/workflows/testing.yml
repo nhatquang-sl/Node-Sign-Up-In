@@ -10,13 +10,15 @@ jobs:
   tests:
     runs-on: windows-latest 
     #https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
+    defaults:
+      run:
+        working-directory: ./back-end
 
     strategy:
       matrix:
         node-version: [14.x]
     
     steps:
-      working-directory: ./back-end
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
