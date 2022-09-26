@@ -8,7 +8,8 @@ on:
 
 jobs:
   tests:
-    run-on: windows-latest #https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
+    runs-on: windows-latest 
+    #https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
 
     strategy:
       matrix:
