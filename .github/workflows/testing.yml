@@ -19,10 +19,15 @@ jobs:
         node-version: [14.x]
     
     steps:
+      - uses: webfactory/ssh-agent@v0.4.1
+        with:
+          ssh-private-key: |
+            ${{ secrets.SUB_CREDENTIALS}}
+          repo-mappings: |
+            github.com:nhatquang-sl/node-sign-up-in-credentials.git
       - uses: actions/checkout@v2
         with:
-          submodules: 'back-end/node-sign-up-in-credentials'
-          token: ${{ secrets.SUB_CREDENTIALS }}
+          submodules: recursive # this is important not to forget
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
