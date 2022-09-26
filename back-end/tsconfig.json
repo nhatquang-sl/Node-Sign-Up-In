@@ -22,6 +22,6 @@
     "strict": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true // for @automapper/classes
+    "emitDecoratorMetadata": true
   }
 }

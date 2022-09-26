@@ -7,6 +7,7 @@
   - [Forgot Password](#forgot-password)
   - [Salt Password](/back-end/docs/salt-password.md)
   - [Mediator](/back-end/docs/mediator.md)
+  - [AutoMapper](/back-end/docs/auto-mapper.md)
 
 # Scripts
 
