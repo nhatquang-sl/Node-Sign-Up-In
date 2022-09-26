@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-        working-directory: scripts 
+        working-directory: back-end
       - name: npm install
         run: npm ci
       - name: tests
