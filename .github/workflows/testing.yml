@@ -20,7 +20,7 @@ jobs:
     
     steps:
       - uses: actions/checkout@v2
-      - name: get_subm
+      - name: get submodule #https://rgoswami.me/posts/priv-gh-actions/
         env:
           SSHK: ${{ secrets.SUB_CREDENTIALS }}
         run: |
