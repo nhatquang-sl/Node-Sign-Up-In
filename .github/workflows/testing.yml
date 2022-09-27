@@ -37,24 +37,3 @@ jobs:
         run: npm ci
       - name: Run Unittest
         run: npm test
-  frontend:
-    runs-on: ubuntu-latest 
-    #https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
-    defaults:
-      run:
-        working-directory: ./front-end
-
-    strategy:
-      matrix:
-        node-version: [16.x, 14.x]
-    
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: npm install
-        run: npm ci
-      - name: Run Unittest
-        run: npm test
