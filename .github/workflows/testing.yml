@@ -20,7 +20,7 @@ jobs:
     
     steps:
       - uses: actions/checkout@v2
-      - name: get submodule #https://rgoswami.me/posts/priv-gh-actions/
+      - name: Get Submodule #https://rgoswami.me/posts/priv-gh-actions/
         env:
           SSHK: ${{ secrets.SUB_CREDENTIALS }}
         run: |
@@ -35,5 +35,5 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: npm install
         run: npm ci
-      - name: tests
+      - name: Run Unittest
         run: npm test
