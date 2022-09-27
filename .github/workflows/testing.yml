@@ -33,9 +33,9 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: npm install
-        run: npm ci
-      - name: Run Unittest
+      - name: Install dependencies
+        run: npm i
+      - name: Run test
         run: npm test
   frontend:
     runs-on: ubuntu-latest 
@@ -49,12 +49,13 @@ jobs:
         node-version: [16.x, 14.x]
     
     steps:
-      - uses: actions/checkout@v2
+      - name: Clone repository
+        uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: npm install
-        run: npm ci
-      - name: Run Unittest
+      - name: Install dependencies
+        run: npm i
+      - name: Run test
         run: npm test
