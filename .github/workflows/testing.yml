@@ -19,8 +19,9 @@ jobs:
         node-version: [16.x, 14.x]
     
     steps:
-      - uses: actions/checkout@v2
-      - name: Get Submodule #https://rgoswami.me/posts/priv-gh-actions/
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Clone Submodule #https://rgoswami.me/posts/priv-gh-actions/
         env:
           SSHK: ${{ secrets.SUB_CREDENTIALS }}
         run: |
