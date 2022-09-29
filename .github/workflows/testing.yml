@@ -65,7 +65,7 @@ jobs:
     needs: [backend, frontend]
     defaults:
       run:
-        working-directory: ./back-end
+        working-directory: /back-end
     strategy:
       matrix:
         node-version: [14.x]
