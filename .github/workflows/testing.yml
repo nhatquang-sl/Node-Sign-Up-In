@@ -90,7 +90,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           CI: false
         run: |
-          shx rm -rf public && shx mkdir public
+          rm -rf public && mkdir public
           cd ../front-end && npm i && npm run build
           cd ../back-end && npm i
           npx vercel deploy --prod --token ${VERCEL_TOKEN}
