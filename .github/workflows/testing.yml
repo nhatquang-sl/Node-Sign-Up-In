@@ -65,10 +65,25 @@ jobs:
     needs: [backend, frontend]
     defaults:
       run:
-        working-directory: /back-end
+        working-directory: ./back-end
     strategy:
       matrix:
         node-version: [14.x]
     steps:
-      - name: "Deploy application"
-        run: npm run deploy
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Clone Submodule #https://rgoswami.me/posts/priv-gh-actions/
+        env:
+          SSHK: ${{ secrets.SUB_CREDENTIALS }}
+        run: |
+          mkdir -p $HOME/.ssh
+          echo "$SSHK" > $HOME/.ssh/ssh.key
+          chmod 600 $HOME/.ssh/ssh.key
+          export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/ssh.key"
+          git submodule update --init --recursive
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: npm i
