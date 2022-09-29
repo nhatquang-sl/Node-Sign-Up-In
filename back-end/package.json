@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "set NODE_ENV=development&& tsnd --respawn index.ts",
     "start": "vercel dev",
-    "deploy": "cd ../front-end && npm run build && cd ../back-end && vercel deploy --prod",
+    "deploy": "npx shx rm -rf public && npx shx mkdir public && cd ../front-end && npm run build && cd ../back-end && vercel deploy --prod",
     "test": "set NODE_ENV=test&& jest",
     "test-watch": "set NODE_ENV=test&& jest --watchAll"
   },
