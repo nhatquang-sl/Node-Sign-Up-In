@@ -60,3 +60,15 @@ jobs:
         run: npm i
       - name: Run test
         run: npm test
+  Deploy-Production:
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    defaults:
+      run:
+        working-directory: ./back-end
+    strategy:
+      matrix:
+        node-version: [14.x]
+    steps:
+      - name: "Deploy application"
+        run: npm run deploy
