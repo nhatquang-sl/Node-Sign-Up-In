@@ -93,4 +93,4 @@ jobs:
           rm -rf public && mkdir public
           cd ../front-end && npm i && npm run build
           cd ../back-end && npm i
-          npx vercel deploy --prod --token ${VERCEL_TOKEN}
+          npx vercel deploy --prod --token ${VERCEL_TOKEN} --confirm
