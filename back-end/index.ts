@@ -24,7 +24,7 @@ mediator.addPipelineBehavior(new AuthorizeBehavior());
 const app = express();
 
 // Cross Origin Resource Sharing
-app.use(cors());
+// app.use(cors());
 app.use(cors(corsOptions));
 
 // built-in middleware to handle urlencoded data
@@ -39,11 +39,15 @@ app.use(express.json());
 const fePath = path.join(__dirname, 'public');
 app.use('/', express.static(fePath));
 const router = express.Router();
-router.get('^/$|/index(.html)?', (req, res) => {
-  res.sendFile(path.join(fePath, 'index.html'));
-});
 router.get('/health-check', (req, res) => {
-  res.json(ENV.APP_VERSION);
+  res.json({
+    ENV: ENV.NODE_ENV,
+    APP_VERSION: ENV.APP_VERSION,
+    APP_HOST: ENV.APP_HOST,
+  });
+});
+router.get('*', (req, res) => {
+  res.sendFile(path.join(fePath, 'index.html'));
 });
 
 // Middleware function for logging the request method and request URL
@@ -57,10 +61,10 @@ const requestLogger = (request: Request, response: Response, next: NextFunction)
 };
 
 app.use(requestLogger);
-app.use('/', router);
 
 app.use('/auth', authRoute);
 app.use('/user', userRoute);
+app.use('/', router);
 
 // https://medium.com/@utkuu/error-handling-in-express-js-and-express-async-errors-package-639c91ba3aa2
 const errorLogger = (error: Error, request: Request, response: Response, next: NextFunction) => {
