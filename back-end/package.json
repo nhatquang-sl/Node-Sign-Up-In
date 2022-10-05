@@ -11,8 +11,7 @@
     "deploy:be": "vercel deploy --prod",
     "test": "set NODE_ENV=test&& jest",
     "test-watch": "set NODE_ENV=test&& jest --watchAll",
-    "postinstall": "npm i",
-    "start": "npm run build:be && node dist/back-end/index.js",
+    "start": "npm i && npm run build:be && node dist/back-end/index.js",
     "deploy": "git add . && git commit -m Heroku && git push heroku master"
   },
   "keywords": [],
