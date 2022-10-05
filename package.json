@@ -10,7 +10,8 @@
   },
   "scripts": {
     "start": "cd back-end && npm start",
-    "heroku-cleanup": "cd back-end && ls && npm i",
+    "heroku-prebuild": "npm install --prefix back-end",
+    "heroku-postbuild": "cd back-end && ls",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
