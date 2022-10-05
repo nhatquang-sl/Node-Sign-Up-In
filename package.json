@@ -9,9 +9,9 @@
     "cz-conventional-changelog": "^3.3.0"
   },
   "scripts": {
-    "start": "cd back-end && npm start",
+    "start": "node back-end/dist/back-end/index.js",
     "heroku-prebuild": "npm install --prefix back-end",
-    "heroku-postbuild": "cd back-end && ls",
+    "heroku-postbuild": "cd ./back-end && npm run build:be",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
