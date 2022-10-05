@@ -9,7 +9,7 @@
     "cz-conventional-changelog": "^3.3.0"
   },
   "scripts": {
-    "postinstall": "npm install --prefix back-end",
+    "start": "cd back-end && npm start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
