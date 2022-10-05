@@ -12,7 +12,7 @@
     "test": "set NODE_ENV=test&& jest",
     "test-watch": "set NODE_ENV=test&& jest --watchAll",
     "postinstall": "npm run clean && tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json && cd dist/back-end && ncc build index.js -o ../../api",
-    "start": "node api/index.js",
+    "start": "npm run clean && npm run build:be && node api/index.js",
     "deploy": "git add . && git commit -m Heroku && git push heroku master"
   },
   "keywords": [],
