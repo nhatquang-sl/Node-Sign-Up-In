@@ -6,13 +6,13 @@
   "scripts": {
     "dev": "set NODE_ENV=development&& tsnd --respawn index.ts",
     "clean": "npx shx rm -rf api/* && npx shx rm -rf dist",
-    "build:be": "npm run clean && tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json && cd dist/back-end && ncc build index.js -o ../../api",
+    "build:be": "npm run clean && tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json && npx shx cp -R node-sign-up-in-credentials dist/back-end",
     "deploy:all": "npx shx rm -rf public && npx shx mkdir public && cd ../front-end && npm run build && cd ../back-end && vercel deploy --prod",
     "deploy:be": "vercel deploy --prod",
     "test": "set NODE_ENV=test&& jest",
     "test-watch": "set NODE_ENV=test&& jest --watchAll",
-    "postinstall": "npm i && npm run clean && tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json && cd dist/back-end && ncc build index.js -o ../../api",
-    "start": "npm run clean && npm run build:be && node api/index.js",
+    "postinstall": "npm i",
+    "start": "npm run build:be && node dist/back-end/index.js",
     "deploy": "git add . && git commit -m Heroku && git push heroku master"
   },
   "keywords": [],
