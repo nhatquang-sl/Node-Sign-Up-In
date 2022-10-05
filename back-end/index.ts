@@ -1,4 +1,3 @@
-import 'module-alias/register';
 import 'express-async-errors';
 import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
@@ -83,3 +82,5 @@ dbContext.connect().then(async () => {
   // await initializeDb();
   app.listen(ENV.PORT, () => console.log(`Server running on port ${ENV.PORT}`));
 });
+
+export default app;

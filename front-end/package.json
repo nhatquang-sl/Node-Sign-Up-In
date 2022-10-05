@@ -33,7 +33,7 @@
   "scripts": {
     "start": "react-scripts start",
     "dev": "set REACT_APP_ENV=development&& react-scripts start",
-    "build": "react-scripts build && shx mv build/* ../back-end/public",
+    "build": "set REACT_APP_ENV=production&&react-scripts build && shx mv build/* ../back-end/public",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
