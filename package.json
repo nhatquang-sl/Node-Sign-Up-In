@@ -11,7 +11,7 @@
   "scripts": {
     "start": "node back-end/dist/back-end/index.js",
     "heroku-prebuild": "cd ./back-end && npm i",
-    "heroku-postbuild": "cd ./back-end && npm run build:be",
+    "heroku-postbuild": "cd ./back-end && npm run build:heroku",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

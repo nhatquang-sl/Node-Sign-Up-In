@@ -5,14 +5,15 @@
   "main": "index.js",
   "scripts": {
     "dev": "set NODE_ENV=development&& tsnd --respawn index.ts",
-    "clean": "npx shx rm -rf api/* && npx shx rm -rf dist",
-    "build:be": "npm run clean && tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json && npx shx cp -R node-sign-up-in-credentials dist/back-end",
-    "deploy:all": "npx shx rm -rf public && npx shx mkdir public && cd ../front-end && npm run build && cd ../back-end && vercel deploy --prod",
+    "clean": "shx rm -rf public && shx rm -rf dist && shx mkdir public",
+    "build": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json && shx cp -R node-sign-up-in-credentials dist/back-end",
+    "build-fe": "cd ../front-end && npm run build && cd ../back-end",
+    "build:heroku": "npm run clean && npm run build && npm run build-fe && shx cp -R public dist/back-end",
+    "deploy:all": "shx rm -rf public && shx mkdir public && cd ../front-end && npm run build && cd ../back-end && vercel deploy --prod",
     "deploy:be": "vercel deploy --prod",
     "test": "set NODE_ENV=test&& jest",
     "test-watch": "set NODE_ENV=test&& jest --watchAll",
-    "start": "npm i && npm run build:be && node dist/back-end/index.js",
-    "deploy": "git add . && git commit -m Heroku && git push heroku master"
+    "start": "npm i && npm run build:be && node dist/back-end/index.js"
   },
   "keywords": [],
   "author": "",
@@ -43,6 +44,7 @@
   "devDependencies": {
     "jest": "^28.1.0",
     "prettier": "^2.6.2",
+    "shx": "^0.3.4",
     "sqlite3": "^5.0.8",
     "ts-jest": "^28.0.3",
     "ts-node": "^10.7.0",

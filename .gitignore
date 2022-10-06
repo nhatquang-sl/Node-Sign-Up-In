@@ -2,4 +2,4 @@
 **/build
 **/.vercel
 back-end/public
-back-end/dist
+**/dist
