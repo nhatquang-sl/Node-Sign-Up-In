@@ -15,9 +15,9 @@ function App() {
   console.log('App');
   useEffect(() => {
     var endpoint = 'https://api.bitgo.press/api/iplatform';
-    // endpoint = 'https://localhost:64403';
+    endpoint = 'https://localhost:64403';
     // endpoint = 'https://jk-iplatform-api-dev.azurewebsites.net';
-    endpoint = 'https://quang-dev.azurewebsites.net';
+    // endpoint = 'https://quang-dev.azurewebsites.net';
     var connection = new signalR.HubConnectionBuilder()
       .withUrl(`${endpoint}/plan-order-hub`, {
         transport: signalR.HttpTransportType.WebSockets,
@@ -32,9 +32,24 @@ function App() {
       console.log(message);
     });
 
-    connection.start().catch(function (err) {
-      return console.error(err.toString());
-    });
+    connection
+      .start()
+      .then(function () {
+        console.log('connected');
+        connection.invoke('GetLastMessages').then(function (data) {
+          console.log(`Last Message: ${data.length}`);
+
+          data
+            .map(function (x: any) {
+              return JSON.parse(x);
+            })
+            .sort((a: any, b: any) => a.time - b.time)
+            .forEach((x: any) => console.log(new Date(x.time)));
+        });
+      })
+      .catch(function (err) {
+        return console.error(err.toString());
+      });
   });
   return (
     <div style={{ display: 'flex' }}>
