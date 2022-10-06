@@ -28,7 +28,7 @@ function App() {
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
-    connection.on('ReceiveMessage', function (message) {
+    connection.on('ReceiveMessage', function (message: any) {
       console.log(message);
     });
 
@@ -36,7 +36,7 @@ function App() {
       .start()
       .then(function () {
         console.log('connected');
-        connection.invoke('GetLastMessages').then(function (data) {
+        connection.invoke('GetLastMessages').then(function (data: any) {
           console.log(`Last Message: ${data.length}`);
 
           data
@@ -47,7 +47,7 @@ function App() {
             .forEach((x: any) => console.log(new Date(x.time)));
         });
       })
-      .catch(function (err) {
+      .catch(function (err: any) {
         return console.error(err.toString());
       });
   });
