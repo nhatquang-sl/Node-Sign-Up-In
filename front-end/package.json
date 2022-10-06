@@ -33,7 +33,8 @@
     "shx": "^0.3.4"
   },
   "devDependencies": {
-    "@reduxjs/toolkit": "^1.8.1"
+    "@reduxjs/toolkit": "^1.8.1",
+    "vercel": "^28.4.7"
   },
   "resolutions": {
     "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"
