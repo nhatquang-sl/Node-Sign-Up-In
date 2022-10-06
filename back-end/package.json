@@ -39,12 +39,12 @@
     "@types/node-mailjet": "^3.3.8",
     "express-async-errors": "^3.1.1",
     "tsc-alias": "^1.7.0",
+    "shx": "^0.3.4",
     "vercel": "^24.1.0"
   },
   "devDependencies": {
     "jest": "^28.1.0",
     "prettier": "^2.6.2",
-    "shx": "^0.3.4",
     "sqlite3": "^5.0.8",
     "ts-jest": "^28.0.3",
     "ts-node": "^10.7.0",
