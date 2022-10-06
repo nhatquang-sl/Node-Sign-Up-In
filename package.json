@@ -9,8 +9,8 @@
     "cz-conventional-changelog": "^3.3.0"
   },
   "scripts": {
-    "start": "set REACT_APP_ENV=production&& node back-end/dist/back-end/index.js",
-    "heroku-prebuild": "cd ./back-end && npm i && cd ../front-end && npm i",
+    "start": "node back-end/dist/back-end/index.js",
+    "heroku-prebuild": "npm i --prefix back-end && npm i && npm i --prefix front-end",
     "heroku-postbuild": "cd ./back-end && npm run build:heroku",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
