@@ -10,9 +10,13 @@
     "@testing-library/react": "^13.1.1",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.4.1",
+    "@types/lodash": "^4.14.182",
     "@types/node": "^16.11.27",
     "@types/react": "^18.0.6",
     "@types/react-dom": "^18.0.2",
+    "@types/react-redux": "^7.1.24",
+    "@types/react-router-dom": "^5.3.3",
+    "@types/redux-logger": "^3.0.9",
     "axios": "^0.27.0",
     "lodash": "^4.17.21",
     "react": "^18.0.0",
@@ -25,12 +29,7 @@
     "redux-thunk": "^2.4.1",
     "styled-components": "^5.3.5",
     "typescript": "^4.6.3",
-    "web-vitals": "^2.1.4",
-    "@types/lodash": "^4.14.182",
-    "@types/react-redux": "^7.1.24",
-    "@types/react-router-dom": "^5.3.3",
-    "@types/redux-logger": "^3.0.9",
-    "shx": "^0.3.4"
+    "web-vitals": "^2.1.4"
   },
   "devDependencies": {
     "@reduxjs/toolkit": "^1.8.1",
@@ -42,7 +41,8 @@
   "scripts": {
     "start": "react-scripts start",
     "dev": "set REACT_APP_ENV=development&& react-scripts start",
-    "build": "react-scripts build && shx mv build/* ../back-end/public",
+    "build": "react-scripts build",
+    "deploy:vercel": "vercel deploy --prod",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
