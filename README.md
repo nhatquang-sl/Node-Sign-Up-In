@@ -11,57 +11,26 @@
 # Scripts
 
 ## Back End
-
 - `npm init -y`: generate `package.json`
-- `npm i typescript -D`: install TypeScript
+
+```
+npm i typescript ts-node nodemon tsc-alias tsconfig-paths prettier shx -D
+npm i express @types/express -S
+```
 - `npx tsc --init`: create `tsconfig.json` for typescript compiler
-- `npm i ts-node -D`: allow us compile and run the typescript file
-- `npm i ts-node-dev -D`: allow auto reload
-  - `"start": "tsnd --respawn src/server.ts"`
-- `npm install express -S`, `npm install @types/express -D`
-- `npm i prettier -D`
-- `npm i module-alias -D`: Create aliases of directories and register custom module paths in NodeJS
-  - Update `package.json`
+- `tsc-alias`: replace alias paths with relative paths after typescript compilation. **Compile time (no runtime dependencies)**
+- `tsconfig-paths`: load modules whose location is specified in the paths section of `tsconfig.json` or `jsconfig.json`. Both loading at **run-time** and via API are supported.
+- `shx`: a wrapper around ShellJS Unix commands, providing an easy solution for simple Unix-like, cross-platform commands in npm package scripts.
+- Update `package.json`
   ```
-  "_moduleAliases": {
-    "@config": "./config"
-  }
+  "dev": "nodemon -r tsconfig-paths/register index.ts",
+  "build": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   ```
-  - Update `tsconfig.json`
+- Update `tsconfig.json`
   ```
   "paths": {
     "@config": ["config"],
     "@config/*": ["config/*"]
-  }
-  ```
-
-### Deploy
-
-- `npm install -g vercel`: Installing vercel cli to global
-- `vercel login`: Login to Vercel
-- Update `package.json`
-  ```
-  "scripts": {
-    "start": "vercel dev",
-    "deploy" : "vercel deploy --prod"
-  },
-  ```
-- Add `vercel.json`
-  ```
-  {
-    "version": 2,
-    "builds": [
-        {
-            "src": "index.ts",
-            "use": "@vercel/node"
-        }
-    ],
-    "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "index.ts"
-        }
-    ]
   }
   ```
 
@@ -93,7 +62,18 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
   ```
-- `npm i shx -D`: is a wrapper around ShellJS Unix commands, providing an easy solution for simple Unix-like, cross-platform commands in npm package scripts.
+
+
+### Deploy
+- `npm install -g vercel`: Installing vercel cli to global
+- `vercel login`: Login to Vercel
+- Update `package.json`
+  ```
+  "scripts": {
+    "start": "vercel dev",
+    "deploy" : "vercel deploy --prod"
+  },
+  ```
 
 # Features
 
