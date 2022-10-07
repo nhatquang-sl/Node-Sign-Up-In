@@ -3,7 +3,7 @@ import { SettingsState, SETTINGS } from './types';
 
 const initialState: SettingsState = {
   sideBarOpen: false,
-  headerOpen: true,
+  headerOpen: false,
   loading: false,
 };
 
