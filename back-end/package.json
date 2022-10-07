@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "set NODE_ENV=development&& nodemon -r tsconfig-paths/register index.ts",
-    "clean": "shx rm -rf public/* && shx rm -rf dist",
+    "clean": "shx rm -rf public && shx rm -rf dist && shx mkdir public",
     "build": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json && shx cp -R node-sign-up-in-credentials dist/back-end",
     "build-fe": "cd ../front-end && npm run build && shx mv build/* ../back-end/public && cd ../back-end",
     "build:heroku": "npm run clean && npm run build && npm run build-fe && shx cp -R public dist/back-end",
