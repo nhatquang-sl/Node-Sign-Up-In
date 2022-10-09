@@ -4,53 +4,48 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "set NODE_ENV=development&& tsnd --respawn index.ts",
-    "start": "vercel dev",
-    "deploy": "cd ../front-end && npm run build && cd ../back-end && vercel deploy --prod",
+    "dev": "set NODE_ENV=development&& nodemon -r tsconfig-paths/register index.ts",
+    "clean": "shx rm -rf public && shx rm -rf dist && shx mkdir public",
+    "build": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json && shx cp -R node-sign-up-in-credentials dist/back-end",
+    "build-fe": "cd ../front-end && yarn run build && shx mv build/* ../back-end/public && cd ../back-end",
+    "build:heroku": "yarn run clean && yarn run build && yarn run build-fe && shx cp -R public dist/back-end",
     "test": "set NODE_ENV=test&& jest",
-    "test-watch": "set NODE_ENV=test&& jest --watchAll"
+    "test-watch": "set NODE_ENV=test&& jest --watchAll",
+    "start": "yarn run build && node dist/back-end/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/express": "^4.17.13",
-    "bcrypt": "^5.0.1",
-    "cors": "^2.8.5",
-    "dotenv": "^16.0.0",
-    "express": "^4.17.3",
-    "jsonwebtoken": "^8.5.1",
-    "node-mailjet": "^3.3.13",
-    "sequelize": "^6.19.0",
-    "tedious": "^14.4.0",
-    "typescript": "^4.6.3",
-    "uuid": "^8.3.2",
-    "vercel": "^24.1.0"
-  },
-  "devDependencies": {
     "@types/bcrypt": "^5.0.0",
     "@types/cors": "^2.8.12",
+    "@types/express": "^4.17.13",
     "@types/jest": "^27.5.1",
     "@types/jsonwebtoken": "^8.5.8",
     "@types/node-mailjet": "^3.3.8",
     "@types/tedious": "^4.0.7",
     "@types/uuid": "^8.3.4",
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
     "express-async-errors": "^3.1.1",
+    "jsonwebtoken": "^8.5.1",
+    "node-mailjet": "^3.3.13",
+    "sequelize": "^6.19.0",
+    "shx": "^0.3.4",
+    "tedious": "^14.4.0",
+    "tsc-alias": "^1.7.0",
+    "tsconfig-paths": "^4.1.0",
+    "typescript": "^4.6.3",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
     "jest": "^28.1.0",
-    "module-alias": "^2.2.2",
+    "nodemon": "^2.0.20",
     "prettier": "^2.6.2",
     "sqlite3": "^5.0.8",
     "ts-jest": "^28.0.3",
-    "ts-node": "^10.7.0",
-    "ts-node-dev": "^1.1.8"
-  },
-  "_moduleAliases": {
-    "@config": "./config",
-    "@application": "./application",
-    "@services": "./services",
-    "@database": "./database",
-    "@controllers": "./controllers",
-    "@middleware": "./middleware",
-    "@libs": "../front-end/src/shared"
+    "ts-node": "^10.7.0"
   }
 }

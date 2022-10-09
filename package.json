@@ -9,6 +9,9 @@
     "cz-conventional-changelog": "^3.3.0"
   },
   "scripts": {
+    "start": "node back-end/dist/back-end/index.js",
+    "heroku-prebuild": "yarn install --cwd back-end && yarn install --cwd front-end",
+    "heroku-postbuild": "cd ./back-end && yarn run build:heroku",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

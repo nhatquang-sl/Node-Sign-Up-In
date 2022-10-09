@@ -1,5 +1,6 @@
 import ENV from '@config';
 import { Sequelize } from 'sequelize';
+import tedious from 'tedious';
 
 class DbContext {
   sequelize: Sequelize;
@@ -11,6 +12,7 @@ class DbContext {
       this.sequelize = new Sequelize(ENV.DB_NAME, ENV.DB_USERNAME, ENV.DB_PASSWORD, {
         host: ENV.DB_HOST,
         dialect: 'mssql' /* one of 'mysql' | 'mariadb' | 'postgres' | 'mssql' */,
+        dialectModule: tedious,
         // query: { raw: true },
         logging: false,
       });
