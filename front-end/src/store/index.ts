@@ -8,13 +8,14 @@ import settings from './settings/reducer';
 import auth from './auth/reducer';
 import user from './user/reducer';
 import snackbar from './snackbar/reducer';
+import bnb from './bnb/reducer';
 import global from './global/reducer';
 import { showSnackbar } from './snackbar/actions';
 import { logOut } from './auth/actions';
 import { errNetwork } from './global/actions';
 
 // Combine Reducers
-var reducer = combineReducers({ settings, auth, user, snackbar, global });
+var reducer = combineReducers({ settings, auth, user, snackbar, global, bnb });
 
 let middleWare = applyMiddleware(promiseMiddleware, logger, thunk);
 // middleWare = applyMiddleware(promiseMiddleware, thunk);
