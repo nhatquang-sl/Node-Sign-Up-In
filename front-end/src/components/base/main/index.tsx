@@ -9,6 +9,7 @@ import { DrawerHeader, Container } from './styles';
 import { Props, mapStateToProps, mapDispatchToProps } from './types';
 
 import Dashboard from 'pages/dashboard';
+import Binance from 'pages/bnb';
 import Register from 'pages/auth/register';
 import Login from 'pages/auth/login';
 import Profile from 'pages/auth/profile';
@@ -28,6 +29,7 @@ function Main(props: Props) {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/bnb" element={<Binance />} />
         <Route path="/" element={<Dashboard />} />
       </Routes>
       <ConsecutiveSnackBars />

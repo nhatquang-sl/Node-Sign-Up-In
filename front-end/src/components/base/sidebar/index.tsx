@@ -1,10 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { styled, useTheme } from '@mui/material/styles';
 import Drawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Icon from '@mui/material/Icon';
+import Zoom from '@mui/material/Zoom';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 
 import { sidebarWidth } from 'store/constants';
 
@@ -21,6 +28,11 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 function Sidebar(props: Props) {
   const theme = useTheme();
+
+  const transitionDuration = {
+    enter: theme.transitions.duration.enteringScreen,
+    exit: theme.transitions.duration.leavingScreen,
+  };
 
   const handleDrawerClose = () => {
     props.closeSidebar();
@@ -41,11 +53,32 @@ function Sidebar(props: Props) {
       open={props.settings.sideBarOpen}
     >
       <DrawerHeader>
-        <IconButton onClick={handleDrawerClose}>
-          <Icon>{theme.direction === 'ltr' ? 'chevron_left' : 'chevron_right'}</Icon>
-        </IconButton>
+        <Zoom
+          in={props.settings.sideBarOpen}
+          timeout={transitionDuration}
+          style={{
+            transitionDelay: `${transitionDuration.exit}ms`,
+          }}
+        >
+          <IconButton onClick={handleDrawerClose}>
+            <Icon>{theme.direction === 'ltr' ? 'chevron_left' : 'chevron_right'}</Icon>
+          </IconButton>
+        </Zoom>
       </DrawerHeader>
       <Divider />
+      <Divider />
+      <List>
+        {['Binance'].map((text, index) => (
+          <ListItem key={text} disablePadding button component={Link} to={'/bnb'}>
+            <ListItemButton>
+              <ListItemIcon>
+                <Icon>currency_bitcoin</Icon>
+              </ListItemIcon>
+              <ListItemText primary={text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
     </Drawer>
   );
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import {
   Slide,
@@ -15,6 +15,7 @@ import {
   Menu,
   MenuItem,
 } from '@mui/material';
+import Zoom from '@mui/material/Zoom';
 
 import { sidebarWidth } from 'store/constants';
 
@@ -43,6 +44,12 @@ const AppBar = styled(MuiAppBar, {
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 function Header(props: Props) {
   const navigate = useNavigate();
+  const theme = useTheme();
+
+  const transitionDuration = {
+    enter: theme.transitions.duration.enteringScreen,
+    exit: theme.transitions.duration.leavingScreen,
+  };
   const { accessToken, emailConfirmed } = props.auth;
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const handleDrawerOpen = () => {
@@ -67,16 +74,25 @@ function Header(props: Props) {
       <AppBar position="fixed" open={props.settings.sideBarOpen}>
         <Toolbar>
           {emailConfirmed && (
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              edge="start"
-              sx={{ mr: 2, ...(props.settings.sideBarOpen && { display: 'none' }) }}
+            <Zoom
+              in={!props.settings.sideBarOpen}
+              timeout={transitionDuration}
+              style={{
+                transitionDelay: `${transitionDuration.exit}ms`,
+              }}
             >
-              <Icon>menu</Icon>
-            </IconButton>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleDrawerOpen}
+                edge="start"
+                sx={{ mr: 2, ...(props.settings.sideBarOpen && { display: 'none' }) }}
+              >
+                <Icon>menu</Icon>
+              </IconButton>
+            </Zoom>
           )}
+
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Application
           </Typography>
