@@ -15,7 +15,16 @@ interface PropsFromState {
   auth: AuthState;
   bnb: BnbState;
 }
-
+export class Indicator {
+  constructor(interval: string) {
+    this.interval = interval;
+  }
+  interval: string;
+  rsi: number = 0;
+  sma20: number = 0;
+  bolu: number = 0;
+  bold: number = 0;
+}
 export interface Props extends PropsFromDispatch, PropsFromState {}
 
 export const mapStateToProps = (store: any) => ({

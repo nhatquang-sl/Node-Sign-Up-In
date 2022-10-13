@@ -10,6 +10,8 @@ export class Kline {
   numberOfTrades: number;
   takerBuyBaseAssetVolume: number;
   takerBuyQuoteAssetVolume: number;
+  gain: number = 0;
+  loss: number = 0;
 
   constructor(kline: any[]) {
     this.openTime = kline[0];
