@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -8,8 +8,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
@@ -22,7 +20,7 @@ import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Kline } from 'shared/bnb';
 import bnbService from 'shared/bnb/service';
-import { round2Dec } from 'shared/utilities';
+import { round2Dec, round3Dec } from 'shared/utilities';
 import relativeStrengthIndex from './relative-strength-index';
 import standardDeviation from './standard-deviation';
 
@@ -42,14 +40,28 @@ const Binance = (props: Props) => {
   useEffect(() => {
     dispatch(openHeader());
 
-    getM5Klines('NEARUSDT', '5m');
-    getM5Klines('NEARUSDT', '15m');
-    getM5Klines('NEARUSDT', '30m');
-    getM5Klines('NEARUSDT', '1h');
-    getM5Klines('NEARUSDT', '4h');
+    getAndCalculateKlines('NEARUSDT', '5m');
+    getAndCalculateKlines('NEARUSDT', '15m');
+    getAndCalculateKlines('NEARUSDT', '30m');
+    getAndCalculateKlines('NEARUSDT', '1h');
+    getAndCalculateKlines('NEARUSDT', '4h');
+    startSocket();
   }, [dispatch, navigate]);
 
-  const getM5Klines = async (symbol: string, interval: string) => {
+  const startSocket = () => {
+    const ws = new WebSocket('wss://fstream.binance.com/ws/nearusdt@markPrice');
+
+    ws.onmessage = function (event) {
+      try {
+        const json = JSON.parse(event.data);
+        if (json['p']) setCurPrice(round3Dec(parseFloat(json['p'])));
+      } catch (err) {
+        console.log(err);
+      }
+    };
+  };
+
+  const getAndCalculateKlines = async (symbol: string, interval: string) => {
     const klines = await bnbService.getKlines(symbol, interval);
     calculateChart(klines, interval);
 
@@ -94,7 +106,6 @@ const Binance = (props: Props) => {
 
     switch (interval) {
       case '5m':
-        setCurPrice(klines[klines.length - 1].close);
         setM5State(indicator);
         break;
       case '15m':
