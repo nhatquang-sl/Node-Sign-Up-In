@@ -7,6 +7,15 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputAdornment from '@mui/material/InputAdornment';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
 import _ from 'lodash';
 import { openHeader } from 'store/settings/actions';
 import { connect } from 'react-redux';
@@ -118,38 +127,94 @@ const Binance = (props: Props) => {
   ];
 
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Interval</TableCell>
-            <TableCell align="right">RSI</TableCell>
-            <TableCell align="right">SMA20</TableCell>
-            <TableCell align="right">Bol Up</TableCell>
-            <TableCell align="right">Bol Down</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {[m5State, m15State, m30State, h1State, h4State].map((row) => (
-            <TableRow key={row.interval} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-              <TableCell component="th" scope="row">
-                {row.interval}
-              </TableCell>
-              <TableCell align="right">{row.rsi}</TableCell>
-              <TableCell align="right">{row.sma20}</TableCell>
-              <TableCell align="right">{row.bolu}</TableCell>
-              <TableCell align="right">{row.bold}</TableCell>
-              {/* <TableCell align="right">{row.fat}</TableCell>
+    <>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Interval</TableCell>
+              <TableCell align="right">RSI</TableCell>
+              <TableCell align="right">SMA20</TableCell>
+              <TableCell align="right">Bol Up</TableCell>
+              <TableCell align="right">Bol Down</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {[m5State, m15State, m30State, h1State, h4State].map((row) => (
+              <TableRow
+                key={row.interval}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              >
+                <TableCell component="th" scope="row">
+                  {row.interval}
+                </TableCell>
+                <TableCell align="right">{row.rsi}</TableCell>
+                <TableCell align="right">{row.sma20}</TableCell>
+                <TableCell align="right">{row.bolu}</TableCell>
+                <TableCell align="right">{row.bold}</TableCell>
+                {/* <TableCell align="right">{row.fat}</TableCell>
               <TableCell align="right">{row.carbs}</TableCell>
               <TableCell align="right">{row.protein}</TableCell> */}
+              </TableRow>
+            ))}
+            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+              <TableCell colSpan={2}>Current Price: {curPrice}</TableCell>
             </TableRow>
-          ))}
-          <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-            <TableCell colSpan={2}>Current Price: {curPrice}</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Box sx={{ display: 'flex', flexGrow: 1, paddingTop: 2 }}>
+        <Box component="form" sx={{ width: 200 }} noValidate autoComplete="off">
+          <FormControl variant="outlined" fullWidth size="small">
+            <InputLabel>Price</InputLabel>
+            <OutlinedInput
+              label="Price"
+              endAdornment={<InputAdornment position="end">USDT</InputAdornment>}
+            />
+          </FormControl>
+          <FormControl variant="outlined" fullWidth size="small" margin="dense">
+            <InputLabel>Size</InputLabel>
+            <OutlinedInput
+              label="Size"
+              endAdornment={<InputAdornment position="end">USDT</InputAdornment>}
+            />
+          </FormControl>
+          <Stack direction="row" justifyContent="space-between" sx={{ paddingTop: 1 }}>
+            <Button variant="contained" color="buy" sx={{ textTransform: 'none' }}>
+              Buy/Long
+            </Button>
+            <Button variant="contained" color="sell" sx={{ textTransform: 'none' }}>
+              Sell/Short
+            </Button>
+          </Stack>
+        </Box>
+        <Box sx={{ flexGrow: 1 }}>
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Symbol</TableCell>
+                  <TableCell align="right">Size</TableCell>
+                  <TableCell align="right">Entry Price</TableCell>
+                  <TableCell align="right">Mark Price</TableCell>
+                  <TableCell align="right">Liq.Price</TableCell>
+                  <TableCell align="right">PNL(ROE %)</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                  <TableCell component="th" scope="row"></TableCell>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </Box>
+    </>
   );
 };
 
