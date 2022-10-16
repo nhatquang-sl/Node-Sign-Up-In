@@ -23,10 +23,12 @@ import bnbService from 'shared/bnb/service';
 import { round2Dec, round3Dec } from 'shared/utilities';
 import relativeStrengthIndex from './relative-strength-index';
 import standardDeviation from './standard-deviation';
+import axios from 'axios';
+import { API_ENDPOINT } from 'store/constants';
 
 import { Props, Indicator, mapStateToProps, mapDispatchToProps } from './types';
 
-const Binance = (props: Props) => {
+const Binance = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -36,6 +38,7 @@ const Binance = (props: Props) => {
   const [h1State, setH1State] = useState(new Indicator('1h'));
   const [h4State, setH4State] = useState(new Indicator('4h'));
   const [curPrice, setCurPrice] = useState(0);
+  const [positions, setPositions] = useState([]);
 
   useEffect(() => {
     dispatch(openHeader());
@@ -48,7 +51,7 @@ const Binance = (props: Props) => {
     startSocket();
   }, [dispatch, navigate]);
 
-  const startSocket = () => {
+  const startSocket = async () => {
     const ws = new WebSocket('wss://fstream.binance.com/ws/nearusdt@markPrice');
 
     ws.onmessage = function (event) {
@@ -59,6 +62,14 @@ const Binance = (props: Props) => {
         console.log(err);
       }
     };
+
+    await getAllOrders();
+  };
+
+  const getAllOrders = async () => {
+    const orders = await axios.get(`${API_ENDPOINT}/bnb/orders/nearusdt`);
+    setPositions(orders.data);
+    console.log(orders.data);
   };
 
   const getAndCalculateKlines = async (symbol: string, interval: string) => {
@@ -213,13 +224,21 @@ const Binance = (props: Props) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                  <TableCell component="th" scope="row"></TableCell>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
-                </TableRow>
+                {positions.map((p: any) => (
+                  <TableRow
+                    key={p.symbol}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {p.symbol} {p.marginType}({p.leverage}x)
+                    </TableCell>
+                    <TableCell align="right">{round3Dec(p.notional)}</TableCell>
+                    <TableCell align="right">{p.entryPrice}</TableCell>
+                    <TableCell align="right">{round3Dec(p.markPrice)}</TableCell>
+                    <TableCell align="right">{round3Dec(p.liquidationPrice)}</TableCell>
+                    <TableCell align="right">{round3Dec(p.unRealizedProfit)}</TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>
