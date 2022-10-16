@@ -27,6 +27,10 @@ export class Indicator {
 }
 export interface Props extends PropsFromDispatch, PropsFromState {}
 
+export interface PositionProps {
+  symbol: string;
+}
+
 export const mapStateToProps = (store: any) => ({
   settings: store.settings,
   auth: store.auth,

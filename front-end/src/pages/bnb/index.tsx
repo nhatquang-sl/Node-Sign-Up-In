@@ -25,6 +25,7 @@ import relativeStrengthIndex from './relative-strength-index';
 import standardDeviation from './standard-deviation';
 import axios from 'axios';
 import { API_ENDPOINT } from 'store/constants';
+import Positions from './positions';
 
 import { Props, Indicator, mapStateToProps, mapDispatchToProps } from './types';
 
@@ -211,37 +212,7 @@ const Binance = () => {
           </Stack>
         </Box>
         <Box sx={{ flexGrow: 1 }}>
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Symbol</TableCell>
-                  <TableCell align="right">Size</TableCell>
-                  <TableCell align="right">Entry Price</TableCell>
-                  <TableCell align="right">Mark Price</TableCell>
-                  <TableCell align="right">Liq.Price</TableCell>
-                  <TableCell align="right">PNL(ROE %)</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {positions.map((p: any) => (
-                  <TableRow
-                    key={p.symbol}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                  >
-                    <TableCell component="th" scope="row">
-                      {p.symbol} {p.marginType}({p.leverage}x)
-                    </TableCell>
-                    <TableCell align="right">{round3Dec(p.notional)}</TableCell>
-                    <TableCell align="right">{p.entryPrice}</TableCell>
-                    <TableCell align="right">{round3Dec(p.markPrice)}</TableCell>
-                    <TableCell align="right">{round3Dec(p.liquidationPrice)}</TableCell>
-                    <TableCell align="right">{round3Dec(p.unRealizedProfit)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <Positions symbol="nearusdt" />
         </Box>
       </Box>
     </>
