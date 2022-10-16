@@ -1,5 +1,4 @@
 import axios, { AxiosInstance } from 'axios';
-import CryptoJS from 'crypto-js';
 import { Kline } from './dto';
 
 export class BnbService {
@@ -39,11 +38,8 @@ export class BnbService {
     return res.data['listenKey'];
   };
 
-  getAllOrders = async (symbol: string, timestamp: number) => {
-    const query = `symbol=${symbol}&timestamp=${timestamp}`;
-    const signature = CryptoJS.HmacSHA256(query, this.secretKey).toString(CryptoJS.enc.Hex);
-
-    var res = await this.fapi.get(`/fapi/v1/allOrders?${query}&signature=${signature}`);
+  getAllOrders = async (query: string) => {
+    var res = await this.fapi.get(`/fapi/v2/positionRisk?${query}`);
     return res.data;
   };
 }
