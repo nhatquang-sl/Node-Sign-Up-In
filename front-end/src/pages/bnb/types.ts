@@ -15,6 +15,7 @@ interface PropsFromState {
   auth: AuthState;
   bnb: BnbState;
 }
+
 export class Indicator {
   constructor(interval: string) {
     this.interval = interval;
@@ -27,9 +28,30 @@ export class Indicator {
 }
 export interface Props extends PropsFromDispatch, PropsFromState {}
 
-export interface PositionProps {
+export type Position = {
   symbol: string;
+  marginType: string;
+  leverage: number;
+  notional: number;
+};
+
+export type OpenOrder = {
+  time: number;
+  symbol: string;
+  origType: string;
+  side: string;
+  price: number;
+  origQty: number;
+  executedQty: number;
+};
+
+export interface PositionProps {
+  positions: Position[];
 }
+
+export type OpenOrdersProps = {
+  orders: OpenOrder[];
+};
 
 export const mapStateToProps = (store: any) => ({
   settings: store.settings,

@@ -31,17 +31,6 @@ export class BnbService {
     }
     return klines;
   };
-
-  getListenKey = async () => {
-    var res = await this.fapi.post('/fapi/v1/listenKey');
-
-    return res.data['listenKey'];
-  };
-
-  getAllOrders = async (query: string) => {
-    var res = await this.fapi.get(`/fapi/v2/positionRisk?${query}`);
-    return res.data;
-  };
 }
 
 export default new BnbService();

@@ -7,6 +7,11 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import Tab from '@mui/material/Tab';
+import TabContext from '@mui/lab/TabContext';
+import TabList from '@mui/lab/TabList';
+import TabPanel from '@mui/lab/TabPanel';
 import _ from 'lodash';
 
 import { round3Dec } from 'shared/utilities';
@@ -14,17 +19,6 @@ import { API_ENDPOINT } from 'store/constants';
 import { PositionProps } from './types';
 
 const Positions = (props: PositionProps) => {
-  const [positions, setPositions] = useState([]);
-
-  useEffect(() => {
-    getAllOrders();
-  }, []);
-
-  const getAllOrders = async () => {
-    const orders = await axios.get(`${API_ENDPOINT}/bnb/orders/${props.symbol}`);
-    setPositions(orders.data);
-  };
-
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -35,11 +29,12 @@ const Positions = (props: PositionProps) => {
             <TableCell align="right">Entry Price</TableCell>
             <TableCell align="right">Mark Price</TableCell>
             <TableCell align="right">Liq.Price</TableCell>
+            <TableCell align="right">Quantity</TableCell>
             <TableCell align="right">PNL(ROE %)</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {positions.map((p: any) => (
+          {props.positions.map((p: any) => (
             <TableRow key={p.symbol} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <TableCell component="th" scope="row">
                 {p.symbol} {p.marginType}({p.leverage}x)
@@ -48,6 +43,7 @@ const Positions = (props: PositionProps) => {
               <TableCell align="right">{p.entryPrice}</TableCell>
               <TableCell align="right">{round3Dec(p.markPrice)}</TableCell>
               <TableCell align="right">{round3Dec(p.liquidationPrice)}</TableCell>
+              <TableCell align="right">{round3Dec(p.positionAmt)}</TableCell>
               <TableCell align="right">{round3Dec(p.unRealizedProfit)}</TableCell>
             </TableRow>
           ))}

@@ -4,7 +4,7 @@ import { dbContext, initializeDb, User } from '@database';
 import { mediator } from '@application/mediator';
 import { generateJwt } from '@application/common/utils';
 import { AuthorizeBehavior } from '@application/common/behaviors';
-import { GetOrdersCommand } from '.';
+import { GetPositionsCommand } from '.';
 
 const userId = 1;
 const { accessToken } = generateJwt({ id: userId } as User, '');
@@ -27,7 +27,7 @@ beforeEach(async () => {
 });
 
 test('activate success', async () => {
-  const command = new GetOrdersCommand(accessToken, 'nearusdt');
+  const command = new GetPositionsCommand(accessToken, 'nearusdt');
 
   const orders = await mediator.send(command);
   console.log({ orders });
