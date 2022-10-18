@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import axios from 'axios';
+import { API_ENDPOINT } from 'store/constants';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -14,6 +16,10 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
+import Tab from '@mui/material/Tab';
+import TabContext from '@mui/lab/TabContext';
+import TabList from '@mui/lab/TabList';
+import TabPanel from '@mui/lab/TabPanel';
 import _ from 'lodash';
 import { openHeader } from 'store/settings/actions';
 import { connect } from 'react-redux';
@@ -23,9 +29,9 @@ import bnbService from 'shared/bnb/service';
 import { round2Dec, round3Dec } from 'shared/utilities';
 import relativeStrengthIndex from './relative-strength-index';
 import standardDeviation from './standard-deviation';
-import axios from 'axios';
-import { API_ENDPOINT } from 'store/constants';
 import Positions from './positions';
+import OpenOrders from './open-orders';
+import OrderForm from './order-form';
 
 import { Props, Indicator, mapStateToProps, mapDispatchToProps } from './types';
 
@@ -38,8 +44,14 @@ const Binance = () => {
   const [m30State, setM30State] = useState(new Indicator('30m'));
   const [h1State, setH1State] = useState(new Indicator('1h'));
   const [h4State, setH4State] = useState(new Indicator('4h'));
-  const [curPrice, setCurPrice] = useState(0);
   const [positions, setPositions] = useState([]);
+  const [openOrders, setOpenOrders] = useState([]);
+  const [curPrice, setCurPrice] = useState(0);
+  const [value, setValue] = useState('1');
+
+  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    setValue(newValue);
+  };
 
   useEffect(() => {
     dispatch(openHeader());
@@ -50,6 +62,12 @@ const Binance = () => {
     getAndCalculateKlines('NEARUSDT', '1h');
     getAndCalculateKlines('NEARUSDT', '4h');
     startSocket();
+    getPositions();
+    getOpenOrders();
+    setInterval(() => {
+      getPositions();
+      getOpenOrders();
+    }, 30 * 1000);
   }, [dispatch, navigate]);
 
   const startSocket = async () => {
@@ -63,14 +81,6 @@ const Binance = () => {
         console.log(err);
       }
     };
-
-    await getAllOrders();
-  };
-
-  const getAllOrders = async () => {
-    const orders = await axios.get(`${API_ENDPOINT}/bnb/orders/nearusdt`);
-    setPositions(orders.data);
-    console.log(orders.data);
   };
 
   const getAndCalculateKlines = async (symbol: string, interval: string) => {
@@ -84,6 +94,16 @@ const Binance = () => {
       else klines.push(lstKline);
       calculateChart(klines, interval);
     }, 30 * 1000);
+  };
+
+  const getPositions = async () => {
+    const res = await axios.get(`${API_ENDPOINT}/bnb/positions/nearusdt`);
+    setPositions(res.data);
+  };
+
+  const getOpenOrders = async () => {
+    const res = await axios.get(`${API_ENDPOINT}/bnb/openOrders/nearusdt`);
+    setOpenOrders(res.data);
   };
 
   const calculateChart = (klines: Kline[], interval: string): Indicator => {
@@ -137,18 +157,6 @@ const Binance = () => {
     return indicator;
   };
 
-  function createData(name: string, calories: number, fat: number, carbs: number, protein: number) {
-    return { name, calories, fat, carbs, protein };
-  }
-
-  const rows = [
-    createData('5m', 159, 6.0, 24, 4.0),
-    createData('15m', 237, 9.0, 37, 4.3),
-    createData('30m', 262, 16.0, 24, 6.0),
-    createData('1h', 305, 3.7, 67, 4.3),
-    createData('4h', 356, 16.0, 49, 3.9),
-  ];
-
   return (
     <>
       <TableContainer component={Paper}>
@@ -187,32 +195,22 @@ const Binance = () => {
         </Table>
       </TableContainer>
       <Box sx={{ display: 'flex', flexGrow: 1, paddingTop: 2 }}>
-        <Box component="form" sx={{ width: 200 }} noValidate autoComplete="off">
-          <FormControl variant="outlined" fullWidth size="small">
-            <InputLabel>Price</InputLabel>
-            <OutlinedInput
-              label="Price"
-              endAdornment={<InputAdornment position="end">USDT</InputAdornment>}
-            />
-          </FormControl>
-          <FormControl variant="outlined" fullWidth size="small" margin="dense">
-            <InputLabel>Size</InputLabel>
-            <OutlinedInput
-              label="Size"
-              endAdornment={<InputAdornment position="end">USDT</InputAdornment>}
-            />
-          </FormControl>
-          <Stack direction="row" justifyContent="space-between" sx={{ paddingTop: 1 }}>
-            <Button variant="contained" color="buy" sx={{ textTransform: 'none' }}>
-              Buy/Long
-            </Button>
-            <Button variant="contained" color="sell" sx={{ textTransform: 'none' }}>
-              Sell/Short
-            </Button>
-          </Stack>
-        </Box>
+        <OrderForm />
         <Box sx={{ flexGrow: 1 }}>
-          <Positions symbol="nearusdt" />
+          <TabContext value={value}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <TabList onChange={handleChange} aria-label="lab API tabs example">
+                <Tab label="Positions" value="1" />
+                <Tab label="Open orders" value="2" />
+              </TabList>
+            </Box>
+            <TabPanel value="1" sx={{ padding: 0 }}>
+              <Positions positions={positions} />
+            </TabPanel>
+            <TabPanel value="2" sx={{ padding: 0 }}>
+              <OpenOrders orders={openOrders} />
+            </TabPanel>
+          </TabContext>
         </Box>
       </Box>
     </>

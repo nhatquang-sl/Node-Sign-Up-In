@@ -1,13 +1,13 @@
+import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import LANG from '@libs/lang';
 import ENV from '@config';
-import { UserAuthDto } from '@libs/user/dto';
 import { User } from '@database';
 import { Authorize, ICommandHandler, AuthorizeCommand } from '@application/mediator';
 import { NotFoundError } from '@application/common/exceptions';
 import { BnbService } from '@libs/bnb/service';
 
-export class GetOrdersCommand extends AuthorizeCommand {
+export class GetPositionsCommand extends AuthorizeCommand {
   symbol: string;
   constructor(accessToken: string, symbol: string) {
     super(accessToken);
@@ -16,8 +16,8 @@ export class GetOrdersCommand extends AuthorizeCommand {
 }
 
 @Authorize()
-export class GetOrdersCommandHandler implements ICommandHandler<GetOrdersCommand, void> {
-  async handle(command: GetOrdersCommand): Promise<void> {
+export class GetPositionsCommandHandler implements ICommandHandler<GetPositionsCommand, void> {
+  async handle(command: GetPositionsCommand): Promise<void> {
     // https://sequelize.org/docs/v6/core-concepts/model-querying-finders/#findone
     const user = await User.findOne({ where: { id: command.userId } });
     if (user === null) throw new NotFoundError({ message: LANG.USER_NOT_FOUND_ERROR });
@@ -27,7 +27,12 @@ export class GetOrdersCommandHandler implements ICommandHandler<GetOrdersCommand
     const query = `symbol=${command.symbol}&timestamp=${serverTime}`;
     const signature = CryptoJS.HmacSHA256(query, ENV.BNB_SECRET_KEY).toString(CryptoJS.enc.Hex);
 
-    const orders = await bnbService.getAllOrders(`${query}&signature=${signature}`);
-    return orders;
+    const fapi = axios.create({
+      baseURL: 'https://fapi.binance.com',
+      headers: { 'X-MBX-APIKEY': ENV.BNB_API_KEY },
+    });
+    var res = await fapi.get(`/fapi/v2/positionRisk?${query}&signature=${signature}`);
+    console.log(res);
+    return res.data;
   }
 }
