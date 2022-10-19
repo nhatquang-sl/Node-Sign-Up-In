@@ -2,20 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import { API_ENDPOINT } from 'store/constants';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputAdornment from '@mui/material/InputAdornment';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -32,6 +19,7 @@ import standardDeviation from './standard-deviation';
 import Positions from './positions';
 import OpenOrders from './open-orders';
 import OrderForm from './order-form';
+import Indicators from './indicators';
 
 import { Props, Indicator, mapStateToProps, mapDispatchToProps } from './types';
 
@@ -159,49 +147,24 @@ const Binance = () => {
 
   return (
     <>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Interval</TableCell>
-              <TableCell align="right">RSI</TableCell>
-              <TableCell align="right">SMA20</TableCell>
-              <TableCell align="right">Bol Up</TableCell>
-              <TableCell align="right">Bol Down</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {[m5State, m15State, m30State, h1State, h4State].map((row) => (
-              <TableRow
-                key={row.interval}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {row.interval}
-                </TableCell>
-                <TableCell align="right">{row.rsi}</TableCell>
-                <TableCell align="right">{row.sma20}</TableCell>
-                <TableCell align="right">{row.bolu}</TableCell>
-                <TableCell align="right">{row.bold}</TableCell>
-                {/* <TableCell align="right">{row.fat}</TableCell>
-              <TableCell align="right">{row.carbs}</TableCell>
-              <TableCell align="right">{row.protein}</TableCell> */}
-              </TableRow>
-            ))}
-            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-              <TableCell colSpan={2}>Current Price: {curPrice}</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Indicators
+        indicators={[m5State, m15State, m30State, h1State, h4State]}
+        currentPrice={curPrice}
+      />
       <Box sx={{ display: 'flex', flexGrow: 1, paddingTop: 2 }}>
         <OrderForm />
         <Box sx={{ flexGrow: 1 }}>
           <TabContext value={value}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
               <TabList onChange={handleChange} aria-label="lab API tabs example">
-                <Tab label="Positions" value="1" />
-                <Tab label="Open orders" value="2" />
+                <Tab
+                  label={`Positions${positions.length > 0 && ` (${positions.length})`}`}
+                  value="1"
+                />
+                <Tab
+                  label={`Open orders${openOrders.length > 0 && ` (${openOrders.length})`}`}
+                  value="2"
+                />
               </TabList>
             </Box>
             <TabPanel value="1" sx={{ padding: 0 }}>
