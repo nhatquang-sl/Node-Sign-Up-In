@@ -1,5 +1,3 @@
-import axios from 'axios';
-import { useEffect, useState } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -8,50 +6,10 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-import _ from 'lodash';
-
 import { round3Dec, formatDateNumber } from 'shared/utilities';
-import { API_ENDPOINT } from 'store/constants';
 import { OpenOrdersProps } from './types';
 
 const OpenOrders = (props: OpenOrdersProps) => {
-  // const [positions, setPositions] = useState([]);
-
-  // useEffect(() => {
-  //   getOpenOrders();
-  //   // startWebSocket();
-  // }, []);
-
-  // const getOpenOrders = async () => {
-  //   console.log(`${API_ENDPOINT}/bnb/openOrders/${props.symbol}`);
-  //   const res = await axios.get(`${API_ENDPOINT}/bnb/openOrders/${props.symbol}`);
-  //   console.log(res.data);
-  //   setPositions(res.data);
-  // };
-
-  // const startWebSocket = async () => {
-  //   const listenKeyRes = await axios.post(`${API_ENDPOINT}/bnb/listenKey`);
-  //   console.log(listenKeyRes.data['listenKey']);
-  //   const ws = new WebSocket(`wss://fstream.binance.com/ws/${listenKeyRes.data['listenKey']}`);
-
-  //   ws.onopen = function (event) {
-  //     console.log(event);
-  //   };
-
-  //   ws.onmessage = function (event) {
-  //     try {
-  //       const json = JSON.parse(event.data);
-  //       console.log(event.data);
-  //       console.log(json);
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   };
-  //   setInterval(() => {
-  //     axios.put(`${API_ENDPOINT}/bnb/listenKey`);
-  //   }, 20 * 60 * 1000);
-  // };
-
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">

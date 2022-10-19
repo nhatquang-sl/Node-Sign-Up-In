@@ -45,12 +45,17 @@ export type OpenOrder = {
   executedQty: number;
 };
 
-export interface PositionProps {
+export type PositionProps = {
   positions: Position[];
-}
+};
 
 export type OpenOrdersProps = {
   orders: OpenOrder[];
+};
+
+export type IndicatorsProps = {
+  indicators: Indicator[];
+  currentPrice: number;
 };
 
 export const mapStateToProps = (store: any) => ({
