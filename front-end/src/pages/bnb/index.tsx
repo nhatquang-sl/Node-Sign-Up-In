@@ -75,13 +75,33 @@ const Binance = () => {
     const klines = await bnbService.getKlines(symbol, interval);
     calculateChart(klines, interval);
 
-    setInterval(async () => {
-      const lstKline = (await bnbService.getKlines(symbol, interval, 1))[0];
-      if (klines[klines.length - 1].openTime === lstKline.openTime)
-        klines[klines.length - 1] = lstKline;
-      else klines.push(lstKline);
-      calculateChart(klines, interval);
-    }, 30 * 1000);
+    let handledMinute = new Date().getMinutes();
+    const ws = new WebSocket(`wss://fstream.binance.com/ws/nearusdt@kline_${interval}`);
+    ws.onmessage = function (event) {
+      const json = JSON.parse(event.data);
+      const eventMinute = new Date(json['E']).getMinutes();
+
+      if (eventMinute > handledMinute) {
+        handledMinute = eventMinute;
+        const lstKline = new Kline();
+        lstKline.openTime = parseFloat(json['k']['t']);
+        lstKline.closeTime = parseFloat(json['k']['T']);
+        lstKline.open = parseFloat(json['k']['o']);
+        lstKline.close = parseFloat(json['k']['c']);
+        lstKline.high = parseFloat(json['k']['h']);
+        lstKline.low = parseFloat(json['k']['l']);
+        lstKline.volume = parseFloat(json['k']['v']);
+        lstKline.quoteAssetVolume = parseFloat(json['k']['q']);
+        lstKline.numberOfTrades = parseFloat(json['k']['n']);
+        lstKline.takerBuyBaseAssetVolume = parseFloat(json['k']['V']);
+        lstKline.takerBuyQuoteAssetVolume = parseFloat(json['k']['Q']);
+
+        if (klines[klines.length - 1].openTime === lstKline.openTime)
+          klines[klines.length - 1] = lstKline;
+        else klines.push(lstKline);
+        calculateChart(klines, interval);
+      }
+    };
   };
 
   const getPositions = async () => {

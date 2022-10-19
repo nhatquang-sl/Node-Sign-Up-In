@@ -13,7 +13,7 @@ export class Kline {
   gain: number = 0;
   loss: number = 0;
 
-  constructor(kline: any[]) {
+  constructor(kline: any[] = []) {
     this.openTime = kline[0];
     this.open = parseFloat(kline[1]);
     this.high = parseFloat(kline[2]);
