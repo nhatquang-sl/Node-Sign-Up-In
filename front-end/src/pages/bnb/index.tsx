@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import axios from 'axios';
-import { API_ENDPOINT } from 'store/constants';
+
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import _ from 'lodash';
+import { apiService } from 'store/services';
 import { openHeader } from 'store/settings/actions';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -21,7 +21,7 @@ import OpenOrders from './open-orders';
 import OrderForm from './order-form';
 import Indicators from './indicators';
 
-import { Props, Indicator, mapStateToProps, mapDispatchToProps } from './types';
+import { Props, OpenOrder, Indicator, mapStateToProps, mapDispatchToProps } from './types';
 
 const Binance = () => {
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ const Binance = () => {
   const [h1State, setH1State] = useState(new Indicator('1h'));
   const [h4State, setH4State] = useState(new Indicator('4h'));
   const [positions, setPositions] = useState([]);
-  const [openOrders, setOpenOrders] = useState([]);
+  const [openOrders, setOpenOrders] = useState<OpenOrder[]>([]);
   const [curPrice, setCurPrice] = useState(0);
   const [value, setValue] = useState('1');
 
@@ -67,6 +67,35 @@ const Binance = () => {
         if (json['p']) setCurPrice(round3Dec(parseFloat(json['p'])));
       } catch (err) {
         console.log(err);
+      }
+    };
+
+    const res = await apiService.post('bnb/listenKey');
+    const userWs = new WebSocket(`wss://fstream.binance.com/ws/${res.data.listenKey}`);
+    userWs.onmessage = function (event) {
+      const json = JSON.parse(event.data);
+      console.log(json['o']);
+      switch (json['e']) {
+        case 'ORDER_TRADE_UPDATE':
+          switch (json['o']['x']) {
+            case 'NEW':
+              const order: OpenOrder = {
+                time: json['o']['T'],
+                orderId: json['o']['i'],
+                symbol: json['o']['s'],
+                origType: json['o']['ot'],
+                side: json['o']['S'],
+                executedQty: 0,
+                origQty: parseFloat(json['o']['q']),
+                price: parseFloat(json['o']['p']),
+              };
+              setOpenOrders([...openOrders, order]);
+              break;
+            case 'CANCELED':
+              setOpenOrders(openOrders.filter((x) => x.orderId != parseFloat(json['o']['i'])));
+              break;
+          }
+          break;
       }
     };
   };
@@ -105,12 +134,13 @@ const Binance = () => {
   };
 
   const getPositions = async () => {
-    const res = await axios.get(`${API_ENDPOINT}/bnb/positions/nearusdt`);
+    const res = await apiService.get(`bnb/positions/nearusdt`);
     setPositions(res.data);
   };
 
   const getOpenOrders = async () => {
-    const res = await axios.get(`${API_ENDPOINT}/bnb/openOrders/nearusdt`);
+    const res = await apiService.get(`bnb/openOrders/nearusdt`);
+
     setOpenOrders(res.data);
   };
 
@@ -178,11 +208,11 @@ const Binance = () => {
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
               <TabList onChange={handleChange} aria-label="lab API tabs example">
                 <Tab
-                  label={`Positions${positions.length > 0 && ` (${positions.length})`}`}
+                  label={`Positions${positions.length > 0 ? ` (${positions.length})` : ''}`}
                   value="1"
                 />
                 <Tab
-                  label={`Open orders${openOrders.length > 0 && ` (${openOrders.length})`}`}
+                  label={`Open orders${openOrders.length > 0 ? ` (${openOrders.length})` : ''}`}
                   value="2"
                 />
               </TabList>

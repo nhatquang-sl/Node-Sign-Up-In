@@ -7,7 +7,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
 import { round3Dec, formatDateNumber } from 'shared/utilities';
-import { OpenOrdersProps } from './types';
+import { OpenOrdersProps, OpenOrder } from './types';
 
 const OpenOrders = (props: OpenOrdersProps) => {
   return (
@@ -26,7 +26,7 @@ const OpenOrders = (props: OpenOrdersProps) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.orders.map((p: any) => (
+          {props.orders.map((p: OpenOrder) => (
             <TableRow key={p.orderId} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <TableCell>{formatDateNumber(p.time)}</TableCell>
               <TableCell>{p.symbol}</TableCell>
