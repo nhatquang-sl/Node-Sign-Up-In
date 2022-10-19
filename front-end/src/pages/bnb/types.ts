@@ -37,6 +37,7 @@ export type Position = {
 
 export type OpenOrder = {
   time: number;
+  orderId: number;
   symbol: string;
   origType: string;
   side: string;
