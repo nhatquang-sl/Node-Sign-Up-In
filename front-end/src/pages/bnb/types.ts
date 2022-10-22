@@ -4,6 +4,7 @@ import { getKlines } from 'store/bnb/actions';
 import { SettingsState } from 'store/settings/types';
 import { AuthState } from 'store/auth/types';
 import { BnbState } from 'store/bnb/types';
+import { Position, OpenOrder } from 'shared/bnb';
 
 interface PropsFromDispatch {
   showSnackbar: typeof showSnackbar;
@@ -27,24 +28,6 @@ export class Indicator {
   bold: number = 0;
 }
 export interface Props extends PropsFromDispatch, PropsFromState {}
-
-export type Position = {
-  symbol: string;
-  marginType: string;
-  leverage: number;
-  notional: number;
-};
-
-export type OpenOrder = {
-  time: number;
-  orderId: number;
-  symbol: string;
-  origType: string;
-  side: string;
-  price: number;
-  origQty: number;
-  executedQty: number;
-};
 
 export type PositionProps = {
   positions: Position[];

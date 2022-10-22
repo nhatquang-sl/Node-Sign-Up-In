@@ -41,7 +41,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "dev": "set REACT_APP_ENV=development&& react-scripts start",
+    "dev": "set PORT=3008&& set REACT_APP_ENV=development&& react-scripts start",
     "build": "react-scripts build",
     "deploy:vercel": "vercel deploy --prod",
     "test": "react-scripts test",
