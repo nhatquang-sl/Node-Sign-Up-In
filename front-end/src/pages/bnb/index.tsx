@@ -43,18 +43,26 @@ const Binance = () => {
     setValue(newValue);
   };
 
+  const startUserDataSocket = useCallback(async () => {
+    if (!localStorage.listenKey) {
+      const res = await apiService.post('bnb/listenKey');
+      localStorage.listenKey = res.data.listenKey;
+    }
+    setUserDataWS(new WebSocket(`wss://fstream.binance.com/ws/${localStorage.listenKey}`));
+  }, []);
+
   const getAndCalculateKlines = useCallback(async (symbol: string, interval: string) => {
     const klines = await bnbService.getKlines(symbol, interval);
     calculateChart(klines, interval);
 
-    let handledMinute = new Date().getMinutes();
+    let handledTime = (new Date().getSeconds() / 30) >> 0;
     const ws = new WebSocket(`wss://fstream.binance.com/ws/nearusdt@kline_${interval}`);
     ws.onmessage = function (event) {
       const json = JSON.parse(event.data);
-      const eventMinute = new Date(json['E']).getMinutes();
-
-      if (eventMinute > handledMinute) {
-        handledMinute = eventMinute;
+      const eventTime = (new Date(json['E']).getSeconds() / 30) >> 0;
+      // console.log({ eventTime, handledTime, currTime: formatDate(new Date(), 'MM:ss') });
+      if (eventTime !== handledTime) {
+        handledTime = eventTime;
         const lstKline = new Kline();
         lstKline.openTime = parseFloat(json['k']['t']);
         lstKline.closeTime = parseFloat(json['k']['T']);
@@ -96,7 +104,12 @@ const Binance = () => {
     if (userDataWS != null) {
       userDataWS.onmessage = (event) => {
         const json = JSON.parse(event.data);
+        console.log(json);
         switch (json['e']) {
+          case 'listenKeyExpired':
+            localStorage.removeItem('listenKey');
+            startUserDataSocket();
+            break;
           case 'ORDER_TRADE_UPDATE':
             switch (json['o']['x']) {
               case 'NEW':
@@ -123,12 +136,7 @@ const Binance = () => {
         }
       };
     }
-  }, [userDataWS, openOrders]);
-
-  const startUserDataSocket = useCallback(async () => {
-    const res = await apiService.post('bnb/listenKey');
-    setUserDataWS(new WebSocket(`wss://fstream.binance.com/ws/${res.data.listenKey}`));
-  }, []);
+  }, [userDataWS, openOrders, startUserDataSocket]);
 
   useEffect(() => {
     startUserDataSocket();
@@ -256,8 +264,8 @@ const Binance = () => {
             const liq = round3Dec(entry - ((80 / 20) * entry) / 100);
             return (
               <div>
-                <p>Entry Price: {entry}</p>
-                <p>Liq.Price: {liq}</p>
+                Entry Price: {entry} <br />
+                Liq.Price: {liq}
               </div>
             );
           }
