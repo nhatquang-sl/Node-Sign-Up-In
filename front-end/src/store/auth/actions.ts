@@ -1,22 +1,21 @@
-import axios from 'axios';
 import { UserLoginDto, UserRegisterDto, UserAuthDto } from 'shared/user/dto';
 import { AUTH_TYPE } from './types';
 
-import { API_ENDPOINT } from '../constants';
+import { apiService } from '../services';
 
 const login = (request: UserLoginDto) => ({
   type: AUTH_TYPE.LOGIN,
-  payload: axios.post(`${API_ENDPOINT}/auth/login`, request),
+  payload: apiService.post(`auth/login`, request),
 });
 
 const register = (request: UserRegisterDto) => ({
   type: AUTH_TYPE.REGISTER,
-  payload: axios.post(`${API_ENDPOINT}/auth/register`, request),
+  payload: apiService.post(`auth/register`, request),
 });
 
 const registerConfirm = (activationCode: string) => ({
   type: AUTH_TYPE.REGISTER_CONFIRM,
-  payload: axios.get(`${API_ENDPOINT}/auth/activate/${activationCode}`),
+  payload: apiService.get(`auth/activate/${activationCode}`),
 });
 
 const logOut = () => ({
@@ -30,27 +29,27 @@ const updateAuth = (userAuth: UserAuthDto) => ({
 
 const sendActivateLink = () => ({
   type: AUTH_TYPE.SEND_ACTIVATE_LINK,
-  payload: axios.post(`${API_ENDPOINT}/auth/send-activation-email`),
+  payload: apiService.post(`auth/send-activation-email`),
 });
 
 const getProfile = () => ({
   type: AUTH_TYPE.GET_USER_PROFILE,
-  payload: axios.get(`${API_ENDPOINT}/auth/profile`),
+  payload: apiService.get(`auth/profile`),
 });
 
 const getLastDateResetPassword = (emailAddress: string) => ({
   type: AUTH_TYPE.GET_RESET_PASSWORD_LAST_DATE,
-  payload: axios.post(`${API_ENDPOINT}/auth/reset-password/last-date`, { emailAddress }),
+  payload: apiService.post(`auth/reset-password/last-date`, { emailAddress }),
 });
 
 const getSendEmailResetPassword = (emailAddress: string) => ({
   type: AUTH_TYPE.SEND_EMAIL_RESET_PASSWORD,
-  payload: axios.post(`${API_ENDPOINT}/auth/reset-password/send-email`, { emailAddress }),
+  payload: apiService.post(`auth/reset-password/send-email`, { emailAddress }),
 });
 
 const setNewPassword = (token: string, password: string) => ({
   type: AUTH_TYPE.SET_NEW_PASSWORD,
-  payload: axios.post(`${API_ENDPOINT}/auth/reset-password/set-new`, { token, password }),
+  payload: apiService.post(`auth/reset-password/set-new`, { token, password }),
 });
 
 export {
