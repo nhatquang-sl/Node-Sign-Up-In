@@ -10,7 +10,6 @@ const apiService = axios.create({
 });
 
 apiService.interceptors.request.use((config: AxiosRequestConfig<any>) => {
-  console.log('interceptors request');
   if (config && config.headers && localStorage.auth) {
     const auth = JSON.parse(localStorage.auth);
     config.headers.Authorization = `Bearer ${auth.accessToken}`;

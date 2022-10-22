@@ -27,3 +27,108 @@ export class Kline {
     this.takerBuyQuoteAssetVolume = parseFloat(kline[10]);
   }
 }
+
+export class Position {
+  symbol: string;
+  positionAmt: number;
+  entryPrice: number;
+  markPrice: number;
+  unRealizedProfit: number;
+  liquidationPrice: number;
+  leverage: number;
+  maxNotionalValue: number;
+  marginType: string;
+  isolatedMargin: number;
+  isAutoAddMargin: boolean;
+  positionSide: string;
+  notional: number;
+  isolatedWallet: number;
+  updateTime: number;
+  constructor(p: any) {
+    this.symbol = p.symbol;
+    this.positionAmt = parseFloat(p.positionAmt);
+    this.entryPrice = parseFloat(p.entryPrice);
+    this.markPrice = parseFloat(p.markPrice);
+    this.unRealizedProfit = parseFloat(p.unRealizedProfit);
+    this.liquidationPrice = parseFloat(p.liquidationPrice);
+    this.leverage = parseFloat(p.leverage);
+    this.maxNotionalValue = parseFloat(p.maxNotionalValue);
+    this.marginType = p.marginType;
+    this.isolatedMargin = parseFloat(p.isolatedMargin);
+    this.isAutoAddMargin = p.isAutoAddMargin === 'true';
+    this.positionSide = p.positionSide;
+    this.notional = parseFloat(p.notional);
+    this.isolatedWallet = parseFloat(p.isolatedWallet);
+    this.updateTime = p.updateTime;
+  }
+}
+
+// {
+//   orderId: 12080085782,
+//   symbol: 'NEARUSDT',
+//   status: 'NEW',
+//   clientOrderId: 'web_4cJaRw9Q4RzGFfcjFNcB',
+//   price: '2.6800',
+//   avgPrice: '0',
+//   origQty: '11',
+//   executedQty: '0',
+//   cumQuote: '0',
+//   timeInForce: 'GTC',
+//   type: 'LIMIT',
+//   reduceOnly: false,
+//   closePosition: false,
+//   side: 'BUY',
+//   positionSide: 'BOTH',
+//   stopPrice: '0',
+//   workingType: 'CONTRACT_PRICE',
+//   priceProtect: false,
+//   origType: 'LIMIT',
+//   time: 1666354910383,
+//   updateTime: 1666354910383
+// }
+export class OpenOrder {
+  constructor(o: any = {}) {
+    this.orderId = o.orderId ?? 0;
+    this.symbol = o.symbol ?? '';
+    this.status = o.status ?? '';
+    this.clientOrderId = o.clientOrderId ?? '';
+    this.price = parseFloat(o.price ?? 0);
+    this.avgPrice = parseFloat(o.avgPrice ?? 0);
+    this.origQty = parseFloat(o.origQty ?? 0);
+    this.executedQty = parseFloat(o.executedQty ?? 0);
+    this.cumQuote = parseFloat(o.cumQuote ?? 0);
+    this.timeInForce = o.timeInForce ?? '';
+    this.type = o.type ?? '';
+    this.reduceOnly = o.reduceOnly ?? false;
+    this.closePosition = o.closePosition ?? false;
+    this.side = o.side ?? '';
+    this.positionSide = o.positionSide ?? '';
+    this.stopPrice = parseFloat(o.stopPrice ?? 0);
+    this.workingType = o.workingType ?? '';
+    this.priceProtect = o.priceProtect ?? false;
+    this.origType = o.origType ?? '';
+    this.time = o.time ?? 0;
+    this.updateTime = o.updateTime ?? 0;
+  }
+  orderId: number;
+  symbol: string;
+  status: string;
+  clientOrderId: string;
+  price: number;
+  avgPrice: number;
+  origQty: number;
+  executedQty: number;
+  cumQuote: number;
+  timeInForce: string;
+  type: string;
+  reduceOnly: boolean;
+  closePosition: boolean;
+  side: string;
+  positionSide: string;
+  stopPrice: number;
+  workingType: string;
+  priceProtect: boolean;
+  origType: string;
+  time: number;
+  updateTime: number;
+}

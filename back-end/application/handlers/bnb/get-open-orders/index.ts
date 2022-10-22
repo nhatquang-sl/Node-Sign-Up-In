@@ -5,7 +5,7 @@ import ENV from '@config';
 import { User } from '@database';
 import { Authorize, ICommandHandler, AuthorizeCommand } from '@application/mediator';
 import { NotFoundError } from '@application/common/exceptions';
-import { BnbService } from '@libs/bnb/service';
+import { BnbService, OpenOrder } from '@libs/bnb';
 
 export class GetOpenOrdersCommand extends AuthorizeCommand {
   symbol: string;
@@ -32,7 +32,7 @@ export class GetOpenOrdersCommandHandler implements ICommandHandler<GetOpenOrder
       headers: { 'X-MBX-APIKEY': ENV.BNB_API_KEY },
     });
     var res = await fapi.get(`/fapi/v1/openOrders?${query}&signature=${signature}`);
-
-    return res.data;
+    console.log(res.data);
+    return res.data.map((x: any) => new OpenOrder(x));
   }
 }

@@ -5,7 +5,7 @@ import ENV from '@config';
 import { User } from '@database';
 import { Authorize, ICommandHandler, AuthorizeCommand } from '@application/mediator';
 import { NotFoundError } from '@application/common/exceptions';
-import { BnbService } from '@libs/bnb/service';
+import { BnbService, Position } from '@libs/bnb';
 
 export class GetPositionsCommand extends AuthorizeCommand {
   symbol: string;
@@ -32,7 +32,7 @@ export class GetPositionsCommandHandler implements ICommandHandler<GetPositionsC
       headers: { 'X-MBX-APIKEY': ENV.BNB_API_KEY },
     });
     var res = await fapi.get(`/fapi/v2/positionRisk?${query}&signature=${signature}`);
-    console.log(res);
-    return res.data;
+    console.log(res.data);
+    return res.data.map((x: any) => new Position(x)).filter((x: Position) => x.positionAmt > 0);
   }
 }
