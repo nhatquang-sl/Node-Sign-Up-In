@@ -1,11 +1,10 @@
-import axios from 'axios';
 import { USER_TYPE } from './types';
 
-import { API_ENDPOINT } from '../constants';
+import { apiService } from '../services';
 
 const getUserSessions = () => ({
   type: USER_TYPE.GET_USER_SESSIONS,
-  payload: axios.get(`${API_ENDPOINT}/user/sessions`),
+  payload: apiService.get(`user/sessions`),
 });
 
 export { getUserSessions };
