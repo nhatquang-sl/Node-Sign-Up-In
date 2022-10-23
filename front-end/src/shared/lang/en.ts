@@ -16,4 +16,8 @@ export const LANG = {
   USER_ACTIVATION_TOKEN_MISSING_ERROR: 'Activation token is required',
   USER_NAME_PASSWORD_MISSING_ERROR: 'Username and password are required',
   USER_NAME_PASSWORD_INVALID_ERROR: 'Username or password invalid',
+  BNB_SYMBOL_MISSING_ERROR: 'Symbol is required',
+  BNB_SIDE_MISSING_ERROR: 'Side is required',
+  BNB_TYPE_MISSING_ERROR: 'Type is required',
+  BNB_QUANTITY_MISSING_ERROR: 'Quantity is required',
 };

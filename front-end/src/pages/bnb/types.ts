@@ -42,6 +42,12 @@ export type IndicatorsProps = {
   currentPrice: number;
 };
 
+export type OrderFormProps = {
+  entryEstimate: number;
+  liqEstimate: number;
+  onSuccess(order: OpenOrder): void;
+};
+
 export const mapStateToProps = (store: any) => ({
   settings: store.settings,
   auth: store.auth,
