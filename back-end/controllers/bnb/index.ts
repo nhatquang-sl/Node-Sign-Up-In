@@ -1,11 +1,21 @@
-import { getAccessToken } from './../utils/index';
+import { getAccessToken } from '@controllers/utils';
 import express, { Request, Response } from 'express';
 import { mediator } from '@application/mediator';
-import { GetOpenOrdersCommand } from '@application/handlers/bnb/get-open-orders';
-import { GetPositionsCommand } from '@application/handlers/bnb/get-positions';
-import { CreateListenKeyCommand } from '@application/handlers/bnb/listen-key/create';
-import { KeepAliveListenKeyCommand } from '@application/handlers/bnb/listen-key/keep-alive';
+import {
+  GetOpenOrdersCommand,
+  GetPositionsCommand,
+  CreateOrderCommand,
+  CreateListenKeyCommand,
+  KeepAliveListenKeyCommand,
+} from '@application/handlers/bnb';
+
 const router = express.Router();
+
+router.post('/order', async (request: Request, response: Response) => {
+  const command = new CreateOrderCommand(getAccessToken(request), request.body);
+  const res = await mediator.send(command);
+  response.json(res);
+});
 
 router.get('/openOrders/:symbol', async (request: Request, response: Response) => {
   const { symbol } = request.params;

@@ -37,6 +37,8 @@ const Binance = () => {
   const [userDataWS, setUserDataWS] = useState<WebSocket>();
 
   const [curPrice, setCurPrice] = useState(0);
+  const [entryEstimate, setEntryEstimate] = useState(0);
+  const [liqEstimate, setLiqEstimate] = useState(0);
   const [value, setValue] = useState('1');
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
@@ -80,76 +82,6 @@ const Binance = () => {
           klines[klines.length - 1] = lstKline;
         else klines.push(lstKline);
         calculateChart(klines, interval);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    dispatch(openHeader());
-
-    getAndCalculateKlines('NEARUSDT', '5m');
-    getAndCalculateKlines('NEARUSDT', '15m');
-    getAndCalculateKlines('NEARUSDT', '30m');
-    getAndCalculateKlines('NEARUSDT', '1h');
-    getAndCalculateKlines('NEARUSDT', '4h');
-    getPositions();
-    getOpenOrders();
-    setInterval(() => {
-      getPositions();
-    }, 30 * 1000);
-  }, [dispatch, navigate, getAndCalculateKlines]);
-
-  useEffect(() => {
-    console.log('User Data WS change');
-    if (userDataWS != null) {
-      userDataWS.onmessage = (event) => {
-        const json = JSON.parse(event.data);
-        console.log(json);
-        switch (json['e']) {
-          case 'listenKeyExpired':
-            localStorage.removeItem('listenKey');
-            startUserDataSocket();
-            break;
-          case 'ORDER_TRADE_UPDATE':
-            switch (json['o']['x']) {
-              case 'NEW':
-                const order = new OpenOrder({
-                  time: json['o']['T'],
-                  orderId: json['o']['i'],
-                  symbol: json['o']['s'],
-                  origType: json['o']['ot'],
-                  side: json['o']['S'],
-                  executedQty: 0,
-                  origQty: parseFloat(json['o']['q']),
-                  price: parseFloat(json['o']['p']),
-                });
-
-                setOpenOrders([...openOrders, order]);
-                break;
-              case 'CANCELED':
-                setOpenOrders(
-                  openOrders.filter((x: OpenOrder) => x.orderId !== parseFloat(json['o']['i']))
-                );
-                break;
-            }
-            break;
-        }
-      };
-    }
-  }, [userDataWS, openOrders, startUserDataSocket]);
-
-  useEffect(() => {
-    startUserDataSocket();
-  }, [startUserDataSocket]);
-
-  useEffect(() => {
-    const markPriceWS = new WebSocket('wss://fstream.binance.com/ws/nearusdt@markPrice');
-    markPriceWS.onmessage = function (event) {
-      try {
-        const json = JSON.parse(event.data);
-        if (json['p']) setCurPrice(round3Dec(parseFloat(json['p'])));
-      } catch (err) {
-        console.log(err);
       }
     };
   }, []);
@@ -215,6 +147,102 @@ const Binance = () => {
     setOpenOrders(res.data);
   };
 
+  useEffect(() => {
+    dispatch(openHeader());
+
+    getAndCalculateKlines('NEARUSDT', '5m');
+    getAndCalculateKlines('NEARUSDT', '15m');
+    getAndCalculateKlines('NEARUSDT', '30m');
+    getAndCalculateKlines('NEARUSDT', '1h');
+    getAndCalculateKlines('NEARUSDT', '4h');
+    getPositions();
+    getOpenOrders();
+    setInterval(() => {
+      getPositions();
+    }, 30 * 1000);
+  }, [dispatch, navigate, getAndCalculateKlines]);
+
+  useEffect(() => {
+    console.log('User Data WS change');
+    if (userDataWS != null) {
+      userDataWS.onmessage = (event) => {
+        const json = JSON.parse(event.data);
+        console.log(json);
+        switch (json['e']) {
+          case 'listenKeyExpired':
+            localStorage.removeItem('listenKey');
+            startUserDataSocket();
+            break;
+          case 'ORDER_TRADE_UPDATE':
+            switch (json['o']['x']) {
+              case 'NEW':
+                const order = new OpenOrder({
+                  time: json['o']['T'],
+                  orderId: json['o']['i'],
+                  symbol: json['o']['s'],
+                  origType: json['o']['ot'],
+                  side: json['o']['S'],
+                  executedQty: 0,
+                  origQty: parseFloat(json['o']['q']),
+                  price: parseFloat(json['o']['p']),
+                });
+
+                setOpenOrders([...openOrders, order]);
+                break;
+              case 'CANCELED':
+                setOpenOrders(
+                  openOrders.filter((x: OpenOrder) => x.orderId !== parseFloat(json['o']['i']))
+                );
+                break;
+            }
+            break;
+        }
+      };
+    }
+  }, [userDataWS, openOrders, startUserDataSocket]);
+
+  useEffect(() => {
+    startUserDataSocket();
+  }, [startUserDataSocket]);
+
+  // WS: get market price
+  useEffect(() => {
+    const markPriceWS = new WebSocket('wss://fstream.binance.com/ws/nearusdt@markPrice');
+    markPriceWS.onmessage = function (event) {
+      try {
+        const json = JSON.parse(event.data);
+        if (json['p']) setCurPrice(round3Dec(parseFloat(json['p'])));
+      } catch (err) {
+        console.log(err);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    let quantityTotal = 0;
+    let sizeTotal = 0;
+    for (const p of positions) {
+      quantityTotal += p.positionAmt;
+      sizeTotal += p.positionAmt * p.entryPrice;
+    }
+
+    for (const o of openOrders) {
+      quantityTotal += o.origQty;
+      sizeTotal += o.origQty * o.price;
+    }
+
+    if (positions.length || openOrders.length) {
+      const entry = round3Dec(sizeTotal / quantityTotal);
+      const liq = round3Dec(entry - ((80 / 20) * entry) / 100);
+      setEntryEstimate(entry);
+      setLiqEstimate(liq);
+    }
+  }, [positions, openOrders]);
+
+  const handleCreateOrderSuccess = (order: OpenOrder) => {
+    setOpenOrders([...openOrders, order]);
+  };
+
   return (
     <>
       <Indicators
@@ -222,7 +250,11 @@ const Binance = () => {
         currentPrice={curPrice}
       />
       <Box sx={{ display: 'flex', flexGrow: 1, paddingTop: 2 }}>
-        <OrderForm />
+        <OrderForm
+          entryEstimate={entryEstimate}
+          liqEstimate={liqEstimate}
+          onSuccess={handleCreateOrderSuccess}
+        />
         <Box sx={{ flexGrow: 1 }}>
           <TabContext value={value}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -247,29 +279,10 @@ const Binance = () => {
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexGrow: 1, paddingTop: 2 }}>
-        {(() => {
-          let totalQuantity = 0;
-          let totalSize = 0;
-          for (const p of positions) {
-            totalQuantity += p.positionAmt;
-            totalSize += p.positionAmt * p.entryPrice;
-          }
-
-          for (const o of openOrders) {
-            totalQuantity += o.origQty;
-            totalSize += o.origQty * o.price;
-          }
-          if (positions.length || openOrders.length) {
-            const entry = round3Dec(totalSize / totalQuantity);
-            const liq = round3Dec(entry - ((80 / 20) * entry) / 100);
-            return (
-              <div>
-                Entry Price: {entry} <br />
-                Liq.Price: {liq}
-              </div>
-            );
-          }
-        })()}
+        <div>
+          Entry Price: {entryEstimate} <br />
+          Liq.Price: {liqEstimate}
+        </div>
       </Box>
     </>
   );
