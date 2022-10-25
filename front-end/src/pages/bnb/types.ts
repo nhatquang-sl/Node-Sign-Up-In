@@ -45,6 +45,7 @@ export type IndicatorsProps = {
 export type OrderFormProps = {
   entryEstimate: number;
   liqEstimate: number;
+  usdtAvailable: number;
   onSuccess(order: OpenOrder): void;
 };
 

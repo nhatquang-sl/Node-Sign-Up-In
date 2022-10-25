@@ -1,11 +1,8 @@
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
-import LANG from '@libs/lang';
 import ENV from '@config';
-import { User } from '@database';
 import { Authorize, ICommandHandler, AuthorizeCommand } from '@application/mediator';
-import { NotFoundError } from '@application/common/exceptions';
-import { BnbService, Position } from '@libs/bnb';
+import { bnbService, Position } from '@libs/bnb';
 
 export class GetPositionsCommand extends AuthorizeCommand {
   symbol: string;
@@ -18,10 +15,6 @@ export class GetPositionsCommand extends AuthorizeCommand {
 @Authorize()
 export class GetPositionsCommandHandler implements ICommandHandler<GetPositionsCommand, void> {
   async handle(command: GetPositionsCommand): Promise<void> {
-    // https://sequelize.org/docs/v6/core-concepts/model-querying-finders/#findone
-    const user = await User.findOne({ where: { id: command.userId } });
-    if (user === null) throw new NotFoundError({ message: LANG.USER_NOT_FOUND_ERROR });
-    const bnbService = new BnbService(ENV.BNB_API_KEY, ENV.BNB_SECRET_KEY);
     const serverTime = await bnbService.getServerTime();
 
     const query = `symbol=${command.symbol}&timestamp=${serverTime}`;

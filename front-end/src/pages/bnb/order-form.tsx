@@ -6,8 +6,10 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
+import { Typography } from '@mui/material';
 import { apiService } from 'store/services';
 import { OrderFormProps } from './types';
+import { round2Dec } from 'shared/utilities';
 
 const OrderForm = (props: OrderFormProps) => {
   const [price, setPrice] = useState('');
@@ -48,6 +50,9 @@ const OrderForm = (props: OrderFormProps) => {
 
   return (
     <Box component="form" sx={{ width: 200 }} noValidate autoComplete="off">
+      <Typography variant="subtitle2" gutterBottom>
+        Avbl: {round2Dec(props.usdtAvailable)} USDT
+      </Typography>
       <FormControl variant="outlined" fullWidth size="small">
         <InputLabel>Price</InputLabel>
         <OutlinedInput
