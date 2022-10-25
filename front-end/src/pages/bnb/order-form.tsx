@@ -87,7 +87,7 @@ const OrderForm = (props: OrderFormProps) => {
         <Button
           variant="contained"
           color="sell"
-          sx={{ textTransform: 'none' }}
+          sx={{ textTransform: 'none', marginLeft: 1 }}
           onClick={handleSubmit}
         >
           Sell/Short
