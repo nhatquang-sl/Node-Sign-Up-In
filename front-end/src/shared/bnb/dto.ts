@@ -132,3 +132,39 @@ export class OpenOrder {
   time: number;
   updateTime: number;
 }
+
+// [
+// {
+//   "accountAlias": "SgsR",    // unique account code
+//   "asset": "USDT",    // asset name
+//   "balance": "122607.35137903", // wallet balance
+//   "crossWalletBalance": "23.72469206", // crossed wallet balance
+//   "crossUnPnl": "0.00000000"  // unrealized profit of crossed positions
+//   "availableBalance": "23.72469206",       // available balance
+//   "maxWithdrawAmount": "23.72469206",     // maximum amount for transfer out
+//   "marginAvailable": true,    // whether the asset can be used as margin in Multi-Assets mode
+//   "updateTime": 1617939110373
+// }
+// ]
+export class Balance {
+  accountAlias: string;
+  asset: string;
+  balance: number;
+  crossWalletBalance: number;
+  crossUnPnl: number;
+  availableBalance: number;
+  maxWithdrawAmount: number;
+  marginAvailable: boolean;
+  updateTime: number;
+  constructor(o: any = {}) {
+    this.accountAlias = o.accountAlias;
+    this.asset = o.asset;
+    this.balance = parseFloat(o.balance ?? 0);
+    this.crossWalletBalance = parseFloat(o.crossWalletBalance ?? 0);
+    this.crossUnPnl = parseFloat(o.crossUnPnl ?? 0);
+    this.availableBalance = parseFloat(o.availableBalance ?? 0);
+    this.maxWithdrawAmount = parseFloat(o.maxWithdrawAmount ?? 0);
+    this.marginAvailable = o.marginAvailable;
+    this.updateTime = o.updateTime;
+  }
+}

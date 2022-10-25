@@ -7,9 +7,16 @@ import {
   CreateOrderCommand,
   CreateListenKeyCommand,
   KeepAliveListenKeyCommand,
+  GetBalanceCommand,
 } from '@application/handlers/bnb';
 
 const router = express.Router();
+
+router.get('/balance', async (request: Request, response: Response) => {
+  const command = new GetBalanceCommand(getAccessToken(request));
+  const res = await mediator.send(command);
+  response.json(res);
+});
 
 router.post('/order', async (request: Request, response: Response) => {
   const command = new CreateOrderCommand(getAccessToken(request), request.body);

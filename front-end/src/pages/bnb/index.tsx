@@ -11,8 +11,8 @@ import { apiService } from 'store/services';
 import { openHeader } from 'store/settings/actions';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Kline, Position, OpenOrder } from 'shared/bnb';
-import bnbService from 'shared/bnb/service';
+import { TIMESTAMP } from 'shared/constant';
+import { bnbService, Kline, Position, OpenOrder, Balance } from 'shared/bnb';
 import { round2Dec, round3Dec } from 'shared/utilities';
 import relativeStrengthIndex from './relative-strength-index';
 import standardDeviation from './standard-deviation';
@@ -40,6 +40,7 @@ const Binance = () => {
   const [entryEstimate, setEntryEstimate] = useState(0);
   const [liqEstimate, setLiqEstimate] = useState(0);
   const [value, setValue] = useState('1');
+  const [usdtAvailable, setUsdtAvailable] = useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
@@ -147,6 +148,12 @@ const Binance = () => {
     setOpenOrders(res.data);
   };
 
+  const getBalance = async () => {
+    const res = await apiService.get('bnb/balance');
+    console.log(res.data.filter((x: Balance) => x.asset === 'USDT'));
+    setUsdtAvailable(res.data.filter((x: Balance) => x.asset === 'USDT')[0].availableBalance);
+  };
+
   useEffect(() => {
     dispatch(openHeader());
 
@@ -157,6 +164,7 @@ const Binance = () => {
     getAndCalculateKlines('NEARUSDT', '4h');
     getPositions();
     getOpenOrders();
+    getBalance();
     setInterval(() => {
       getPositions();
     }, 30 * 1000);
@@ -203,6 +211,10 @@ const Binance = () => {
 
   useEffect(() => {
     startUserDataSocket();
+    setInterval(() => {
+      localStorage.removeItem('listenKey');
+      startUserDataSocket();
+    }, 5 * TIMESTAMP.MINUTE);
   }, [startUserDataSocket]);
 
   // WS: get market price
@@ -251,6 +263,7 @@ const Binance = () => {
       />
       <Box sx={{ display: 'flex', flexGrow: 1, paddingTop: 2 }}>
         <OrderForm
+          usdtAvailable={usdtAvailable}
           entryEstimate={entryEstimate}
           liqEstimate={liqEstimate}
           onSuccess={handleCreateOrderSuccess}

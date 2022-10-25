@@ -3,7 +3,6 @@ import CryptoJS from 'crypto-js';
 import qs from 'qs';
 import LANG from '@libs/lang';
 import ENV from '@config';
-import { User } from '@database';
 import {
   Authorize,
   RegisterValidator,
@@ -11,8 +10,8 @@ import {
   ICommandHandler,
   AuthorizeCommand,
 } from '@application/mediator';
-import { NotFoundError, BadRequestError } from '@application/common/exceptions';
-import { BnbService, OpenOrder } from '@libs/bnb';
+import { BadRequestError } from '@application/common/exceptions';
+import { bnbService, OpenOrder } from '@libs/bnb';
 
 export class CreateOrderCommand extends AuthorizeCommand {
   symbol: string;
@@ -33,10 +32,6 @@ export class CreateOrderCommand extends AuthorizeCommand {
 @Authorize()
 export class CreateOrderCommandHandler implements ICommandHandler<CreateOrderCommand, OpenOrder> {
   async handle(command: CreateOrderCommand): Promise<OpenOrder> {
-    // https://sequelize.org/docs/v6/core-concepts/model-querying-finders/#findone
-    const user = await User.findOne({ where: { id: command.userId } });
-    if (user === null) throw new NotFoundError({ message: LANG.USER_NOT_FOUND_ERROR });
-    const bnbService = new BnbService(ENV.BNB_API_KEY, ENV.BNB_SECRET_KEY);
     const serverTime = await bnbService.getServerTime();
 
     const query = qs.stringify({
