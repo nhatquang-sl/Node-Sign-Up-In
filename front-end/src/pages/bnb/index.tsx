@@ -255,6 +255,15 @@ const Binance = () => {
     setOpenOrders([...openOrders, order]);
   };
 
+  const handleCancelOrder = async (symbol: string, orderId: number): Promise<number> => {
+    await apiService.delete(`bnb/order/${symbol}/${orderId}`);
+    return orderId;
+  };
+
+  const handleCancelAllOrders = async (): Promise<void> => {
+    const res = await apiService.delete(`bnb/positions/nearusdt`);
+  };
+
   return (
     <>
       <Indicators
@@ -286,7 +295,11 @@ const Binance = () => {
               <Positions positions={positions} />
             </TabPanel>
             <TabPanel value="2" sx={{ padding: 0 }}>
-              <OpenOrders orders={openOrders} />
+              <OpenOrders
+                orders={openOrders}
+                cancel={handleCancelOrder}
+                cancelAll={handleCancelAllOrders}
+              />
             </TabPanel>
           </TabContext>
         </Box>

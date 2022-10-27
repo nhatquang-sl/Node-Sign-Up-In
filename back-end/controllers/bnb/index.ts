@@ -8,6 +8,7 @@ import {
   CreateListenKeyCommand,
   KeepAliveListenKeyCommand,
   GetBalanceCommand,
+  CancelOrderCommand,
 } from '@application/handlers/bnb';
 
 const router = express.Router();
@@ -20,6 +21,13 @@ router.get('/balance', async (request: Request, response: Response) => {
 
 router.post('/order', async (request: Request, response: Response) => {
   const command = new CreateOrderCommand(getAccessToken(request), request.body);
+  const res = await mediator.send(command);
+  response.json(res);
+});
+
+router.delete('/order/:symbol/:orderId', async (request: Request, response: Response) => {
+  const { symbol, orderId } = request.params;
+  const command = new CancelOrderCommand(getAccessToken(request), symbol, orderId);
   const res = await mediator.send(command);
   response.json(res);
 });
