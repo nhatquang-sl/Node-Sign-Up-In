@@ -20,4 +20,5 @@ export const LANG = {
   BNB_SIDE_MISSING_ERROR: 'Side is required',
   BNB_TYPE_MISSING_ERROR: 'Type is required',
   BNB_QUANTITY_MISSING_ERROR: 'Quantity is required',
+  BNB_ORDER_ID_MISSING_ERROR: 'OrderId is required',
 };

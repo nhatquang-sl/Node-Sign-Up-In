@@ -1,16 +1,21 @@
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-
+import { useState } from 'react';
+import {
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Paper,
+} from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { round3Dec, formatDateNumber } from 'shared/utilities';
 import { OpenOrder } from 'shared/bnb';
 import { OpenOrdersProps } from './types';
 
 const OpenOrders = (props: OpenOrdersProps) => {
+  const [loading, setLoading] = useState<number[]>([]);
+
   const getPrice = (p: OpenOrder) => {
     let price = p.price;
     switch (p.type) {
@@ -19,6 +24,12 @@ const OpenOrders = (props: OpenOrdersProps) => {
         break;
     }
     return round3Dec(price);
+  };
+
+  const handleCancel = async (symbol: string, orderId: number) => {
+    setLoading([...loading, orderId]);
+    await props.cancel(symbol, orderId);
+    setLoading(loading.filter((x) => x !== orderId));
   };
 
   return (
@@ -33,7 +44,12 @@ const OpenOrders = (props: OpenOrdersProps) => {
             <TableCell align="right">Price</TableCell>
             <TableCell align="right">Amount</TableCell>
             <TableCell align="right">Quantity</TableCell>
-            <TableCell align="right">Filled</TableCell>
+            {/* <TableCell align="right">Filled</TableCell> */}
+            <TableCell align="right">
+              <LoadingButton aria-label="delete" size="small" sx={{ textTransform: 'none' }}>
+                Cancel All
+              </LoadingButton>
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -47,7 +63,17 @@ const OpenOrders = (props: OpenOrdersProps) => {
                 <TableCell align="right">{getPrice(p)}</TableCell>
                 <TableCell align="right">{round3Dec(p.origQty * p.price)}</TableCell>
                 <TableCell align="right">{round3Dec(p.origQty)}</TableCell>
-                <TableCell align="right">{round3Dec(p.executedQty)}</TableCell>
+                {/* <TableCell align="right">{round3Dec(p.executedQty)}</TableCell> */}
+                <TableCell align="right">
+                  <LoadingButton
+                    size="small"
+                    loading={loading.includes(p.orderId)}
+                    sx={{ textTransform: 'none' }}
+                    onClick={() => handleCancel(p.symbol, p.orderId)}
+                  >
+                    Cancel
+                  </LoadingButton>
+                </TableCell>
               </TableRow>
             );
           })}
