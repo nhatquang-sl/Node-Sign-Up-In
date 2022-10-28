@@ -4,6 +4,7 @@
   - [Back End](#back-end)
   - [Front End](#front-end)
 - [Features](#features)
+  - [JWT](/back-end/docs/jwt.md)
   - [Forgot Password](#forgot-password)
   - [Salt Password](/back-end/docs/salt-password.md)
   - [Mediator](/back-end/docs/mediator.md)
