@@ -253,15 +253,19 @@ const Binance = () => {
 
   const handleCreateOrderSuccess = (order: OpenOrder) => {
     setOpenOrders([...openOrders, order]);
+    getBalance();
   };
 
   const handleCancelOrder = async (symbol: string, orderId: number): Promise<number> => {
     await apiService.delete(`bnb/order/${symbol}/${orderId}`);
+    setOpenOrders(openOrders.filter((x) => x.orderId !== orderId));
+    getBalance();
     return orderId;
   };
 
   const handleCancelAllOrders = async (): Promise<void> => {
     const res = await apiService.delete(`bnb/positions/nearusdt`);
+    getBalance();
   };
 
   return (
