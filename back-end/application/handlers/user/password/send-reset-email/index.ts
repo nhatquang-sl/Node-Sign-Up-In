@@ -34,7 +34,7 @@ export class UserSendResetPasswordEmailResult {
   }
   declare lastDate: number;
 }
-console.log('@RegisterHandler');
+
 @RegisterHandler
 export class UserSendResetPasswordEmailCommandHandler
   implements ICommandHandler<UserSendResetPasswordEmailCommand, UserSendResetPasswordEmailResult>
