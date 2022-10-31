@@ -4,7 +4,7 @@ import LANG from '@libs/lang';
 import { TIMESTAMP } from '@libs/constant';
 import { validateEmailAddress } from '@libs/user';
 
-import { generateJwt, sendResetPasswordEmail } from '@application/common/utils';
+import { generateTokens, sendResetPasswordEmail, TokenData } from '@application/common/utils';
 import { BadRequestError, NotFoundError } from '@application/common/exceptions';
 import {
   RegisterHandler,
@@ -56,9 +56,7 @@ export class UserSendResetPasswordEmailCommandHandler
     if (ufp != null) return new UserSendResetPasswordEmailResult(new Date(ufp.createdAt).getTime());
 
     // send reset password email and create a UserForgotPassword in the db
-    const user = new User();
-    user.id = userId;
-    const { accessToken } = generateJwt(user, 'RESET_PASSWORD');
+    const { accessToken } = generateTokens({ userId, type: 'RESET_PASSWORD' } as TokenData);
     await sendResetPasswordEmail(emailAddress, accessToken);
     ufp = await UserForgotPassword.create({
       userId: userId,

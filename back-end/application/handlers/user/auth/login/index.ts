@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import LANG from '@libs/lang';
 import { UserLoginDto, UserAuthDto } from '@libs/user/dto';
 
-import { generateJwt } from '@application/common/utils';
+import { generateTokens } from '@application/common/utils';
 import { BadRequestError, UnauthorizedError } from '@application/common/exceptions';
 import {
   RegisterHandler,
@@ -50,7 +50,11 @@ export class UserLoginCommandHandler implements ICommandHandler<UserLoginCommand
     if (!match) throw new UnauthorizedError({ message: LANG.USER_NAME_PASSWORD_INVALID_ERROR });
 
     // Create JWTs
-    const { accessToken, refreshToken } = generateJwt(foundUser, 'LOGIN');
+    const { accessToken, refreshToken } = generateTokens({
+      userId: foundUser.id,
+      roles: foundUser.roles?.map((x) => x.code) ?? [],
+      type: 'LOGIN',
+    });
     await UserLoginHistory.create({
       userId: foundUser.id,
       accessToken,
