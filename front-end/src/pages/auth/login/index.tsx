@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { connect, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-
+import axios, { AxiosInstance, AxiosError, AxiosResponse } from 'axios';
 import {
   Container,
   Box,
@@ -20,16 +20,24 @@ import {
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
+import AuthContext, { AuthState } from 'context/auth-provider';
 import LANG from 'shared/lang';
-import { validateEmailAddress } from 'shared/user/validate';
+import { validateEmailAddress, UserLoginDto } from 'shared/user';
+import { apiService } from 'store/services';
 import { closeSidebarAndHeader } from 'store/settings/actions';
 import { showSnackbar } from 'store/snackbar/actions';
 
 import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
 
+type LoginError = {
+  message: string;
+};
+
 const Login = (props: Props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { setAuth } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
 
   const [values, setValues] = useState<State>({
     emailAddress: '',
@@ -79,18 +87,35 @@ const Login = (props: Props) => {
 
   const handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
+    setLoading(true);
 
     const emailAddressError = validateEmailAddress(values.emailAddress);
     const passwordError = values.password ? undefined : LANG.USER_PASSWORD_MISSING_ERROR;
-    setValues({
-      ...values,
-      emailAddressError,
-      passwordError,
-    });
+    setValues({ ...values, emailAddressError, passwordError });
 
-    if (emailAddressError || passwordError) return;
-
-    props.login(values);
+    const isValid = !emailAddressError && !passwordError;
+    if (isValid) {
+      try {
+        const res = await apiService.post(`auth/login`, values, {
+          withCredentials: true,
+        });
+        setAuth(res.data as AuthState);
+        const { accessToken, emailConfirmed } = res.data;
+        console.log(accessToken, emailConfirmed);
+        if (accessToken && emailConfirmed) {
+          console.log('go home');
+          navigate('/');
+        } else if (accessToken) navigate('/request-activate-email');
+      } catch (err) {
+        const res = (err as AxiosError<LoginError>).response;
+        const status = res?.status ?? 0;
+        if ([400, 401].includes(status)) {
+          const errMsg = res?.data.message;
+          errMsg && dispatch(showSnackbar(errMsg, 'error'));
+        }
+      }
+    }
+    setLoading(false);
   };
 
   return (
@@ -157,7 +182,7 @@ const Login = (props: Props) => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            loading={props.auth.pendingLogin()}
+            loading={loading}
           >
             Submit
           </LoadingButton>

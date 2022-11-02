@@ -1,11 +1,11 @@
 import { SNACKBAR, SnackbarMessage } from './types';
 
 const openSnackbar = () => ({
-  type: SNACKBAR.OPEN
+  type: SNACKBAR.OPEN,
 });
 
 const closeSnackbar = () => ({
-  type: SNACKBAR.CLOSE
+  type: SNACKBAR.CLOSE,
 });
 const showSnackbar = (
   message: string,
@@ -21,12 +21,12 @@ const showSnackbar = (
   mes.severity = severity;
   return {
     type: SNACKBAR.SHOW,
-    payload: mes
+    payload: mes,
   };
 };
 
 const cleanUpSnackbar = () => ({
-  type: SNACKBAR.CLEAN_UP
+  type: SNACKBAR.CLEAN_UP,
 });
 
 export { openSnackbar, closeSnackbar, showSnackbar, cleanUpSnackbar };

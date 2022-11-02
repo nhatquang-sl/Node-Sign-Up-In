@@ -5,7 +5,7 @@ import { apiService } from '../services';
 
 const login = (request: UserLoginDto) => ({
   type: AUTH_TYPE.LOGIN,
-  payload: apiService.post(`auth/login`, request),
+  payload: apiService.post(`auth/login`, request, { withCredentials: true }),
 });
 
 const register = (request: UserRegisterDto) => ({

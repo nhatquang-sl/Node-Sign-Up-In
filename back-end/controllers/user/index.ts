@@ -6,6 +6,7 @@ import { getAccessToken } from '@controllers/utils';
 const router = express.Router();
 
 router.get('/sessions', async (request: Request, response: Response) => {
+  console.log(JSON.stringify(request.cookies));
   response.json(await mediator.send(new UserGetAllSessionCommand(getAccessToken(request))));
 });
 

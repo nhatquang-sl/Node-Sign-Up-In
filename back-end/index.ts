@@ -2,6 +2,7 @@ import 'express-async-errors';
 import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import ENV from '@config';
 import corsOptions from '@config/cors-options';
 import { dbContext, initializeDb } from '@database';
@@ -60,7 +61,7 @@ const requestLogger = (request: Request, response: Response, next: NextFunction)
 };
 
 app.use(requestLogger);
-
+app.use(cookieParser());
 app.use('/auth', authRoute);
 app.use('/user', userRoute);
 app.use('/bnb', bnbRoute);

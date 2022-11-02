@@ -1,13 +1,13 @@
 export class UserDto {
-  declare id: number;
-  declare firstName: string;
-  declare lastName: string;
-  declare emailAddress: string;
-  declare emailConfirmed: boolean | false;
+  id: number = 0;
+  firstName: string = '';
+  lastName: string = '';
+  emailAddress: string = '';
+  emailConfirmed: boolean = false;
 }
 
 export class UserAuthDto extends UserDto {
-  declare accessToken: string;
+  accessToken: string = '';
 }
 
 export class UserLoginDto {
@@ -15,8 +15,8 @@ export class UserLoginDto {
     this.emailAddress = obj?.emailAddress;
     this.password = obj?.password;
   }
-  declare emailAddress: string;
-  declare password: string;
+  emailAddress: string;
+  password: string;
 }
 
 export class UserRegisterDto extends UserLoginDto {
@@ -25,8 +25,8 @@ export class UserRegisterDto extends UserLoginDto {
     this.firstName = obj.firstName;
     this.lastName = obj.lastName;
   }
-  declare firstName: string;
-  declare lastName: string;
+  firstName: string;
+  lastName: string;
 }
 
 export interface UserSession {
