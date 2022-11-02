@@ -27,8 +27,11 @@ apiService.interceptors.response.use(
       store.dispatch(errNetwork());
     } else if (store.getState().global.errNetwork) store.dispatch(errNetwork(false));
 
-    if (error.response?.status === 401) store.dispatch(logOut());
     console.log(error.response);
+    if (error.response?.status === 401) {
+      apiService.get('/auth/refresh-token', { withCredentials: true });
+      // store.dispatch(logOut());
+    }
     return Promise.reject(error);
   }
 );

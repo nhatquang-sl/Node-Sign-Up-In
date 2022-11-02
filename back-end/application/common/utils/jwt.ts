@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
 import ENV from '@config';
-import { User } from '@database';
 
 export type TokenData = {
   userId: number;
@@ -9,7 +8,7 @@ export type TokenData = {
 };
 
 export const generateTokens = (user: TokenData) => {
-  const accessToken = jwt.sign(user, ENV.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+  const accessToken = jwt.sign(user, ENV.ACCESS_TOKEN_SECRET, { expiresIn: '3s' });
   const refreshToken = jwt.sign(user, ENV.REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
 
   return { accessToken, refreshToken };

@@ -88,4 +88,9 @@ router.post('/reset-password/set-new', async (request: Request, response: Respon
   response.json(await mediator.send(command));
 });
 
+router.get('/refresh-token', async (request: Request, response: Response) => {
+  console.log(JSON.stringify(request.cookies));
+  response.sendStatus(200);
+});
+
 export default router;
