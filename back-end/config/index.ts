@@ -11,10 +11,9 @@ if (process.env.NODE_ENV?.trim() == 'development')
 const ENV = {
   NODE_ENV: process.env.NODE_ENV,
   APP_VERSION: process.env.APP_VERSION,
-  APP_HOST: process.env.APP_HOST ?? '',
   PORT: process.env.PORT || 3500,
 
-  FE_ENDPOINT: 'http://localhost:3000',
+  FE_ENDPOINT: process.env.FE_ENDPOINT,
 
   DB_NAME: process.env.DB_NAME ?? '',
   DB_USERNAME: process.env.DB_USERNAME ?? '',

@@ -43,7 +43,6 @@ router.get('/health-check', (req, res) => {
   res.json({
     ENV: ENV.NODE_ENV,
     APP_VERSION: ENV.APP_VERSION,
-    APP_HOST: ENV.APP_HOST,
   });
 });
 
