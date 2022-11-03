@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import axios, { AxiosInstance, AxiosError, AxiosResponse } from 'axios';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { AxiosError } from 'axios';
 import {
   Container,
   Box,
@@ -20,12 +20,13 @@ import {
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import AuthContext, { AuthState } from 'context/auth-provider';
+import { AuthState } from 'context/auth-provider';
 import LANG from 'shared/lang';
 import { validateEmailAddress, UserLoginDto } from 'shared/user';
 import { apiService } from 'store/services';
 import { closeSidebarAndHeader } from 'store/settings/actions';
 import { showSnackbar } from 'store/snackbar/actions';
+import useAuth from 'hooks/use-auth';
 
 import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
 
@@ -35,8 +36,11 @@ type LoginError = {
 
 const Login = (props: Props) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname ?? '/';
+
   const dispatch = useDispatch();
-  const { setAuth } = useContext(AuthContext);
+  const { setAuth } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const [values, setValues] = useState<State>({
@@ -99,13 +103,10 @@ const Login = (props: Props) => {
         const res = await apiService.post(`auth/login`, values, {
           withCredentials: true,
         });
-        setAuth(res.data as AuthState);
+        setAuth(new AuthState(res.data));
         const { accessToken, emailConfirmed } = res.data;
-        console.log(accessToken, emailConfirmed);
-        if (accessToken && emailConfirmed) {
-          console.log('go home');
-          navigate('/');
-        } else if (accessToken) navigate('/request-activate-email');
+        if (accessToken && emailConfirmed) navigate(from, { replace: true });
+        else if (accessToken) navigate('/request-activate-email');
       } catch (err) {
         const res = (err as AxiosError<LoginError>).response;
         const status = res?.status ?? 0;
