@@ -1,4 +1,5 @@
-import { generateTokens, decodeRefreshToken, TokenData } from '@application/common/utils';
+import { TokenData } from '@libs/user';
+import { generateTokens, decodeRefreshToken } from '@application/common/utils';
 import { BadRequestError, ForbiddenError } from '@application/common/exceptions';
 import {
   RegisterHandler,

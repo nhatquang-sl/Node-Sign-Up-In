@@ -1,13 +1,14 @@
 import jwt from 'jsonwebtoken';
 import ENV from '@config';
+import { TokenData } from '@libs/user';
 
-export type TokenData = {
+export type TokenParam = {
   userId: number;
   roles: string[];
   type: string;
 };
 
-export const generateTokens = (user: TokenData) => {
+export const generateTokens = (user: TokenParam) => {
   const accessToken = jwt.sign(user, ENV.ACCESS_TOKEN_SECRET, { expiresIn: '3s' });
   const refreshToken = jwt.sign(user, ENV.REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
 

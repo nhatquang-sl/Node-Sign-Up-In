@@ -49,4 +49,11 @@ export interface UserForgotPasswordDto {
   updatedAt: string;
 }
 
+export type TokenData = {
+  userId: number;
+  roles: string[];
+  type: string;
+  exp: number;
+  iat: number;
+};
 // export type { UserDto, UserAuthDto, UserLoginDto };

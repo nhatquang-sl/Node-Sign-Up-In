@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import ENV from '@config';
 import { User } from '@database';
 import { mediator } from '@application/mediator';
-import { generateTokens, delay, TokenData } from '@application/common/utils';
+import { generateTokens, delay, TokenParam } from '@application/common/utils';
 import { AuthorizeBehavior } from '@application/common/behaviors';
 import { ForbiddenError, UnauthorizedError, BadRequestError } from '@application/common/exceptions';
 import { UserSetNewPasswordCommand } from '.';
@@ -56,7 +56,7 @@ test('token type invalid', async () => {
 });
 
 test('token type invalid', async () => {
-  const { accessToken } = generateTokens({} as TokenData);
+  const { accessToken } = generateTokens({} as TokenParam);
 
   let command = new UserSetNewPasswordCommand(accessToken, '');
   const rejects = expect(mediator.send(command)).rejects;
@@ -65,7 +65,7 @@ test('token type invalid', async () => {
 });
 
 test('password missing', async () => {
-  const { accessToken } = generateTokens({ type: 'RESET_PASSWORD' } as TokenData);
+  const { accessToken } = generateTokens({ type: 'RESET_PASSWORD' } as TokenParam);
 
   let command = new UserSetNewPasswordCommand(accessToken, '');
   const rejects = expect(mediator.send(command)).rejects;
