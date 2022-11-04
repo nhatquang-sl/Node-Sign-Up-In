@@ -15,6 +15,7 @@ import Login from 'pages/auth/login';
 import Profile from 'pages/auth/profile';
 import RequestActivateEmail from 'pages/auth/request-activate-email';
 import RegisterConfirm from 'pages/auth/register-confirm';
+import Unauthorized from 'pages/auth/unauthorized';
 import { ForgotPassword, ResetPassword } from 'pages/auth/password';
 import RequireAuth from './require-auth';
 
@@ -29,11 +30,14 @@ function Main(props: Props) {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/bnb" element={<Binance />} />
           <Route path="/" element={<Dashboard />} />
+        </Route>
+        <Route element={<RequireAuth allowedRoles={['admin']} />}>
+          <Route path="/bnb" element={<Binance />} />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
       </Routes>
       <ConsecutiveSnackBars />
       <Loading />

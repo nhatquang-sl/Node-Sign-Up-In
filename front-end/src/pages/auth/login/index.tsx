@@ -22,7 +22,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 
 import { AuthState } from 'context/auth-provider';
 import LANG from 'shared/lang';
-import { validateEmailAddress, UserLoginDto } from 'shared/user';
+import { validateEmailAddress } from 'shared/user';
 import { apiService } from 'store/services';
 import { closeSidebarAndHeader } from 'store/settings/actions';
 import { showSnackbar } from 'store/snackbar/actions';
@@ -105,6 +105,7 @@ const Login = (props: Props) => {
         });
         setAuth(new AuthState(res.data));
         const { accessToken, emailConfirmed } = res.data;
+
         if (accessToken && emailConfirmed) navigate(from, { replace: true });
         else if (accessToken) navigate('/request-activate-email');
       } catch (err) {
