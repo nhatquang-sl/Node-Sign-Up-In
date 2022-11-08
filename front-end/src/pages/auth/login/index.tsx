@@ -103,7 +103,8 @@ const Login = (props: Props) => {
         const res = await apiService.post(`auth/login`, values, {
           withCredentials: true,
         });
-        setAuth(new AuthState(res.data));
+
+        setAuth(new AuthState(res.data.accessToken));
         const { accessToken, emailConfirmed } = res.data;
 
         if (accessToken && emailConfirmed) navigate(from, { replace: true });

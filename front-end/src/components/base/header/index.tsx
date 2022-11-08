@@ -16,10 +16,12 @@ import {
   MenuItem,
 } from '@mui/material';
 import Zoom from '@mui/material/Zoom';
-
 import { sidebarWidth } from 'store/constants';
 
+import useAuth from 'hooks/use-auth';
+import useApiService from 'hooks/use-api-service';
 import { Props, mapStateToProps, mapDispatchToProps } from './types';
+import { AuthState } from 'context/auth-provider';
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -42,15 +44,18 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+
 function Header(props: Props) {
-  const navigate = useNavigate();
   const theme = useTheme();
+  const navigate = useNavigate();
+  const { auth, setAuth } = useAuth();
+  const apiService = useApiService();
 
   const transitionDuration = {
     enter: theme.transitions.duration.enteringScreen,
     exit: theme.transitions.duration.leavingScreen,
   };
-  const { accessToken, emailConfirmed } = props.auth;
+  const { accessToken } = auth;
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const handleDrawerOpen = () => {
     props.openSidebar();
@@ -58,10 +63,20 @@ function Header(props: Props) {
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
+
+  const logOut = async () => {
+    props.loading(true);
+    try {
+      await apiService.get('/auth/log-out');
+      setAuth(new AuthState());
+    } catch (err) {}
+    props.loading(false);
+  };
+
   const handleCloseUserMenu = (setting: string | undefined) => {
     switch (setting?.toLocaleLowerCase()) {
       case 'logout':
-        props.logOut();
+        logOut();
         break;
       case 'profile':
         navigate('/profile');
@@ -73,25 +88,23 @@ function Header(props: Props) {
     <Slide in={props.settings.headerOpen}>
       <AppBar position="fixed" open={props.settings.sideBarOpen}>
         <Toolbar>
-          {emailConfirmed && (
-            <Zoom
-              in={!props.settings.sideBarOpen}
-              timeout={transitionDuration}
-              style={{
-                transitionDelay: `${transitionDuration.exit}ms`,
-              }}
+          <Zoom
+            in={!props.settings.sideBarOpen}
+            timeout={transitionDuration}
+            style={{
+              transitionDelay: `${transitionDuration.exit}ms`,
+            }}
+          >
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              edge="start"
+              sx={{ mr: 2, ...(props.settings.sideBarOpen && { display: 'none' }) }}
             >
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleDrawerOpen}
-                edge="start"
-                sx={{ mr: 2, ...(props.settings.sideBarOpen && { display: 'none' }) }}
-              >
-                <Icon>menu</Icon>
-              </IconButton>
-            </Zoom>
-          )}
+              <Icon>menu</Icon>
+            </IconButton>
+          </Zoom>
 
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Application
