@@ -1,5 +1,4 @@
-import { TokenData } from '@libs/user';
-import { generateTokens, decodeRefreshToken } from '@application/common/utils';
+import { generateTokens, decodeRefreshToken, TokenParam } from '@application/common/utils';
 import { BadRequestError, ForbiddenError } from '@application/common/exceptions';
 import {
   RegisterHandler,
@@ -20,7 +19,7 @@ export class UserRefreshTokenCommand implements ICommand {
   refreshToken: string = '';
   ipAddress: string = '';
   userAgent: string = '';
-  declare decoded: TokenData;
+  declare decoded: TokenParam;
 }
 
 @RegisterHandler
@@ -53,7 +52,8 @@ export class UserRefreshTokenCommandValidator
   async validate(command: UserRefreshTokenCommand): Promise<void> {
     if (!command.refreshToken) throw new BadRequestError();
     try {
-      command.decoded = await decodeRefreshToken(command.refreshToken);
+      const { iat, exp, ...decoded } = await decodeRefreshToken(command.refreshToken);
+      command.decoded = decoded;
     } catch (err) {
       throw new ForbiddenError();
     }

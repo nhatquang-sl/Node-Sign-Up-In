@@ -51,10 +51,14 @@ export class UserLoginCommandHandler implements ICommandHandler<UserLoginCommand
 
     // Create JWTs
     const { accessToken, refreshToken } = generateTokens({
-      userId: foundUser.id,
+      id: foundUser.id,
+      emailAddress: foundUser.emailAddress,
+      firstName: foundUser.firstName,
+      lastName: foundUser.lastName,
       roles: foundUser.roles?.map((x) => x.code) ?? [],
       type: 'LOGIN',
     });
+
     await UserLoginHistory.create({
       userId: foundUser.id,
       accessToken,

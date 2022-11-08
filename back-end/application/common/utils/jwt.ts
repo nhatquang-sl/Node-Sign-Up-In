@@ -3,8 +3,11 @@ import ENV from '@config';
 import { TokenData } from '@libs/user';
 
 export type TokenParam = {
-  userId: number;
+  id: number;
   roles: string[];
+  firstName: string;
+  lastName: string;
+  emailAddress: string;
   type: string;
 };
 
@@ -19,11 +22,7 @@ export const decodeAccessToken = async (accessToken: string) => {
   return new Promise<TokenData>((resolve, reject) =>
     jwt.verify(accessToken, ENV.ACCESS_TOKEN_SECRET, (err: any, decoded: any) => {
       if (err) reject(err);
-      resolve({
-        userId: decoded.userId,
-        roles: decoded.roles,
-        type: decoded.type,
-      } as TokenData);
+      resolve(decoded as TokenData);
     })
   );
 };
@@ -32,11 +31,7 @@ export const decodeRefreshToken = async (refreshToken: string) => {
   return new Promise<TokenData>((resolve, reject) =>
     jwt.verify(refreshToken, ENV.REFRESH_TOKEN_SECRET, (err: any, decoded: any) => {
       if (err) reject(err);
-      resolve({
-        userId: decoded.userId,
-        roles: decoded.roles,
-        type: decoded.type,
-      } as TokenData);
+      resolve(decoded as TokenData);
     })
   );
 };

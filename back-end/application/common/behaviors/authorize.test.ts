@@ -85,7 +85,7 @@ test('access token expired', async () => {
   await delay(2 * TIMESTAMP.SECOND);
   const rejects = expect(mediator.send(new TestCommand(10, accessToken))).rejects;
   await rejects.toThrow(UnauthorizedError);
-  await rejects.toThrow(JSON.stringify({ message: 'Invalid Token' }));
+  await rejects.toThrow(JSON.stringify({ message: 'Access Token Expired' }));
 });
 
 test('access token valid', async () => {
@@ -118,7 +118,7 @@ test('role missing', async () => {
 
   const rejects = expect(mediator.send(new TestRolesCommand(10, accessToken))).rejects;
   await rejects.toThrow(ForbiddenError);
-  await rejects.toThrow(JSON.stringify({ message: 'Forbidden' }));
+  await rejects.toThrow(JSON.stringify({ message: 'Insufficient Scope' }));
 });
 
 test('role invalid', async () => {
@@ -135,7 +135,7 @@ test('role invalid', async () => {
 
   const rejects = expect(mediator.send(new TestRolesCommand(10, accessToken))).rejects;
   await rejects.toThrow(ForbiddenError);
-  await rejects.toThrow(JSON.stringify({ message: 'Forbidden' }));
+  await rejects.toThrow(JSON.stringify({ message: 'Insufficient Scope' }));
 });
 
 test('role admin valid', async () => {

@@ -9,7 +9,7 @@ import { AuthorizeBehavior } from '@application/common/behaviors';
 import { UserSetNewPasswordCommand } from '.';
 
 const userId = 1;
-const { accessToken } = generateTokens({ userId, type: 'RESET_PASSWORD' } as TokenParam);
+const { accessToken } = generateTokens({ id: userId, type: 'RESET_PASSWORD' } as TokenParam);
 
 beforeEach(async () => {
   await dbContext.connect();
