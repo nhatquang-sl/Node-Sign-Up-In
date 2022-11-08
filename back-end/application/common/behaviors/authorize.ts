@@ -27,8 +27,8 @@ export class AuthorizeBehavior implements IPipelineBehavior {
         ) {
           reject(new ForbiddenError('Insufficient Scope'));
         }
-        console.log({ decoded });
-        command.userId = decoded.userId;
+
+        command.userId = decoded.id;
         command.accessTokenType = decoded.type;
         resolve(decoded);
       });

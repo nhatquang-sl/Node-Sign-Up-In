@@ -1,34 +1,29 @@
 import { createContext, useState, FC, PropsWithChildren } from 'react';
-import jwt_decode from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 
 import { TokenData } from 'shared/user';
 
 export class AuthState {
-  constructor(obj: any = {}) {
-    this.id = isNaN(obj?.id) ? -1 : parseInt(obj?.id);
-    this.accessToken = obj?.accessToken ?? '';
-    this.firstName = obj?.firstName ?? '';
-    this.lastName = obj?.lastName ?? '';
-    this.emailAddress = obj?.emailAddress ?? '';
-    this.emailConfirmed = !!obj?.emailConfirmed;
-    if (obj?.accessToken) {
-      const tokenData = jwt_decode<TokenData>(obj?.accessToken);
-      this.roles = tokenData.roles;
-      this.exp = tokenData.exp;
-      this.iat = tokenData.iat;
+  constructor(accessToken: string = '') {
+    const tokenData = (accessToken ? jwtDecode(accessToken) : {}) as TokenData;
 
-      // var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
-      // d.setUTCSeconds(this.exp);
-      // console.log({ accessToken: this.accessToken, exp: d });
-    }
+    this.id = isNaN(tokenData?.id) ? -1 : parseInt(tokenData?.id + '');
+    this.accessToken = accessToken ?? '';
+    this.firstName = tokenData?.firstName ?? '';
+    this.lastName = tokenData?.lastName ?? '';
+    this.emailAddress = tokenData?.emailAddress ?? '';
+    this.type = tokenData?.type ?? '';
+    this.roles = tokenData?.roles ?? [];
+    this.exp = tokenData?.exp ?? 0;
+    this.iat = tokenData?.iat ?? 0;
   }
   id: number;
   accessToken: string;
   firstName: string;
   lastName: string;
   emailAddress: string;
-  emailConfirmed: boolean;
   roles: string[] = [];
+  type: string;
   exp: number = 0;
   iat: number = 0;
 }

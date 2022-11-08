@@ -7,7 +7,7 @@ import { AuthorizeBehavior } from '@application/common/behaviors';
 import { GetPositionsCommand } from '.';
 
 const userId = 1;
-const { accessToken } = generateTokens({ userId, type: '' } as TokenParam);
+const { accessToken } = generateTokens({ id: userId, type: '' } as TokenParam);
 
 beforeEach(async () => {
   await dbContext.connect();

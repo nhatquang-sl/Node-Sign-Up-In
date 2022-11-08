@@ -36,7 +36,7 @@ test('token expired', async () => {
   let command = new UserSetNewPasswordCommand(accessToken, '');
   const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(UnauthorizedError);
-  await rejects.toThrow(JSON.stringify({ message: `Invalid Token` }));
+  await rejects.toThrow(JSON.stringify({ message: `Access Token Expired` }));
 });
 
 test('token type invalid', async () => {

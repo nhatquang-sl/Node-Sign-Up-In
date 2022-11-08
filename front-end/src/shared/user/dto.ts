@@ -50,7 +50,10 @@ export interface UserForgotPasswordDto {
 }
 
 export type TokenData = {
-  userId: number;
+  id: number;
+  firstName: string;
+  lastName: string;
+  emailAddress: string;
   roles: string[];
   type: string;
   exp: number;

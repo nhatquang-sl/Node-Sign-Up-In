@@ -62,7 +62,7 @@ test('refresh token not found', async () => {
 
 test('refresh token success', async () => {
   const refreshToken = jwt.sign(
-    { userId: 1, roles: ['user'], type: 'LOGIN' },
+    { id: 1, roles: ['user'], type: 'LOGIN' },
     ENV.REFRESH_TOKEN_SECRET,
     { expiresIn: '1d' }
   );
@@ -79,9 +79,9 @@ test('refresh token success', async () => {
   });
 
   const accessToken = (await mediator.send(command)) as string;
-  const { userId, roles, type } = await decodeAccessToken(accessToken);
+  const { id, roles, type } = await decodeAccessToken(accessToken);
 
-  expect(userId).toBe(1);
+  expect(id).toBe(1);
   expect(roles).toEqual(['user']);
   expect(type).toBe('LOGIN');
 

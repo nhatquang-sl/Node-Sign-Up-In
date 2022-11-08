@@ -7,11 +7,11 @@ class Props {
 
 const RequireAuth = (props: Props) => {
   const { auth } = useAuth();
-  const { allowedRoles } = props;
   const location = useLocation();
   const isAuth = auth.id > 0;
+  const { allowedRoles } = props;
   const author = !allowedRoles?.length || !!auth.roles.find((r) => props.allowedRoles?.includes(r));
-
+  console.log(auth);
   return isAuth ? (
     author ? (
       <Outlet />

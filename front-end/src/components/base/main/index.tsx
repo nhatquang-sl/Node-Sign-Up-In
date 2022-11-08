@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { Routes, Route } from 'react-router-dom';
 
@@ -7,6 +7,8 @@ import Loading from 'components/loading';
 
 import { DrawerHeader, Container } from './styles';
 import { Props, mapStateToProps, mapDispatchToProps } from './types';
+
+import useRefreshToken from 'hooks/use-refresh-token';
 
 import Dashboard from 'pages/dashboard';
 import Binance from 'pages/bnb';
@@ -20,7 +22,25 @@ import { ForgotPassword, ResetPassword } from 'pages/auth/password';
 import RequireAuth from './require-auth';
 
 function Main(props: Props) {
-  return (
+  const { refresh } = useRefreshToken();
+  const [init, setInit] = useState(true);
+  const { loading } = props;
+
+  useEffect(() => {
+    loading(true);
+    const getProfile = async () => {
+      await refresh();
+
+      loading(false);
+      setInit(false);
+    };
+
+    getProfile();
+  }, []);
+
+  return init ? (
+    <Loading />
+  ) : (
     <Container open={props.settings.sideBarOpen}>
       {props.settings.headerOpen && <DrawerHeader />}
       <Routes>

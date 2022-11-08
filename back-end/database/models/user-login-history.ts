@@ -43,10 +43,10 @@ UserLoginHistory.init(
       type: DataTypes.STRING,
     },
     accessToken: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(300),
     },
     refreshToken: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(300),
     },
   },
   {
