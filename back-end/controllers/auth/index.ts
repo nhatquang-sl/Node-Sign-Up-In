@@ -7,6 +7,7 @@ import { UserLoginCommand, UserLoginResult } from '@application/handlers/user/au
 import { UserSendActivationEmailCommand } from '@application/handlers/user/auth/send-activation-email';
 import { UserGetProfileCommand } from '@application/handlers/user/profile/get';
 import { UserGetActivationLinkCommand } from '@application/handlers/user/auth/get-activation-link';
+import { UserRefreshTokenCommand } from '@application/handlers/user/auth/refresh-token';
 import {
   UserSendResetPasswordEmailCommand,
   UserSetNewPasswordCommand,
@@ -90,7 +91,8 @@ router.post('/reset-password/set-new', async (request: Request, response: Respon
 
 router.get('/refresh-token', async (request: Request, response: Response) => {
   console.log(JSON.stringify(request.cookies));
-  response.sendStatus(200);
+  const command = new UserRefreshTokenCommand(request.cookies['jwt'], request);
+  response.json({ accessToken: await mediator.send(command) });
 });
 
 export default router;
