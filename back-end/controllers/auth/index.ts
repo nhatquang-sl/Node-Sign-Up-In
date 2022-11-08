@@ -95,4 +95,9 @@ router.get('/refresh-token', async (request: Request, response: Response) => {
   response.json({ accessToken: await mediator.send(command) });
 });
 
+router.get('/log-out', async (request: Request, response: Response) => {
+  response.clearCookie('jwt', { httpOnly: true });
+  response.sendStatus(204);
+});
+
 export default router;
