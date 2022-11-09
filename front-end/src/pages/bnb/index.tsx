@@ -1,19 +1,15 @@
 import { useEffect, useCallback, useState } from 'react';
-import { useDispatch } from 'react-redux';
-
-import Box from '@mui/material/Box';
-import Tab from '@mui/material/Tab';
-import TabContext from '@mui/lab/TabContext';
-import TabList from '@mui/lab/TabList';
-import TabPanel from '@mui/lab/TabPanel';
 import _ from 'lodash';
-import { apiService } from 'store/services';
-import { openHeader } from 'store/settings/actions';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+
+import { Box, Tab } from '@mui/material';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
+
 import { TIMESTAMP } from 'shared/constant';
 import { bnbService, Kline, Position, OpenOrder, Balance } from 'shared/bnb';
 import { round2Dec, round3Dec } from 'shared/utilities';
+import { useApiService } from 'hooks';
 import relativeStrengthIndex from './relative-strength-index';
 import standardDeviation from './standard-deviation';
 import Positions from './positions';
@@ -25,7 +21,7 @@ import { Indicator, mapStateToProps, mapDispatchToProps } from './types';
 
 const Binance = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const apiService = useApiService();
 
   const [m5State, setM5State] = useState(new Indicator('5m'));
   const [m15State, setM15State] = useState(new Indicator('15m'));
@@ -155,8 +151,6 @@ const Binance = () => {
   };
 
   useEffect(() => {
-    dispatch(openHeader());
-
     getAndCalculateKlines('NEARUSDT', '5m');
     getAndCalculateKlines('NEARUSDT', '15m');
     getAndCalculateKlines('NEARUSDT', '30m');
@@ -168,7 +162,7 @@ const Binance = () => {
     setInterval(() => {
       getPositions();
     }, 30 * 1000);
-  }, [dispatch, navigate, getAndCalculateKlines]);
+  }, [navigate, getAndCalculateKlines]);
 
   useEffect(() => {
     console.log('User Data WS change');
@@ -264,7 +258,7 @@ const Binance = () => {
   };
 
   const handleCancelAllOrders = async (): Promise<void> => {
-    const res = await apiService.delete(`bnb/positions/nearusdt`);
+    await apiService.delete(`bnb/positions/nearusdt`);
     getBalance();
   };
 
