@@ -4,8 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Container, Box } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import useAuth from 'hooks/use-auth';
-import useApiService from 'hooks/use-api-service';
+import { useAuth, useApiService } from 'hooks';
 
 import { Props, mapStateToProps, mapDispatchToProps } from './types';
 import { TokenType } from 'shared/user';

@@ -3,7 +3,7 @@ import { apiService } from 'store/services';
 import useAuth from './use-auth';
 import { AuthState } from 'context/auth-provider';
 
-const useRefreshToken = () => {
+export const useRefreshToken = () => {
   const { setAuth } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
 
