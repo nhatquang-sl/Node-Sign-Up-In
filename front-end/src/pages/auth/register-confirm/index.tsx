@@ -13,10 +13,10 @@ const RegisterConfirm = (props: Props) => {
   const apiService = useApiService();
 
   useEffect(() => {
-    console.log('register confirm');
     const registerConfirm = async () => {
       try {
         await apiService.get(`auth/activate/${activationCode}`);
+        props.showSnackbar('Activate your account success', 'success');
       } catch (err) {
         if (err instanceof AxiosError) {
           const { data } = err.response as AxiosResponse<{ message: string }>;

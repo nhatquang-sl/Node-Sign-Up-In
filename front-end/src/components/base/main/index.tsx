@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 
 import ConsecutiveSnackBars from 'components/consecutive-snackbars';
 import Loading from 'components/loading';
@@ -23,20 +23,21 @@ import RequireAuth from './require-auth';
 
 function Main(props: Props) {
   console.log('main');
+  const location = useLocation();
   const { refresh } = useRefreshToken();
   const [init, setInit] = useState(true);
   const { loading } = props;
 
   useEffect(() => {
     loading(true);
-    const getProfile = async () => {
-      await refresh();
+    const refreshToken = async () => {
+      if (!location.pathname.includes('register-confirm')) await refresh();
 
       loading(false);
       setInit(false);
     };
 
-    getProfile();
+    refreshToken();
   }, []);
 
   return init ? (
