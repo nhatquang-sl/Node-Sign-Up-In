@@ -1,9 +1,14 @@
 import { useEffect } from 'react';
-import { AxiosError, AxiosRequestHeaders, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosRequestHeaders, AxiosResponse } from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { apiService } from 'store/services';
+import { API_ENDPOINT } from 'store/constants';
 import useRefreshToken from './use-refresh-token';
 import useAuth from './use-auth';
+
+const apiService = axios.create({
+  baseURL: API_ENDPOINT,
+  withCredentials: true,
+});
 
 export const useApiService = () => {
   const navigate = useNavigate();
