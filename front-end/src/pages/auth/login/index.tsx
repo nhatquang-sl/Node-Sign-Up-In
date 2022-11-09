@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { connect, useDispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import {
@@ -24,8 +24,6 @@ import { AuthState } from 'context/auth-provider';
 import LANG from 'shared/lang';
 import { validateEmailAddress } from 'shared/user';
 import { apiService } from 'store/services';
-import { closeSidebarAndHeader } from 'store/settings/actions';
-import { showSnackbar } from 'store/snackbar/actions';
 import useAuth from 'hooks/use-auth';
 
 import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
@@ -39,7 +37,6 @@ const Login = (props: Props) => {
   const location = useLocation();
   const from = location.state?.from?.pathname ?? '/';
 
-  const dispatch = useDispatch();
   const { setAuth } = useAuth();
   const [loading, setLoading] = useState(false);
 
@@ -60,19 +57,6 @@ const Login = (props: Props) => {
       }));
     }
   }, [values.emailAddress, values.password]);
-
-  const { accessToken, emailConfirmed } = props.auth;
-  const loginError = props.auth.error.login;
-
-  useEffect(() => {
-    // if (accessToken && emailConfirmed) navigate('/');
-    // else if (accessToken) navigate('/request-activate-email');
-    // else dispatch(closeSidebarAndHeader());
-  }, [accessToken, emailConfirmed, navigate, dispatch]);
-
-  useEffect(() => {
-    loginError && dispatch(showSnackbar(loginError, 'error'));
-  }, [loginError, dispatch]);
 
   const handleClickShowPassword = () => {
     setValues({
@@ -114,7 +98,7 @@ const Login = (props: Props) => {
         const status = res?.status ?? 0;
         if ([400, 401].includes(status)) {
           const errMsg = res?.data.message;
-          errMsg && dispatch(showSnackbar(errMsg, 'error'));
+          errMsg && props.showSnackbar(errMsg, 'error');
         }
       }
     }
