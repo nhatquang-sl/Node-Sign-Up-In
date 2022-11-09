@@ -22,7 +22,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 
 import { AuthState } from 'context/auth-provider';
 import LANG from 'shared/lang';
-import { validateEmailAddress } from 'shared/user';
+import { TokenType, validateEmailAddress } from 'shared/user';
 import { apiService } from 'store/services';
 import useAuth from 'hooks/use-auth';
 
@@ -35,9 +35,8 @@ type LoginError = {
 const Login = (props: Props) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname ?? '/';
 
-  const { setAuth } = useAuth();
+  const { auth, setAuth } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const [values, setValues] = useState<State>({
@@ -47,6 +46,18 @@ const Login = (props: Props) => {
     passwordError: undefined,
     showPassword: false,
   });
+
+  useEffect(() => {
+    switch (auth.type) {
+      case TokenType.Login:
+        const from = location.state?.from?.pathname ?? '/';
+        navigate(from, { replace: true });
+        break;
+      case TokenType.NeedActivate:
+        navigate('/request-activate-email', { replace: true });
+        break;
+    }
+  }, [auth.type, location, navigate]);
 
   useEffect(() => {
     if (process.env.REACT_APP_ENV === 'development' && !values.emailAddress && !values.password) {
@@ -89,10 +100,6 @@ const Login = (props: Props) => {
         });
 
         setAuth(new AuthState(res.data.accessToken));
-        const { accessToken, emailConfirmed } = res.data;
-
-        if (accessToken && emailConfirmed) navigate(from, { replace: true });
-        else if (accessToken) navigate('/request-activate-email');
       } catch (err) {
         const res = (err as AxiosError<LoginError>).response;
         const status = res?.status ?? 0;

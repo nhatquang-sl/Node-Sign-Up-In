@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import { validateUserRegister, UserRegisterDto } from 'shared/user';
+import { validateUserRegister, UserRegisterDto, TokenType } from 'shared/user';
 import useApiService from 'hooks/use-api-service';
 import useAuth from 'hooks/use-auth';
 
@@ -31,7 +31,7 @@ const Register = (props: Props) => {
   const navigate = useNavigate();
   const apiService = useApiService();
   const [submitting, setSubmitting] = useState(false);
-  const { setAuth } = useAuth();
+  const { auth, setAuth } = useAuth();
 
   const { firstNameError, lastNameError, emailAddressError, passwordError } = props.auth;
   useEffect(() => {
@@ -56,6 +56,17 @@ const Register = (props: Props) => {
     showPassword: false,
     submitted: false,
   });
+
+  useEffect(() => {
+    switch (auth.type) {
+      case TokenType.Login:
+        navigate('/', { replace: true });
+        break;
+      case TokenType.NeedActivate:
+        navigate('/request-activate-email', { replace: true });
+        break;
+    }
+  }, [auth.type, navigate]);
 
   useEffect(() => {
     if (
@@ -123,11 +134,10 @@ const Register = (props: Props) => {
       setSubmitting(false);
       return;
     }
-    console.log(new UserRegisterDto(values));
+
     try {
       const res = await apiService.post(`auth/register`, new UserRegisterDto(values));
       setAuth(new AuthState(res.data.accessToken));
-      navigate('/request-activate-email', { replace: true });
     } catch (err) {
       if (err instanceof AxiosError) {
         const { data } = err.response as AxiosResponse<State>;
