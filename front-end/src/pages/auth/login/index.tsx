@@ -65,9 +65,9 @@ const Login = (props: Props) => {
   const loginError = props.auth.error.login;
 
   useEffect(() => {
-    if (accessToken && emailConfirmed) navigate('/');
-    else if (accessToken) navigate('/request-activate-email');
-    else dispatch(closeSidebarAndHeader());
+    // if (accessToken && emailConfirmed) navigate('/');
+    // else if (accessToken) navigate('/request-activate-email');
+    // else dispatch(closeSidebarAndHeader());
   }, [accessToken, emailConfirmed, navigate, dispatch]);
 
   useEffect(() => {

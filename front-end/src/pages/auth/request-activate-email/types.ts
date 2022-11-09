@@ -1,25 +1,11 @@
 import { bindActionCreators, Dispatch } from 'redux';
-import { sendActivateLink } from 'store/auth/actions';
-import { AuthState } from 'store/auth/types';
 
-interface PropsFromDispatch {
-  sendActivateLink: typeof sendActivateLink;
-}
+interface PropsFromDispatch {}
 
-interface PropsFromState {
-  auth: AuthState;
-}
+interface PropsFromState {}
 
 export interface Props extends PropsFromDispatch, PropsFromState {}
 
-export const mapStateToProps = (store: any) => ({
-  auth: store.auth,
-});
+export const mapStateToProps = (store: any) => ({});
 
-export const mapDispatchToProps = (dispatch: Dispatch) =>
-  bindActionCreators(
-    {
-      sendActivateLink,
-    },
-    dispatch
-  );
+export const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators({}, dispatch);

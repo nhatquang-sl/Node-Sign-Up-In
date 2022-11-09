@@ -19,21 +19,29 @@ import {
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import { validateUserRegister } from 'shared/user/validate';
+import { validateUserRegister, UserRegisterDto } from 'shared/user';
 import { closeSidebarAndHeader } from 'store/settings/actions';
+import useApiService from 'hooks/use-api-service';
+import useAuth from 'hooks/use-auth';
 
 import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
+import { convertTypeAcquisitionFromJson } from 'typescript';
+import { AxiosError, AxiosResponse } from 'axios';
+import { AuthState } from 'context/auth-provider';
 
 const Register = (props: Props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const apiService = useApiService();
+  const [submitting, setSubmitting] = useState(false);
+  const { auth, setAuth } = useAuth();
 
-  const { accessToken, emailConfirmed } = props.auth;
-  useEffect(() => {
-    if (accessToken && emailConfirmed) navigate('/');
-    else if (accessToken) navigate('/request-activate-email');
-    else dispatch(closeSidebarAndHeader());
-  }, [accessToken, emailConfirmed, navigate, dispatch]);
+  // const { accessToken, emailConfirmed } = props.auth;
+  // useEffect(() => {
+  //   if (accessToken && emailConfirmed) navigate('/');
+  //   else if (accessToken) navigate('/request-activate-email');
+  //   else dispatch(closeSidebarAndHeader());
+  // }, [accessToken, emailConfirmed, navigate, dispatch]);
 
   const { firstNameError, lastNameError, emailAddressError, passwordError } = props.auth;
   useEffect(() => {
@@ -106,6 +114,7 @@ const Register = (props: Props) => {
   };
 
   const handleSubmit = async (event: React.SyntheticEvent) => {
+    setSubmitting(true);
     event.preventDefault();
 
     const { firstNameError, lastNameError, emailAddressError, passwordError } =
@@ -121,10 +130,28 @@ const Register = (props: Props) => {
     });
 
     if (firstNameError || lastNameError || emailAddressError || passwordError.length) {
-      return;
+      // setSubmitting(false);
+      // return;
     }
-
-    props.register(values);
+    console.log(new UserRegisterDto(values));
+    try {
+      const res = await apiService.post(`auth/register`, new UserRegisterDto(values));
+      setAuth(new AuthState(res.data.accessToken));
+      navigate('/request-activate-email', { replace: true });
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        const { data } = err.response as AxiosResponse<State>;
+        const { firstNameError, lastNameError, emailAddressError, passwordError } = data;
+        setValues({
+          ...values,
+          firstNameError,
+          lastNameError,
+          emailAddressError,
+          passwordError: passwordError ?? [],
+        });
+      }
+    }
+    setSubmitting(false);
   };
 
   return (
@@ -226,7 +253,7 @@ const Register = (props: Props) => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            loading={props.auth.pendingRegister()}
+            loading={submitting}
           >
             Submit
           </LoadingButton>

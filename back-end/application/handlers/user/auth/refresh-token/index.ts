@@ -34,6 +34,7 @@ export class UserRefreshTokenCommandHandler
     if (!loginHis) throw new ForbiddenError();
 
     const { accessToken } = generateTokens(command.decoded);
+    console.log({ accessToken, length: accessToken.length });
     await UserLoginHistory.create({
       userId: loginHis.userId,
       accessToken,

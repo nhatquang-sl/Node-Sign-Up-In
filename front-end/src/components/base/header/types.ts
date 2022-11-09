@@ -1,11 +1,12 @@
 import { bindActionCreators, Dispatch } from 'redux';
-import { openSidebar, closeSidebarAndHeader, loading } from 'store/settings/actions';
+import { openSidebar, closeSidebarAndHeader, openHeader, loading } from 'store/settings/actions';
 import { SettingsState } from 'store/settings/types';
 
 interface PropsFromDispatch {
   openSidebar: typeof openSidebar;
   closeSidebarAndHeader: typeof closeSidebarAndHeader;
   loading: typeof loading;
+  openHeader: typeof openHeader;
 }
 
 interface PropsFromState {
@@ -24,6 +25,7 @@ export const mapDispatchToProps = (dispatch: Dispatch) =>
       openSidebar,
       closeSidebarAndHeader,
       loading,
+      openHeader,
     },
     dispatch
   );

@@ -55,8 +55,13 @@ export type TokenData = {
   lastName: string;
   emailAddress: string;
   roles: string[];
-  type: string;
+  type: keyof typeof TokenType;
   exp: number;
   iat: number;
 };
+
+export enum TokenType {
+  Login = 'LOGIN',
+  NeedActivate = 'NEED_ACTIVATE',
+}
 // export type { UserDto, UserAuthDto, UserLoginDto };
