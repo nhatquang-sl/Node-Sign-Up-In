@@ -50,6 +50,7 @@ function Header(props: Props) {
   const navigate = useNavigate();
   const { auth, setAuth } = useAuth();
   const apiService = useApiService();
+  const { openHeader, closeSidebarAndHeader } = props;
 
   const transitionDuration = {
     enter: theme.transitions.duration.enteringScreen,
@@ -59,8 +60,8 @@ function Header(props: Props) {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
   useEffect(() => {
-    accessToken ? props.openHeader() : props.closeSidebarAndHeader();
-  }, [accessToken]);
+    accessToken ? openHeader() : closeSidebarAndHeader();
+  }, [accessToken, openHeader, closeSidebarAndHeader]);
 
   const handleDrawerOpen = () => {
     props.openSidebar();

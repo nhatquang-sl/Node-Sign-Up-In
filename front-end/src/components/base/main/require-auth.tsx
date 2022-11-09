@@ -19,8 +19,9 @@ const RequireAuth = (props: Props) => {
     !location.pathname.includes(needActivatePath) &&
     !location.pathname.includes('register-confirm');
   console.log({
-    needActivate,
+    allowedRoles,
     auth,
+    needActivate,
     type: auth.type,
     pathname: location.pathname,
     needActivatePath,

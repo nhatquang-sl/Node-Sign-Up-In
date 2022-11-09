@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { connect, useDispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -20,28 +20,18 @@ import {
 import LoadingButton from '@mui/lab/LoadingButton';
 
 import { validateUserRegister, UserRegisterDto } from 'shared/user';
-import { closeSidebarAndHeader } from 'store/settings/actions';
 import useApiService from 'hooks/use-api-service';
 import useAuth from 'hooks/use-auth';
 
 import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
-import { convertTypeAcquisitionFromJson } from 'typescript';
 import { AxiosError, AxiosResponse } from 'axios';
 import { AuthState } from 'context/auth-provider';
 
 const Register = (props: Props) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const apiService = useApiService();
   const [submitting, setSubmitting] = useState(false);
-  const { auth, setAuth } = useAuth();
-
-  // const { accessToken, emailConfirmed } = props.auth;
-  // useEffect(() => {
-  //   if (accessToken && emailConfirmed) navigate('/');
-  //   else if (accessToken) navigate('/request-activate-email');
-  //   else dispatch(closeSidebarAndHeader());
-  // }, [accessToken, emailConfirmed, navigate, dispatch]);
+  const { setAuth } = useAuth();
 
   const { firstNameError, lastNameError, emailAddressError, passwordError } = props.auth;
   useEffect(() => {
@@ -130,8 +120,8 @@ const Register = (props: Props) => {
     });
 
     if (firstNameError || lastNameError || emailAddressError || passwordError.length) {
-      // setSubmitting(false);
-      // return;
+      setSubmitting(false);
+      return;
     }
     console.log(new UserRegisterDto(values));
     try {

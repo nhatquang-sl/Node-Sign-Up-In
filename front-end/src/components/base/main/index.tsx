@@ -22,6 +22,7 @@ import { ForgotPassword, ResetPassword } from 'pages/auth/password';
 import RequireAuth from './require-auth';
 
 function Main(props: Props) {
+  console.log('main');
   const { refresh } = useRefreshToken();
   const [init, setInit] = useState(true);
   const { loading } = props;
@@ -45,7 +46,6 @@ function Main(props: Props) {
       {props.settings.headerOpen && <DrawerHeader />}
       <Routes>
         <Route element={<RequireAuth />}>
-          <Route path="/register-confirm/:activationCode" element={<RegisterConfirm />} />
           <Route path="/request-activate-email" element={<RequestActivateEmail />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
@@ -57,6 +57,7 @@ function Main(props: Props) {
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/register-confirm/:activationCode" element={<RegisterConfirm />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
       </Routes>
       <ConsecutiveSnackBars />
