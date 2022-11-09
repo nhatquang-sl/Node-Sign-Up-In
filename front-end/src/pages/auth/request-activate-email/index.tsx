@@ -1,25 +1,22 @@
-import React, { useEffect } from 'react';
-import { connect, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { connect } from 'react-redux';
 import { Container, Box } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import { openHeader } from 'store/settings/actions';
+import useApiService from 'hooks/use-api-service';
 
 import { Props, mapStateToProps, mapDispatchToProps } from './types';
 
 const RequestActivateEmail = (props: Props) => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const { accessToken } = props.auth;
-  useEffect(() => {
-    if (!accessToken) navigate('/login');
-    else dispatch(openHeader());
-  }, [accessToken, navigate, dispatch]);
+  const apiService = useApiService();
+  const [loading, setLoading] = useState(false);
 
   const handleSendActivateEmail = async () => {
-    props.sendActivateLink();
+    setLoading(true);
+    try {
+      await apiService.post(`auth/send-activation-email`);
+    } catch (err) {}
+    setLoading(false);
   };
 
   return (
@@ -31,10 +28,7 @@ const RequestActivateEmail = (props: Props) => {
           alignItems: 'center',
         }}
       >
-        <LoadingButton
-          loading={props.auth.pendingSendActivateLink()}
-          onClick={handleSendActivateEmail}
-        >
+        <LoadingButton loading={loading} onClick={handleSendActivateEmail}>
           Send active link to my email
         </LoadingButton>
       </Box>

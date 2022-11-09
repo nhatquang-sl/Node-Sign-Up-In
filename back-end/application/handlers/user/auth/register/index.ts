@@ -1,11 +1,10 @@
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
-import jwt from 'jsonwebtoken';
 
 import LANG from '@libs/lang';
-import { UserRegisterDto, UserAuthDto, validateUserRegister } from '@libs/user';
+import { UserRegisterDto, UserAuthDto, validateUserRegister, TokenType } from '@libs/user';
 
-import { sendActivateEmail } from '@application/common/utils';
+import { sendActivateEmail, generateTokens } from '@application/common/utils';
 import { BadRequestError, ConflictError } from '@application/common/exceptions';
 import {
   RegisterHandler,
@@ -58,21 +57,14 @@ export class UserRegisterCommandHandler
     await UserRole.bulkCreate(userRoles);
 
     // Create JWTs
-    const accessToken = jwt.sign(
-      {
-        userId: result.id,
-      },
-      process.env.ACCESS_TOKEN_SECRET as string,
-      { expiresIn: '1d' }
-    );
-
-    const refreshToken = jwt.sign(
-      {
-        userId: result.id,
-      },
-      process.env.REFRESH_TOKEN_SECRET as string,
-      { expiresIn: '1d' }
-    );
+    const { accessToken, refreshToken } = generateTokens({
+      id: result.id,
+      emailAddress: result.emailAddress,
+      firstName: result.firstName,
+      lastName: result.lastName,
+      roles: result.roles?.map((x) => x.code) ?? [],
+      type: TokenType.NeedActivate,
+    });
 
     await Promise.all([
       UserLoginHistory.create({

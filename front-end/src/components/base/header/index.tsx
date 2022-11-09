@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { styled, useTheme } from '@mui/material/styles';
@@ -57,6 +57,11 @@ function Header(props: Props) {
   };
   const { accessToken } = auth;
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+
+  useEffect(() => {
+    accessToken ? props.openHeader() : props.closeSidebarAndHeader();
+  }, [accessToken]);
+
   const handleDrawerOpen = () => {
     props.openSidebar();
   };
