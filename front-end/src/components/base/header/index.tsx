@@ -22,6 +22,7 @@ import useAuth from 'hooks/use-auth';
 import useApiService from 'hooks/use-api-service';
 import { Props, mapStateToProps, mapDispatchToProps } from './types';
 import { AuthState } from 'context/auth-provider';
+import { TokenType } from 'shared/user';
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -94,23 +95,25 @@ function Header(props: Props) {
     <Slide in={props.settings.headerOpen}>
       <AppBar position="fixed" open={props.settings.sideBarOpen}>
         <Toolbar>
-          <Zoom
-            in={!props.settings.sideBarOpen}
-            timeout={transitionDuration}
-            style={{
-              transitionDelay: `${transitionDuration.exit}ms`,
-            }}
-          >
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              edge="start"
-              sx={{ mr: 2, ...(props.settings.sideBarOpen && { display: 'none' }) }}
+          {auth.type === TokenType.Login && (
+            <Zoom
+              in={!props.settings.sideBarOpen}
+              timeout={transitionDuration}
+              style={{
+                transitionDelay: `${transitionDuration.exit}ms`,
+              }}
             >
-              <Icon>menu</Icon>
-            </IconButton>
-          </Zoom>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleDrawerOpen}
+                edge="start"
+                sx={{ mr: 2, ...(props.settings.sideBarOpen && { display: 'none' }) }}
+              >
+                <Icon>menu</Icon>
+              </IconButton>
+            </Zoom>
+          )}
 
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Application
