@@ -1,14 +1,9 @@
 import { bindActionCreators, Dispatch } from 'redux';
 import { UserRegisterDto } from 'shared/user/dto';
-import { SettingsState } from 'store/settings/types';
-import { AuthState } from 'store/auth/types';
 
 interface PropsFromDispatch {}
 
-interface PropsFromState {
-  settings: SettingsState;
-  auth: AuthState;
-}
+interface PropsFromState {}
 
 export interface State extends UserRegisterDto {
   firstNameError: string | undefined;
@@ -19,9 +14,6 @@ export interface State extends UserRegisterDto {
 
 export interface Props extends PropsFromDispatch, PropsFromState {}
 
-export const mapStateToProps = (store: any) => ({
-  settings: store.settings,
-  auth: store.auth,
-});
+export const mapStateToProps = () => ({});
 
 export const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators({}, dispatch);

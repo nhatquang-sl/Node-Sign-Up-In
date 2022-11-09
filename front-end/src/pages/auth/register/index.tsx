@@ -32,17 +32,6 @@ const Register = (props: Props) => {
   const [submitting, setSubmitting] = useState(false);
   const { auth, setAuth } = useAuth();
 
-  const { firstNameError, lastNameError, emailAddressError, passwordError } = props.auth;
-  useEffect(() => {
-    setValues((v) => ({
-      ...v,
-      firstNameError,
-      lastNameError,
-      emailAddressError,
-      passwordError,
-    }));
-  }, [firstNameError, lastNameError, emailAddressError, passwordError]);
-
   const [values, setValues] = useState<State>({
     firstName: '',
     firstNameError: '',
