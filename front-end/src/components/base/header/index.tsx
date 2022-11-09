@@ -18,8 +18,7 @@ import {
 import Zoom from '@mui/material/Zoom';
 import { sidebarWidth } from 'store/constants';
 
-import useAuth from 'hooks/use-auth';
-import useApiService from 'hooks/use-api-service';
+import { useAuth, useApiService } from 'hooks';
 import { Props, mapStateToProps, mapDispatchToProps } from './types';
 import { AuthState } from 'context/auth-provider';
 import { TokenType } from 'shared/user';

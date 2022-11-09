@@ -20,8 +20,7 @@ import {
 import LoadingButton from '@mui/lab/LoadingButton';
 
 import { validateUserRegister, UserRegisterDto, TokenType } from 'shared/user';
-import useApiService from 'hooks/use-api-service';
-import useAuth from 'hooks/use-auth';
+import { useAuth, useApiService } from 'hooks';
 
 import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
 import { AxiosError, AxiosResponse } from 'axios';

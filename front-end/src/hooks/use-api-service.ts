@@ -5,7 +5,7 @@ import { apiService } from 'store/services';
 import useRefreshToken from './use-refresh-token';
 import useAuth from './use-auth';
 
-const useApiService = () => {
+export const useApiService = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { refresh } = useRefreshToken();
@@ -54,7 +54,7 @@ const useApiService = () => {
       apiService.interceptors.request.eject(reqIntercept);
       apiService.interceptors.response.eject(resIntercept);
     };
-  }, [auth, refresh]);
+  }, [auth.accessToken, location, refresh, navigate]);
 
   return apiService;
 };
