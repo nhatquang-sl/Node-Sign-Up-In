@@ -1,36 +1,33 @@
-import { useState, useEffect } from 'react';
-import { connect, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import { AxiosError, AxiosResponse } from 'axios';
+import { connect } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Container, Box } from '@mui/material';
-import { registerConfirm, logOut } from 'store/auth/actions';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { closeSidebarAndHeader } from 'store/settings/actions';
-
+import useApiService from 'hooks/use-api-service';
 import { Props, mapStateToProps, mapDispatchToProps } from './types';
-
 const RegisterConfirm = (props: Props) => {
   const { activationCode } = useParams();
-  const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  console.log(activationCode);
-  useEffect(() => {
-    if (activationCode) {
-      dispatch(logOut());
-      dispatch(closeSidebarAndHeader());
-      setSubmitted(true);
-      dispatch(registerConfirm(activationCode));
-    }
-  }, [activationCode, navigate, dispatch]);
+  const apiService = useApiService();
 
   useEffect(() => {
-    console.log({ init: submitted, pending: props.auth.pendingRegisterConfirm() });
-    if (submitted && !props.auth.pendingRegisterConfirm()) {
-      navigate('/login');
-    }
-  }, [submitted, props.auth, navigate]);
+    console.log('register confirm');
+    const registerConfirm = async () => {
+      try {
+        await apiService.get(`auth/activate/${activationCode}`);
+      } catch (err) {
+        if (err instanceof AxiosError) {
+          const { data } = err.response as AxiosResponse<{ message: string }>;
+          props.showSnackbar(data.message, 'error');
+        }
+      }
+      navigate('/login', { replace: true });
+    };
+
+    registerConfirm();
+  }, [activationCode, navigate, props, apiService]);
 
   return (
     <Container component="main" maxWidth="xs">

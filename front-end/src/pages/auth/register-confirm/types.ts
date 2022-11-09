@@ -1,25 +1,15 @@
 import { bindActionCreators, Dispatch } from 'redux';
-import { registerConfirm } from 'store/auth/actions';
-import { AuthState } from 'store/auth/types';
+import { showSnackbar } from 'store/snackbar/actions';
 
 interface PropsFromDispatch {
-  registerConfirm: typeof registerConfirm;
+  showSnackbar: typeof showSnackbar;
 }
 
-interface PropsFromState {
-  auth: AuthState;
-}
+interface PropsFromState {}
 
 export interface Props extends PropsFromDispatch, PropsFromState {}
 
-export const mapStateToProps = (store: any) => ({
-  auth: store.auth,
-});
+export const mapStateToProps = () => ({});
 
 export const mapDispatchToProps = (dispatch: Dispatch) =>
-  bindActionCreators(
-    {
-      registerConfirm,
-    },
-    dispatch
-  );
+  bindActionCreators({ showSnackbar }, dispatch);
