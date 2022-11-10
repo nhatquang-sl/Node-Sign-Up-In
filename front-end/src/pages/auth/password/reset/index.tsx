@@ -27,8 +27,7 @@ const ResetPassword = (props: Props) => {
   const apiService = useApiService();
   const { token } = useParams();
   const [values, setValues] = useState<State>({
-    password: '',
-    // password: '123456x@X',
+    password: process.env.REACT_APP_ENV === 'development' ? '123456x@X' : '',
     passwordError: [],
     showPassword: false,
     submitted: false,
