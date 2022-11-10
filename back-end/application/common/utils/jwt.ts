@@ -11,7 +11,7 @@ export type TokenParam = {
   type: string;
 };
 
-export const generateTokens = (user: TokenParam, expiresIn: '3s' | '5m' | '15m' | '30m' = '3s') => {
+export const generateTokens = (user: TokenParam, expiresIn: '3s' | '5m' | '15m' | '30m' = '5m') => {
   const accessToken = jwt.sign(user, ENV.ACCESS_TOKEN_SECRET, { expiresIn });
   const refreshToken = jwt.sign(user, ENV.REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
 
