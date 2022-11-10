@@ -40,9 +40,9 @@ const Login = (props: Props) => {
   const [loading, setLoading] = useState(false);
 
   const [values, setValues] = useState<State>({
-    emailAddress: '',
+    emailAddress: process.env.REACT_APP_ENV === 'development' ? 'sunlight479@yahoo.com' : '',
     emailAddressError: undefined,
-    password: '',
+    password: process.env.REACT_APP_ENV === 'development' ? '123456x@X' : '',
     passwordError: undefined,
     showPassword: false,
   });
@@ -58,16 +58,6 @@ const Login = (props: Props) => {
         break;
     }
   }, [auth.type, location, navigate]);
-
-  useEffect(() => {
-    if (process.env.REACT_APP_ENV === 'development' && !values.emailAddress && !values.password) {
-      setValues((v) => ({
-        ...v,
-        emailAddress: 'sunlight479@yahoo.com',
-        password: '123456x@X',
-      }));
-    }
-  }, [values.emailAddress, values.password]);
 
   const handleClickShowPassword = () => {
     setValues({

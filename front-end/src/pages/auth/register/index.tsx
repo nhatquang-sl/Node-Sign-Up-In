@@ -33,13 +33,13 @@ const Register = (props: Props) => {
   const { auth, setAuth } = useAuth();
 
   const [values, setValues] = useState<State>({
-    firstName: '',
+    firstName: process.env.REACT_APP_ENV === 'development' ? 'quang' : '',
     firstNameError: '',
-    lastName: '',
+    lastName: process.env.REACT_APP_ENV === 'development' ? 'nguyen' : '',
     lastNameError: '',
-    emailAddress: '',
+    emailAddress: process.env.REACT_APP_ENV === 'development' ? 'sunlight479@yahoo.com' : '',
     emailAddressError: '',
-    password: '',
+    password: process.env.REACT_APP_ENV === 'development' ? '123456x@X' : '',
     passwordError: [],
     showPassword: false,
     submitted: false,
@@ -55,24 +55,6 @@ const Register = (props: Props) => {
         break;
     }
   }, [auth.type, navigate]);
-
-  useEffect(() => {
-    if (
-      process.env.REACT_APP_ENV === 'development' &&
-      !values.firstName &&
-      !values.lastName &&
-      !values.emailAddress &&
-      !values.password
-    ) {
-      setValues((v) => ({
-        ...v,
-        firstName: 'quang',
-        lastName: 'nguyen',
-        emailAddress: 'sunlight479@yahoo.com',
-        password: '123456x@X',
-      }));
-    }
-  }, [values.firstName, values.lastName, values.emailAddress, values.password]);
 
   const handleChange = (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [prop]: event.target.value });
