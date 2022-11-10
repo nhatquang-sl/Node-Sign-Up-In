@@ -56,7 +56,10 @@ export class UserSendResetPasswordEmailCommandHandler
     if (ufp != null) return new UserSendResetPasswordEmailResult(new Date(ufp.createdAt).getTime());
 
     // send reset password email and create a UserForgotPassword in the db
-    const { accessToken } = generateTokens({ id: userId, type: 'RESET_PASSWORD' } as TokenParam);
+    const { accessToken } = generateTokens(
+      { id: userId, type: 'RESET_PASSWORD' } as TokenParam,
+      '15m'
+    );
     await sendResetPasswordEmail(emailAddress, accessToken);
     ufp = await UserForgotPassword.create({
       userId: userId,
