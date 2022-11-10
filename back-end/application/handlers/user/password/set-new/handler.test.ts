@@ -4,12 +4,12 @@ import { v4 as uuid } from 'uuid';
 import { dbContext, initializeDb, User, UserForgotPassword } from '@database';
 
 import { mediator } from '@application/mediator';
-import { generateJwt } from '@application/common/utils';
+import { generateTokens, TokenParam } from '@application/common/utils';
 import { AuthorizeBehavior } from '@application/common/behaviors';
 import { UserSetNewPasswordCommand } from '.';
 
 const userId = 1;
-const { accessToken } = generateJwt({ id: userId } as User, 'RESET_PASSWORD');
+const { accessToken } = generateTokens({ id: userId, type: 'RESET_PASSWORD' } as TokenParam);
 
 beforeEach(async () => {
   await dbContext.connect();

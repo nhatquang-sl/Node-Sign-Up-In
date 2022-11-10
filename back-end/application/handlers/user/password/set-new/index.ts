@@ -1,22 +1,28 @@
 import bcrypt from 'bcrypt';
 import { Op } from 'sequelize';
+import { TokenExpiredError } from 'jsonwebtoken';
 import { User, UserForgotPassword } from '@database';
 import { validatePassword } from '@libs/user/validate';
-import { ForbiddenError, BadRequestError } from '@application/common/exceptions';
+import { BadRequestError } from '@application/common/exceptions';
+import { decodeAccessToken } from '@application/common/utils';
 
 import {
   Authorize,
   RegisterValidator,
   ICommandHandler,
   ICommandValidator,
-  AuthorizeCommand,
+  ICommand,
 } from '@application/mediator';
+import LANG from '@libs/lang';
+import { TokenType } from '@libs/user';
 
-export class UserSetNewPasswordCommand extends AuthorizeCommand {
+export class UserSetNewPasswordCommand implements ICommand {
   constructor(accessToken: string, password: string) {
-    super(accessToken);
+    this.token = accessToken;
     this.password = password;
   }
+  userId: number = 0;
+  declare token: string;
   declare password: string;
 }
 
@@ -25,11 +31,11 @@ export class UserSetNewPasswordCommandHandler
   implements ICommandHandler<UserSetNewPasswordCommand, void>
 {
   async handle(command: UserSetNewPasswordCommand): Promise<void> {
-    const { userId, accessToken } = command;
+    const { userId, token } = command;
 
     // get ForgotPassword's request
     const ufp = await UserForgotPassword.findOne({
-      where: { userId, token: accessToken, password: { [Op.is]: null } },
+      where: { userId, token: token, password: { [Op.is]: null } },
       attributes: ['id', 'salt'],
     });
     if (!ufp) return;
@@ -50,10 +56,17 @@ export class UserSetNewPasswordCommandValidator
   implements ICommandValidator<UserSetNewPasswordCommand>
 {
   async validate(command: UserSetNewPasswordCommand): Promise<void> {
-    console.log({ command });
-    const { password, accessTokenType } = command;
-    if (accessTokenType !== 'RESET_PASSWORD')
-      throw new ForbiddenError({ message: 'Token is invalid' });
+    const { password, token } = command;
+    try {
+      const decoded = await decodeAccessToken(token);
+      console.log({ decoded }, TokenType.ResetPassword.toString());
+      if (decoded.type !== TokenType.ResetPassword.toString())
+        throw new BadRequestError(LANG.USER_RESET_PASSWORD_TOKEN_INVALID_ERROR);
+    } catch (err) {
+      if (err instanceof TokenExpiredError)
+        throw new BadRequestError(LANG.USER_RESET_PASSWORD_TOKEN_EXPIRED_ERROR);
+      throw new BadRequestError(LANG.USER_RESET_PASSWORD_TOKEN_INVALID_ERROR);
+    }
 
     const passwordError = validatePassword(password);
     if (passwordError.length) throw new BadRequestError({ passwordError });

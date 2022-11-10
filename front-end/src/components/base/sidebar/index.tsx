@@ -69,7 +69,14 @@ function Sidebar(props: Props) {
       <Divider />
       <List>
         {['Binance'].map((text, index) => (
-          <ListItem key={text} disablePadding button component={Link} to={'/bnb'}>
+          <ListItem
+            key={text}
+            disablePadding
+            button
+            component={Link}
+            to={'/bnb'}
+            onClick={handleDrawerClose}
+          >
             <ListItemButton>
               <ListItemIcon>
                 <Icon>currency_bitcoin</Icon>

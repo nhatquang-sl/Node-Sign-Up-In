@@ -5,6 +5,7 @@ import {
   InferCreationAttributes,
   CreationOptional,
 } from 'sequelize';
+import User from './user';
 import dbContext from '../db-context';
 
 // https://sequelize.org/docs/v6/other-topics/typescript/
@@ -30,7 +31,10 @@ UserLoginHistory.init(
     },
     userId: {
       type: DataTypes.BIGINT,
-      allowNull: false, // allowNull defaults to true
+      references: {
+        model: User, // 'users' would also work
+        key: 'id',
+      },
     },
     ipAddress: {
       type: DataTypes.STRING,
@@ -39,10 +43,10 @@ UserLoginHistory.init(
       type: DataTypes.STRING,
     },
     accessToken: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(300),
     },
     refreshToken: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(300),
     },
   },
   {
@@ -50,6 +54,7 @@ UserLoginHistory.init(
     sequelize: dbContext.sequelize, // We need to pass the connection instance
     modelName: 'userLoginHistory', // We need to choose the model name
     updatedAt: false,
+    paranoid: true,
   }
 );
 

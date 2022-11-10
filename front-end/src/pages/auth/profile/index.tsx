@@ -1,18 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { connect, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { connect } from 'react-redux';
 import { styled } from '@mui/material/styles';
 import { Box, Avatar, TextField, Grid } from '@mui/material';
 
-// import LoadingButton from '@mui/lab/LoadingButton';
-
-// import { validateEmailAddress } from 'shared/user/validate';
-// import { closeSidebarAndHeader } from 'store/settings/actions';
-// import { showSnackbar } from 'store/snackbar/actions';
+import { useAuth } from 'hooks';
 
 import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
-import { getProfile } from 'store/auth/actions';
-import { loading } from 'store/settings/actions';
 
 const CssTextField = styled(TextField)({
   '& .Mui-disabled': {
@@ -25,12 +18,10 @@ const CssTextField = styled(TextField)({
 });
 
 const Profile = (props: Props) => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { accessToken, firstName, lastName, emailAddress } = props.auth;
+  const { auth } = useAuth();
+  const { firstName, lastName, emailAddress } = auth;
 
-  let [gettingProfile, setGettingProfile] = useState(false);
-  const [values, setValues] = useState<State>({
+  const [values] = useState<State>({
     firstName: firstName,
     firstNameError: '',
     lastName: lastName,
@@ -40,30 +31,6 @@ const Profile = (props: Props) => {
     password: '',
     submitted: false,
   });
-
-  useEffect(() => {
-    console.log('Profile');
-    if (!accessToken) navigate('/login'); // need to login
-    else if (!gettingProfile) {
-      // start getting profile
-      setGettingProfile(() => true);
-      dispatch(getProfile());
-      dispatch(loading());
-    } else if (gettingProfile && !props.auth.pendingGetProfile() && props.settings.loading) {
-      // finish getting profile
-      dispatch(loading(false));
-    }
-
-    // update message errors if need.
-    const { firstNameError, lastNameError, emailAddressError, passwordError } = props.auth;
-    setValues((v) => ({
-      ...v,
-      firstNameError,
-      lastNameError,
-      emailAddressError,
-      passwordError,
-    }));
-  }, [props.settings.loading, props.auth, gettingProfile, accessToken, navigate, dispatch]);
 
   return (
     <Grid container spacing={2} justifyContent="center">

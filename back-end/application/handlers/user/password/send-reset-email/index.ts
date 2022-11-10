@@ -1,10 +1,10 @@
 import { v4 as uuid } from 'uuid';
 import { Op } from 'sequelize';
 import LANG from '@libs/lang';
-import { TIMESTAMP } from '@libs/constant';
+import { TIMESTAMP, FORGOT_PASSWORD_WAIT_SECONDS } from '@libs/constant';
 import { validateEmailAddress } from '@libs/user';
 
-import { generateJwt, sendResetPasswordEmail } from '@application/common/utils';
+import { generateTokens, sendResetPasswordEmail, TokenParam } from '@application/common/utils';
 import { BadRequestError, NotFoundError } from '@application/common/exceptions';
 import {
   RegisterHandler,
@@ -34,7 +34,7 @@ export class UserSendResetPasswordEmailResult {
   }
   declare lastDate: number;
 }
-console.log('@RegisterHandler');
+
 @RegisterHandler
 export class UserSendResetPasswordEmailCommandHandler
   implements ICommandHandler<UserSendResetPasswordEmailCommand, UserSendResetPasswordEmailResult>
@@ -48,7 +48,7 @@ export class UserSendResetPasswordEmailCommandHandler
         userId,
         password: { [Op.is]: null },
         createdAt: {
-          [Op.gt]: new Date(new Date().getTime() - 5 * TIMESTAMP.MINUTE),
+          [Op.gt]: new Date(new Date().getTime() - FORGOT_PASSWORD_WAIT_SECONDS * TIMESTAMP.SECOND),
         },
       },
       attributes: ['createdAt'],
@@ -56,9 +56,10 @@ export class UserSendResetPasswordEmailCommandHandler
     if (ufp != null) return new UserSendResetPasswordEmailResult(new Date(ufp.createdAt).getTime());
 
     // send reset password email and create a UserForgotPassword in the db
-    const user = new User();
-    user.id = userId;
-    const { accessToken } = generateJwt(user, 'RESET_PASSWORD');
+    const { accessToken } = generateTokens(
+      { id: userId, type: 'RESET_PASSWORD' } as TokenParam,
+      '15m'
+    );
     await sendResetPasswordEmail(emailAddress, accessToken);
     ufp = await UserForgotPassword.create({
       userId: userId,

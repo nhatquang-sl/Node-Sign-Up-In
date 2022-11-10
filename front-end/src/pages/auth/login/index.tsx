@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { connect, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-
+import { connect } from 'react-redux';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { AxiosError } from 'axios';
 import {
   Container,
   Box,
@@ -20,47 +20,44 @@ import {
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
+import { AuthState } from 'context/auth-provider';
 import LANG from 'shared/lang';
-import { validateEmailAddress } from 'shared/user/validate';
-import { closeSidebarAndHeader } from 'store/settings/actions';
-import { showSnackbar } from 'store/snackbar/actions';
+import { TokenType, validateEmailAddress } from 'shared/user';
+import { apiService } from 'store/services';
+import useAuth from 'hooks/use-auth';
 
 import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
 
+type LoginError = {
+  message: string;
+};
+
 const Login = (props: Props) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const location = useLocation();
+
+  const { auth, setAuth } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   const [values, setValues] = useState<State>({
-    emailAddress: '',
+    emailAddress: process.env.REACT_APP_ENV === 'development' ? 'sunlight479@yahoo.com' : '',
     emailAddressError: undefined,
-    password: '',
+    password: process.env.REACT_APP_ENV === 'development' ? '123456x@X' : '',
     passwordError: undefined,
     showPassword: false,
   });
 
   useEffect(() => {
-    if (process.env.REACT_APP_ENV === 'development' && !values.emailAddress && !values.password) {
-      setValues((v) => ({
-        ...v,
-        emailAddress: 'sunlight479@yahoo.com',
-        password: '123456x@X',
-      }));
+    switch (auth.type) {
+      case TokenType.Login:
+        const from = location.state?.from?.pathname ?? '/';
+        navigate(from, { replace: true });
+        break;
+      case TokenType.NeedActivate:
+        navigate('/request-activate-email', { replace: true });
+        break;
     }
-  }, [values.emailAddress, values.password]);
-
-  const { accessToken, emailConfirmed } = props.auth;
-  const loginError = props.auth.error.login;
-
-  useEffect(() => {
-    if (accessToken && emailConfirmed) navigate('/');
-    else if (accessToken) navigate('/request-activate-email');
-    else dispatch(closeSidebarAndHeader());
-  }, [accessToken, emailConfirmed, navigate, dispatch]);
-
-  useEffect(() => {
-    loginError && dispatch(showSnackbar(loginError, 'error'));
-  }, [loginError, dispatch]);
+  }, [auth.type, location, navigate]);
 
   const handleClickShowPassword = () => {
     setValues({
@@ -79,18 +76,30 @@ const Login = (props: Props) => {
 
   const handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
+    setLoading(true);
 
     const emailAddressError = validateEmailAddress(values.emailAddress);
     const passwordError = values.password ? undefined : LANG.USER_PASSWORD_MISSING_ERROR;
-    setValues({
-      ...values,
-      emailAddressError,
-      passwordError,
-    });
+    setValues({ ...values, emailAddressError, passwordError });
 
-    if (emailAddressError || passwordError) return;
+    const isValid = !emailAddressError && !passwordError;
+    if (isValid) {
+      try {
+        const res = await apiService.post(`auth/login`, values, {
+          withCredentials: true,
+        });
 
-    props.login(values);
+        setAuth(new AuthState(res.data.accessToken));
+      } catch (err) {
+        const res = (err as AxiosError<LoginError>).response;
+        const status = res?.status ?? 0;
+        if ([400, 401].includes(status)) {
+          const errMsg = res?.data.message;
+          errMsg && props.showSnackbar(errMsg, 'error');
+        }
+      }
+    }
+    setLoading(false);
   };
 
   return (
@@ -157,7 +166,7 @@ const Login = (props: Props) => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            loading={props.auth.pendingLogin()}
+            loading={loading}
           >
             Submit
           </LoadingButton>

@@ -6,7 +6,7 @@ export class NotFoundError extends Error {
 }
 
 export class BadRequestError extends Error {
-  constructor(err: any) {
+  constructor(err: any = 'Bad Request') {
     if (typeof err === 'string') super(JSON.stringify({ message: err }));
     else super(JSON.stringify(err));
   }

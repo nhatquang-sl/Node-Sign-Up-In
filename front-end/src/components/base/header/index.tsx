@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { styled, useTheme } from '@mui/material/styles';
@@ -16,10 +16,12 @@ import {
   MenuItem,
 } from '@mui/material';
 import Zoom from '@mui/material/Zoom';
-
 import { sidebarWidth } from 'store/constants';
 
+import { useAuth, useApiService } from 'hooks';
 import { Props, mapStateToProps, mapDispatchToProps } from './types';
+import { AuthState } from 'context/auth-provider';
+import { TokenType } from 'shared/user';
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -42,26 +44,45 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+
 function Header(props: Props) {
-  const navigate = useNavigate();
   const theme = useTheme();
+  const navigate = useNavigate();
+  const { auth, setAuth } = useAuth();
+  const apiService = useApiService();
+  const { openHeader, closeSidebarAndHeader } = props;
 
   const transitionDuration = {
     enter: theme.transitions.duration.enteringScreen,
     exit: theme.transitions.duration.leavingScreen,
   };
-  const { accessToken, emailConfirmed } = props.auth;
+  const { accessToken } = auth;
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+
+  useEffect(() => {
+    accessToken ? openHeader() : closeSidebarAndHeader();
+  }, [accessToken, openHeader, closeSidebarAndHeader]);
+
   const handleDrawerOpen = () => {
     props.openSidebar();
   };
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
+
+  const logOut = async () => {
+    props.loading(true);
+    try {
+      await apiService.get('/auth/log-out');
+      setAuth(new AuthState());
+    } catch (err) {}
+    props.loading(false);
+  };
+
   const handleCloseUserMenu = (setting: string | undefined) => {
     switch (setting?.toLocaleLowerCase()) {
       case 'logout':
-        props.logOut();
+        logOut();
         break;
       case 'profile':
         navigate('/profile');
@@ -73,7 +94,7 @@ function Header(props: Props) {
     <Slide in={props.settings.headerOpen}>
       <AppBar position="fixed" open={props.settings.sideBarOpen}>
         <Toolbar>
-          {emailConfirmed && (
+          {auth.type === TokenType.Login && (
             <Zoom
               in={!props.settings.sideBarOpen}
               timeout={transitionDuration}

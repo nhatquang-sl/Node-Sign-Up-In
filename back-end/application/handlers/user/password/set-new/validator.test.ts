@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import ENV from '@config';
 import { User } from '@database';
 import { mediator } from '@application/mediator';
-import { generateJwt, delay } from '@application/common/utils';
+import { generateTokens, delay, TokenParam } from '@application/common/utils';
 import { AuthorizeBehavior } from '@application/common/behaviors';
 import { ForbiddenError, UnauthorizedError, BadRequestError } from '@application/common/exceptions';
 import { UserSetNewPasswordCommand } from '.';
@@ -36,7 +36,7 @@ test('token expired', async () => {
   let command = new UserSetNewPasswordCommand(accessToken, '');
   const rejects = expect(mediator.send(command)).rejects;
   await rejects.toThrow(UnauthorizedError);
-  await rejects.toThrow(JSON.stringify({ message: `Invalid Token` }));
+  await rejects.toThrow(JSON.stringify({ message: `Access Token Expired` }));
 });
 
 test('token type invalid', async () => {
@@ -56,7 +56,7 @@ test('token type invalid', async () => {
 });
 
 test('token type invalid', async () => {
-  const { accessToken } = generateJwt({} as User, '');
+  const { accessToken } = generateTokens({} as TokenParam);
 
   let command = new UserSetNewPasswordCommand(accessToken, '');
   const rejects = expect(mediator.send(command)).rejects;
@@ -65,7 +65,7 @@ test('token type invalid', async () => {
 });
 
 test('password missing', async () => {
-  const { accessToken } = generateJwt({} as User, 'RESET_PASSWORD');
+  const { accessToken } = generateTokens({ type: 'RESET_PASSWORD' } as TokenParam);
 
   let command = new UserSetNewPasswordCommand(accessToken, '');
   const rejects = expect(mediator.send(command)).rejects;

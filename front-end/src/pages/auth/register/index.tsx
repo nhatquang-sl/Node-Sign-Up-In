@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { connect, useDispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -19,63 +19,42 @@ import {
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import { validateUserRegister } from 'shared/user/validate';
-import { closeSidebarAndHeader } from 'store/settings/actions';
+import { validateUserRegister, UserRegisterDto, TokenType } from 'shared/user';
+import { useAuth, useApiService } from 'hooks';
 
 import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
+import { AxiosError, AxiosResponse } from 'axios';
+import { AuthState } from 'context/auth-provider';
 
 const Register = (props: Props) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const { accessToken, emailConfirmed } = props.auth;
-  useEffect(() => {
-    if (accessToken && emailConfirmed) navigate('/');
-    else if (accessToken) navigate('/request-activate-email');
-    else dispatch(closeSidebarAndHeader());
-  }, [accessToken, emailConfirmed, navigate, dispatch]);
-
-  const { firstNameError, lastNameError, emailAddressError, passwordError } = props.auth;
-  useEffect(() => {
-    setValues((v) => ({
-      ...v,
-      firstNameError,
-      lastNameError,
-      emailAddressError,
-      passwordError,
-    }));
-  }, [firstNameError, lastNameError, emailAddressError, passwordError]);
+  const apiService = useApiService();
+  const [submitting, setSubmitting] = useState(false);
+  const { auth, setAuth } = useAuth();
 
   const [values, setValues] = useState<State>({
-    firstName: '',
+    firstName: process.env.REACT_APP_ENV === 'development' ? 'quang' : '',
     firstNameError: '',
-    lastName: '',
+    lastName: process.env.REACT_APP_ENV === 'development' ? 'nguyen' : '',
     lastNameError: '',
-    emailAddress: '',
+    emailAddress: process.env.REACT_APP_ENV === 'development' ? 'sunlight479@yahoo.com' : '',
     emailAddressError: '',
-    password: '',
+    password: process.env.REACT_APP_ENV === 'development' ? '123456x@X' : '',
     passwordError: [],
     showPassword: false,
     submitted: false,
   });
 
   useEffect(() => {
-    if (
-      process.env.REACT_APP_ENV === 'development' &&
-      !values.firstName &&
-      !values.lastName &&
-      !values.emailAddress &&
-      !values.password
-    ) {
-      setValues((v) => ({
-        ...v,
-        firstName: 'quang',
-        lastName: 'nguyen',
-        emailAddress: 'sunlight479@yahoo.com',
-        password: '123456x@X',
-      }));
+    switch (auth.type) {
+      case TokenType.Login:
+        navigate('/', { replace: true });
+        break;
+      case TokenType.NeedActivate:
+        navigate('/request-activate-email', { replace: true });
+        break;
     }
-  }, [values.firstName, values.lastName, values.emailAddress, values.password]);
+  }, [auth.type, navigate]);
 
   const handleChange = (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [prop]: event.target.value });
@@ -106,6 +85,7 @@ const Register = (props: Props) => {
   };
 
   const handleSubmit = async (event: React.SyntheticEvent) => {
+    setSubmitting(true);
     event.preventDefault();
 
     const { firstNameError, lastNameError, emailAddressError, passwordError } =
@@ -121,10 +101,27 @@ const Register = (props: Props) => {
     });
 
     if (firstNameError || lastNameError || emailAddressError || passwordError.length) {
+      setSubmitting(false);
       return;
     }
 
-    props.register(values);
+    try {
+      const res = await apiService.post(`auth/register`, new UserRegisterDto(values));
+      setAuth(new AuthState(res.data.accessToken));
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        const { data } = err.response as AxiosResponse<State>;
+        const { firstNameError, lastNameError, emailAddressError, passwordError } = data;
+        setValues({
+          ...values,
+          firstNameError,
+          lastNameError,
+          emailAddressError,
+          passwordError: passwordError ?? [],
+        });
+      }
+    }
+    setSubmitting(false);
   };
 
   return (
@@ -226,7 +223,7 @@ const Register = (props: Props) => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            loading={props.auth.pendingRegister()}
+            loading={submitting}
           >
             Submit
           </LoadingButton>
