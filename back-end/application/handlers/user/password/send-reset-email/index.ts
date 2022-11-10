@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { Op } from 'sequelize';
 import LANG from '@libs/lang';
-import { TIMESTAMP } from '@libs/constant';
+import { TIMESTAMP, FORGOT_PASSWORD_WAIT_SECONDS } from '@libs/constant';
 import { validateEmailAddress } from '@libs/user';
 
 import { generateTokens, sendResetPasswordEmail, TokenParam } from '@application/common/utils';
@@ -48,7 +48,7 @@ export class UserSendResetPasswordEmailCommandHandler
         userId,
         password: { [Op.is]: null },
         createdAt: {
-          [Op.gt]: new Date(new Date().getTime() - 5 * TIMESTAMP.MINUTE),
+          [Op.gt]: new Date(new Date().getTime() - FORGOT_PASSWORD_WAIT_SECONDS * TIMESTAMP.SECOND),
         },
       },
       attributes: ['createdAt'],
