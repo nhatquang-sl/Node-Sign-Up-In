@@ -1,19 +1,23 @@
-import { useEffect, useCallback, useState } from 'react';
-import Box from '@mui/material/Box';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputAdornment from '@mui/material/InputAdornment';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
-import { Typography } from '@mui/material';
-import { apiService } from 'store/services';
+import { useEffect, useState } from 'react';
+import {
+  Box,
+  OutlinedInput,
+  InputAdornment,
+  InputLabel,
+  FormControl,
+  Stack,
+  Typography,
+} from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
+import { useApiService } from 'hooks';
 import { OrderFormProps } from './types';
 import { round2Dec } from 'shared/utilities';
 
 const OrderForm = (props: OrderFormProps) => {
   const [price, setPrice] = useState('');
   const [size, setSize] = useState('');
+  const [submitting, setSubmitting] = useState<'buy' | 'sell' | ''>('');
+  const apiService = useApiService();
   useEffect(() => {
     setPrice(props.liqEstimate + '');
   }, [props.liqEstimate]);
@@ -41,11 +45,18 @@ const OrderForm = (props: OrderFormProps) => {
       side: '',
     };
 
-    if (txtBtn.includes('buy')) orderData.side = 'BUY';
-    else if (txtBtn.includes('sell')) orderData.side = 'SELL';
-
-    const res = await apiService.post('bnb/order', orderData);
-    props.onSuccess(res.data);
+    if (txtBtn.includes('buy')) {
+      setSubmitting('buy');
+      orderData.side = 'BUY';
+    } else if (txtBtn.includes('sell')) {
+      setSubmitting('sell');
+      orderData.side = 'SELL';
+    }
+    try {
+      const res = await apiService.post('bnb/order', orderData);
+      props.onSuccess(res.data);
+    } catch (err) {}
+    setSubmitting('');
   };
 
   return (
@@ -76,22 +87,24 @@ const OrderForm = (props: OrderFormProps) => {
         />
       </FormControl>
       <Stack direction="row" justifyContent="space-between" sx={{ paddingTop: 1 }}>
-        <Button
+        <LoadingButton
           variant="contained"
           color="buy"
+          loading={submitting === 'buy'}
           sx={{ textTransform: 'none' }}
           onClick={handleSubmit}
         >
           Buy/Long
-        </Button>
-        <Button
+        </LoadingButton>
+        <LoadingButton
           variant="contained"
           color="sell"
+          loading={submitting === 'sell'}
           sx={{ textTransform: 'none', marginLeft: 1 }}
           onClick={handleSubmit}
         >
           Sell/Short
-        </Button>
+        </LoadingButton>
       </Stack>
     </Box>
   );
