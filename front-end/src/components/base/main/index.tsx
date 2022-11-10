@@ -48,7 +48,6 @@ function Main(props: Props) {
       <Routes>
         <Route element={<RequireAuth />}>
           <Route path="/request-activate-email" element={<RequestActivateEmail />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/" element={<Dashboard />} />
         </Route>
@@ -58,6 +57,7 @@ function Main(props: Props) {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/register-confirm/:activationCode" element={<RegisterConfirm />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
       </Routes>

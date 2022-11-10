@@ -1,18 +1,11 @@
 import { bindActionCreators, Dispatch } from 'redux';
-import { setNewPassword } from 'store/auth/actions';
-import { SettingsState } from 'store/settings/types';
-import { AuthState } from 'store/auth/types';
-import { GlobalState } from 'store/global/types';
+import { showSnackbar } from 'store/snackbar/actions';
 
 interface PropsFromDispatch {
-  setNewPassword: typeof setNewPassword;
+  showSnackbar: typeof showSnackbar;
 }
 
-interface PropsFromState {
-  settings: SettingsState;
-  auth: AuthState;
-  global: GlobalState;
-}
+interface PropsFromState {}
 
 export interface Props extends PropsFromDispatch, PropsFromState {}
 
@@ -21,19 +14,10 @@ export class State {
   passwordError: string[] = [];
   showPassword: boolean = false;
   submitted: boolean = false;
-  loading: boolean = false;
+  submitting: boolean = false;
 }
 
-export const mapStateToProps = (store: any) => ({
-  settings: store.settings,
-  auth: store.auth,
-  global: store.global,
-});
+export const mapStateToProps = (store: any) => ({});
 
 export const mapDispatchToProps = (dispatch: Dispatch) =>
-  bindActionCreators(
-    {
-      setNewPassword,
-    },
-    dispatch
-  );
+  bindActionCreators({ showSnackbar }, dispatch);

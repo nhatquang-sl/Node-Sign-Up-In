@@ -63,5 +63,6 @@ export type TokenData = {
 export enum TokenType {
   Login = 'LOGIN',
   NeedActivate = 'NEED_ACTIVATE',
+  ResetPassword = 'RESET_PASSWORD',
 }
 // export type { UserDto, UserAuthDto, UserLoginDto };
