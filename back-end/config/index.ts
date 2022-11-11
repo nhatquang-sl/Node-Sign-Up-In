@@ -1,13 +1,13 @@
 import * as dotenv from 'dotenv';
 import path from 'path';
 
-console.log({ NODE_ENV: process.env.NODE_ENV });
 dotenv.config({ path: path.join(__dirname, '..', 'node-sign-up-in-credentials', '.env') });
 if (process.env.NODE_ENV?.trim() == 'development')
   dotenv.config({
     path: path.join(__dirname, '..', 'node-sign-up-in-credentials', '.development.env'),
     override: true,
   });
+
 const ENV = {
   NODE_ENV: process.env.NODE_ENV,
   APP_VERSION: process.env.APP_VERSION,
@@ -28,6 +28,7 @@ const ENV = {
 
   BNB_API_KEY: process.env.BNB_API_KEY ?? '',
   BNB_SECRET_KEY: process.env.BNB_SECRET_KEY ?? '',
+  ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS?.split(',').map((x) => x.trim()) ?? [],
 };
 
 export default ENV;
