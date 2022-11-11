@@ -18,14 +18,14 @@ const RequireAuth = (props: Props) => {
     auth.type === TokenType.NeedActivate &&
     !location.pathname.includes(needActivatePath) &&
     !location.pathname.includes('register-confirm');
-  console.log({
-    allowedRoles,
-    auth,
-    needActivate,
-    type: auth.type,
-    pathname: location.pathname,
-    needActivatePath,
-  });
+  // console.log({
+  //   allowedRoles,
+  //   auth,
+  //   needActivate,
+  //   type: auth.type,
+  //   pathname: location.pathname,
+  //   needActivatePath,
+  // });
 
   return isAuth ? (
     needActivate ? (
