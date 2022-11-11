@@ -30,7 +30,7 @@ export type PositionProps = {
 export type OpenOrdersProps = {
   orders: OpenOrder[];
   cancel: (symbol: string, orderId: number) => Promise<number>;
-  cancelAll: () => Promise<void>;
+  cancelAll: (symbol: string) => Promise<void>;
 };
 
 export type IndicatorsProps = {

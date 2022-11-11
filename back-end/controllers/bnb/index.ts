@@ -9,6 +9,7 @@ import {
   KeepAliveListenKeyCommand,
   GetBalanceCommand,
   CancelOrderCommand,
+  CancelAllOrdersCommand,
 } from '@application/handlers/bnb';
 
 const router = express.Router();
@@ -28,6 +29,13 @@ router.post('/order', async (request: Request, response: Response) => {
 router.delete('/order/:symbol/:orderId', async (request: Request, response: Response) => {
   const { symbol, orderId } = request.params;
   const command = new CancelOrderCommand(getAccessToken(request), symbol, orderId);
+  const res = await mediator.send(command);
+  response.json(res);
+});
+
+router.delete('/all-orders/:symbol', async (request: Request, response: Response) => {
+  const { symbol } = request.params;
+  const command = new CancelAllOrdersCommand(getAccessToken(request), symbol);
   const res = await mediator.send(command);
   response.json(res);
 });
