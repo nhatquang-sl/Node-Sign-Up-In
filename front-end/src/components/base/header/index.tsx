@@ -113,11 +113,17 @@ function Header(props: Props) {
               </IconButton>
             </Zoom>
           )}
-
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ cursor: 'pointer' }}
+            onClick={() => navigate('/')}
+          >
             Application
           </Typography>
-          <Box sx={{ flexGrow: 0 }}>
+          <Typography sx={{ flexGrow: 1 }} />
+          <Box>
             {accessToken ? (
               <Tooltip title="Open settings">
                 <IconButton
