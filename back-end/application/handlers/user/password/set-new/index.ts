@@ -59,9 +59,9 @@ export class UserSetNewPasswordCommandValidator
     const { password, token } = command;
     try {
       const decoded = await decodeAccessToken(token);
-      console.log({ decoded }, TokenType.ResetPassword.toString());
       if (decoded.type !== TokenType.ResetPassword.toString())
         throw new BadRequestError(LANG.USER_RESET_PASSWORD_TOKEN_INVALID_ERROR);
+      command.userId = decoded.id;
     } catch (err) {
       if (err instanceof TokenExpiredError)
         throw new BadRequestError(LANG.USER_RESET_PASSWORD_TOKEN_EXPIRED_ERROR);
