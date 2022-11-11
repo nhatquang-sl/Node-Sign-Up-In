@@ -11,7 +11,8 @@ import {
   AuthorizeCommand,
 } from '@application/mediator';
 import { BadRequestError } from '@application/common/exceptions';
-import { bnbService, OpenOrder } from '@libs/bnb';
+import { bnbService } from '@application/handlers/bnb/service';
+import { OpenOrder } from '@libs/bnb';
 
 export class CreateOrderCommand extends AuthorizeCommand {
   symbol: string;

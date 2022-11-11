@@ -2,7 +2,8 @@ import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import ENV from '@config';
 import { Authorize, ICommandHandler, AuthorizeCommand } from '@application/mediator';
-import { bnbService, OpenOrder } from '@libs/bnb';
+import { bnbService } from '@application/handlers/bnb/service';
+import { OpenOrder } from '@libs/bnb';
 
 export class GetOpenOrdersCommand extends AuthorizeCommand {
   symbol: string;

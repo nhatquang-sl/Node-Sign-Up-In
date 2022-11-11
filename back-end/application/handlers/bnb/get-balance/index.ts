@@ -2,7 +2,8 @@ import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import ENV from '@config';
 import { Authorize, ICommandHandler, AuthorizeCommand } from '@application/mediator';
-import { Balance, bnbService } from '@libs/bnb';
+import { bnbService } from '@application/handlers/bnb/service';
+import { Balance } from '@libs/bnb';
 
 export class GetBalanceCommand extends AuthorizeCommand {
   constructor(accessToken: string) {

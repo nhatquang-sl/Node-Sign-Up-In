@@ -2,7 +2,8 @@ import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import ENV from '@config';
 import { Authorize, ICommandHandler, AuthorizeCommand } from '@application/mediator';
-import { bnbService, Position } from '@libs/bnb';
+import { bnbService } from '@application/handlers/bnb/service';
+import { Position } from '@libs/bnb';
 
 export class GetPositionsCommand extends AuthorizeCommand {
   symbol: string;
