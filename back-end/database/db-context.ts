@@ -7,7 +7,8 @@ class DbContext {
 
   constructor() {
     // Option 3: Passing parameters separately (other dialects)
-    if (process.env.NODE_ENV === 'test') this.sequelize = new Sequelize('sqlite::memory:');
+    if (process.env.NODE_ENV === 'test')
+      this.sequelize = new Sequelize('sqlite::memory:', { logging: false });
     else
       this.sequelize = new Sequelize(ENV.DB_NAME, ENV.DB_USERNAME, ENV.DB_PASSWORD, {
         host: ENV.DB_HOST,
