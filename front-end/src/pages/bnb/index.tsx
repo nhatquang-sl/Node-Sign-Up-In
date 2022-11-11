@@ -146,7 +146,7 @@ const Binance = () => {
 
   const getBalance = async () => {
     const res = await apiService.get('bnb/balance');
-    console.log(res.data.filter((x: Balance) => x.asset === 'USDT'));
+    // console.log(res.data.filter((x: Balance) => x.asset === 'USDT'));
     setUsdtAvailable(res.data.filter((x: Balance) => x.asset === 'USDT')[0].availableBalance);
   };
 
@@ -176,8 +176,10 @@ const Binance = () => {
             startUserDataSocket();
             break;
           case 'ORDER_TRADE_UPDATE':
+            const od = json['o'];
             switch (json['o']['x']) {
               case 'NEW':
+                console.log(`${od['s']} ${od['x']} ${od['S']} ${od['p']} ${od['q']}`);
                 const order = new OpenOrder({
                   time: json['o']['T'],
                   orderId: json['o']['i'],
@@ -192,8 +194,9 @@ const Binance = () => {
                 setOpenOrders([...openOrders, order]);
                 break;
               case 'CANCELED':
-                setOpenOrders(
-                  openOrders.filter((x: OpenOrder) => x.orderId !== parseFloat(json['o']['i']))
+                console.log(`${od['s']} ${od['x']} ${od['S']} ${od['p']} ${od['q']}`);
+                setOpenOrders((orders) =>
+                  orders.filter((x: OpenOrder) => x.orderId !== parseFloat(json['o']['i']))
                 );
                 break;
             }
@@ -246,7 +249,7 @@ const Binance = () => {
   }, [positions, openOrders]);
 
   const handleCreateOrderSuccess = (order: OpenOrder) => {
-    setOpenOrders([...openOrders, order]);
+    // setOpenOrders([...openOrders, order]);
     getBalance();
   };
 
@@ -257,8 +260,8 @@ const Binance = () => {
     return orderId;
   };
 
-  const handleCancelAllOrders = async (): Promise<void> => {
-    await apiService.delete(`bnb/positions/nearusdt`);
+  const handleCancelAllOrders = async (symbol: string): Promise<void> => {
+    await apiService.delete(`bnb/all-orders/${symbol}`);
     getBalance();
   };
 

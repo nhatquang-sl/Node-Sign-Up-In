@@ -59,6 +59,14 @@ const OrderForm = (props: OrderFormProps) => {
     setSubmitting('');
   };
 
+  const enableSubmit = () => {
+    try {
+      return parseFloat(price) > 0 && parseFloat(size) > 0;
+    } catch (err) {
+      return false;
+    }
+  };
+
   return (
     <Box component="form" sx={{ width: 200 }} noValidate autoComplete="off">
       <Typography variant="subtitle2" gutterBottom>
@@ -90,8 +98,9 @@ const OrderForm = (props: OrderFormProps) => {
         <LoadingButton
           variant="contained"
           color="buy"
-          loading={submitting === 'buy'}
           sx={{ textTransform: 'none' }}
+          disabled={!enableSubmit()}
+          loading={submitting === 'buy'}
           onClick={handleSubmit}
         >
           Buy/Long
@@ -99,8 +108,9 @@ const OrderForm = (props: OrderFormProps) => {
         <LoadingButton
           variant="contained"
           color="sell"
-          loading={submitting === 'sell'}
           sx={{ textTransform: 'none', marginLeft: 1 }}
+          disabled={!enableSubmit()}
+          loading={submitting === 'sell'}
           onClick={handleSubmit}
         >
           Sell/Short

@@ -14,7 +14,8 @@ import { OpenOrder } from 'shared/bnb';
 import { OpenOrdersProps } from './types';
 
 const OpenOrders = (props: OpenOrdersProps) => {
-  const [loading, setLoading] = useState<number[]>([]);
+  const [cancelling, setCancelling] = useState<number[]>([]);
+  const [cancellingAll, setCancellingAll] = useState(false);
 
   const getPrice = (p: OpenOrder) => {
     let price = p.price;
@@ -26,10 +27,16 @@ const OpenOrders = (props: OpenOrdersProps) => {
     return round3Dec(price);
   };
 
+  const handleCancelAll = async (symbol: string) => {
+    setCancellingAll(true);
+    await props.cancelAll(symbol);
+    setCancellingAll(false);
+  };
+
   const handleCancel = async (symbol: string, orderId: number) => {
-    setLoading([...loading, orderId]);
+    setCancelling([...cancelling, orderId]);
     await props.cancel(symbol, orderId);
-    setLoading(loading.filter((x) => x !== orderId));
+    setCancelling(cancelling.filter((x) => x !== orderId));
   };
 
   return (
@@ -46,7 +53,14 @@ const OpenOrders = (props: OpenOrdersProps) => {
             <TableCell align="right">Quantity</TableCell>
             {/* <TableCell align="right">Filled</TableCell> */}
             <TableCell align="right">
-              <LoadingButton aria-label="delete" size="small" sx={{ textTransform: 'none' }}>
+              <LoadingButton
+                aria-label="delete"
+                size="small"
+                sx={{ textTransform: 'none' }}
+                disabled={!props.orders.length}
+                loading={cancellingAll}
+                onClick={() => handleCancelAll('nearusdt')}
+              >
                 Cancel All
               </LoadingButton>
             </TableCell>
@@ -72,7 +86,7 @@ const OpenOrders = (props: OpenOrdersProps) => {
                   <TableCell align="right">
                     <LoadingButton
                       size="small"
-                      loading={loading.includes(p.orderId)}
+                      loading={cancelling.includes(p.orderId) || cancellingAll}
                       sx={{ textTransform: 'none' }}
                       onClick={() => handleCancel(p.symbol, p.orderId)}
                     >
