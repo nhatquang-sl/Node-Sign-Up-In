@@ -27,8 +27,7 @@ beforeEach(async () => {
 });
 
 test('activate success', async () => {
-  const command = new GetPositionsCommand(accessToken, 'nearusdt');
-
-  const orders = await mediator.send(command);
-  console.log({ orders });
+  // const command = new GetPositionsCommand(accessToken, 'nearusdt');
+  // const orders = await mediator.send(command);
+  // console.log({ orders });
 });
