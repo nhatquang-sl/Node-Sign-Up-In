@@ -15,7 +15,7 @@ import { round2Dec } from 'shared/utilities';
 
 const OrderForm = (props: OrderFormProps) => {
   const [price, setPrice] = useState('');
-  const [size, setSize] = useState('');
+  const [size, setSize] = useState(localStorage.orderSize ?? '');
   const [submitting, setSubmitting] = useState<'buy' | 'sell' | ''>('');
   const apiService = useApiService();
   useEffect(() => {
@@ -30,6 +30,7 @@ const OrderForm = (props: OrderFormProps) => {
         setPrice(value);
         break;
       case 'size':
+        localStorage.orderSize = value;
         setSize(value);
         break;
     }
