@@ -1,4 +1,5 @@
 import { useEffect, useCallback, useState } from 'react';
+import useWebSocket from 'react-use-websocket';
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -30,25 +31,98 @@ const Binance = () => {
   const [h4State, setH4State] = useState(new Indicator('4h'));
   const [positions, setPositions] = useState<Position[]>([]);
   const [openOrders, setOpenOrders] = useState<OpenOrder[]>([]);
-  const [userDataWS, setUserDataWS] = useState<WebSocket>();
+  const [klineWSes, setKlineWSes] = useState<WebSocket[]>([]);
 
   const [curPrice, setCurPrice] = useState(0);
   const [entryEstimate, setEntryEstimate] = useState(0);
   const [liqEstimate, setLiqEstimate] = useState(0);
   const [value, setValue] = useState('1');
   const [usdtAvailable, setUsdtAvailable] = useState(0);
+  const getListenKey = useCallback(async () => {
+    const res = await apiService.post('bnb/listenKey');
+    setInterval(() => {
+      try {
+        apiService.put(`bnb/listenKeyv/${res.data.listenKey}`);
+      } catch (err) {}
+    }, TIMESTAMP.MINUTE);
+    return `wss://fstream.binance.com/ws/${res.data.listenKey}`;
+  }, []);
+  const { lastMessage } = useWebSocket(getListenKey);
+
+  const estimateLiqAndEntry = useCallback(
+    (orders: OpenOrder[]) => {
+      let quantityTotal = 0;
+      let sizeTotal = 0;
+      for (const p of positions) {
+        quantityTotal += p.positionAmt;
+        sizeTotal += p.positionAmt * p.entryPrice;
+      }
+
+      for (const o of orders) {
+        quantityTotal += o.origQty;
+        sizeTotal += o.origQty * o.price;
+      }
+
+      if (positions.length || orders.length) {
+        const entry = round3Dec(sizeTotal / quantityTotal);
+        const liq = round3Dec(entry - ((80 / 20) * entry) / 100);
+        setEntryEstimate(entry);
+        setLiqEstimate(liq);
+      }
+    },
+    [positions]
+  );
+
+  useEffect(() => {
+    if (!lastMessage) return;
+    const json = JSON.parse(lastMessage?.data);
+    switch (json['e']) {
+      case 'listenKeyExpired':
+        window.location.reload();
+        break;
+      case 'ORDER_TRADE_UPDATE':
+        const od = json['o'];
+        console.log(`${od['s']} ${od['x']} ${od['S']} ${od['p']} ${od['q']}`);
+        switch (json['o']['x']) {
+          case 'NEW':
+            const order = new OpenOrder({
+              time: json['o']['T'],
+              orderId: json['o']['i'],
+              symbol: json['o']['s'],
+              origType: json['o']['ot'],
+              side: json['o']['S'],
+              executedQty: 0,
+              origQty: parseFloat(json['o']['q']),
+              price: parseFloat(json['o']['p']),
+            });
+
+            setOpenOrders((orders) => {
+              orders.push(order);
+              estimateLiqAndEntry(orders);
+              return orders;
+            });
+            break;
+          case 'CANCELED':
+            setOpenOrders((orders) => {
+              orders = orders.filter((x: OpenOrder) => x.orderId !== parseFloat(json['o']['i']));
+              estimateLiqAndEntry(orders);
+              return orders;
+            });
+            break;
+          default:
+            console.log(lastMessage?.data);
+            break;
+        }
+        break;
+      default:
+        console.log(lastMessage?.data);
+        break;
+    }
+  }, [lastMessage, estimateLiqAndEntry]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
-
-  const startUserDataSocket = useCallback(async () => {
-    if (!localStorage.listenKey) {
-      const res = await apiService.post('bnb/listenKey');
-      localStorage.listenKey = res.data.listenKey;
-    }
-    setUserDataWS(new WebSocket(`wss://fstream.binance.com/ws/${localStorage.listenKey}`));
-  }, []);
 
   const getAndCalculateKlines = useCallback(async (symbol: string, interval: string) => {
     const klines = await bnbService.getKlines(symbol, interval);
@@ -81,6 +155,11 @@ const Binance = () => {
         calculateChart(klines, interval);
       }
     };
+
+    setKlineWSes((prevVal) => {
+      prevVal.push(ws);
+      return prevVal;
+    });
   }, []);
 
   const calculateChart = (klines: Kline[], interval: string): Indicator => {
@@ -159,60 +238,15 @@ const Binance = () => {
     getPositions();
     getOpenOrders();
     getBalance();
-    setInterval(() => {
+    const getPositionsInterval = setInterval(() => {
+      // console.log('getPositions');
       getPositions();
-    }, 30 * 1000);
+    }, 3 * TIMESTAMP.SECOND);
+    return () => {
+      clearInterval(getPositionsInterval);
+      klineWSes.forEach((x) => x.close());
+    };
   }, [navigate, getAndCalculateKlines]);
-
-  useEffect(() => {
-    console.log('User Data WS change');
-    if (userDataWS != null) {
-      userDataWS.onmessage = (event) => {
-        const json = JSON.parse(event.data);
-        console.log(json);
-        switch (json['e']) {
-          case 'listenKeyExpired':
-            localStorage.removeItem('listenKey');
-            startUserDataSocket();
-            break;
-          case 'ORDER_TRADE_UPDATE':
-            const od = json['o'];
-            switch (json['o']['x']) {
-              case 'NEW':
-                console.log(`${od['s']} ${od['x']} ${od['S']} ${od['p']} ${od['q']}`);
-                const order = new OpenOrder({
-                  time: json['o']['T'],
-                  orderId: json['o']['i'],
-                  symbol: json['o']['s'],
-                  origType: json['o']['ot'],
-                  side: json['o']['S'],
-                  executedQty: 0,
-                  origQty: parseFloat(json['o']['q']),
-                  price: parseFloat(json['o']['p']),
-                });
-
-                setOpenOrders([...openOrders, order]);
-                break;
-              case 'CANCELED':
-                console.log(`${od['s']} ${od['x']} ${od['S']} ${od['p']} ${od['q']}`);
-                setOpenOrders((orders) =>
-                  orders.filter((x: OpenOrder) => x.orderId !== parseFloat(json['o']['i']))
-                );
-                break;
-            }
-            break;
-        }
-      };
-    }
-  }, [userDataWS, openOrders, startUserDataSocket]);
-
-  useEffect(() => {
-    startUserDataSocket();
-    setInterval(() => {
-      localStorage.removeItem('listenKey');
-      startUserDataSocket();
-    }, 5 * TIMESTAMP.MINUTE);
-  }, [startUserDataSocket]);
 
   // WS: get market price
   useEffect(() => {
@@ -225,31 +259,15 @@ const Binance = () => {
         console.log(err);
       }
     };
+
+    return () => markPriceWS.close();
   }, []);
 
   useEffect(() => {
-    let quantityTotal = 0;
-    let sizeTotal = 0;
-    for (const p of positions) {
-      quantityTotal += p.positionAmt;
-      sizeTotal += p.positionAmt * p.entryPrice;
-    }
-
-    for (const o of openOrders) {
-      quantityTotal += o.origQty;
-      sizeTotal += o.origQty * o.price;
-    }
-
-    if (positions.length || openOrders.length) {
-      const entry = round3Dec(sizeTotal / quantityTotal);
-      const liq = round3Dec(entry - ((80 / 20) * entry) / 100);
-      setEntryEstimate(entry);
-      setLiqEstimate(liq);
-    }
-  }, [positions, openOrders]);
+    estimateLiqAndEntry(openOrders);
+  }, [positions, openOrders, estimateLiqAndEntry]);
 
   const handleCreateOrderSuccess = (order: OpenOrder) => {
-    // setOpenOrders([...openOrders, order]);
     getBalance();
   };
 
