@@ -7,6 +7,9 @@ import {
   FormControl,
   Stack,
   Typography,
+  Select,
+  SelectChangeEvent,
+  MenuItem,
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useApiService } from 'hooks';
@@ -16,15 +19,24 @@ import { round2Dec } from 'shared/utilities';
 const OrderForm = (props: OrderFormProps) => {
   const [price, setPrice] = useState('');
   const [size, setSize] = useState(localStorage.orderSize ?? '');
-  const [submitting, setSubmitting] = useState<'buy' | 'sell' | ''>('');
+  const [submitting, setSubmitting] = useState(false);
   const apiService = useApiService();
   useEffect(() => {
     setPrice(props.liqEstimate + '');
   }, [props.liqEstimate]);
 
+  const handleSelectChange = (event: SelectChangeEvent) => {
+    let value = event.target.value;
+    switch (event.target.name) {
+      case 'side':
+        props.onChangeSide(value);
+        break;
+    }
+  };
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     let value = event.target.value;
-
+    console.log(value, event.target.name);
     switch (event.target.name) {
       case 'price':
         setPrice(value);
@@ -37,27 +49,18 @@ const OrderForm = (props: OrderFormProps) => {
     // console.log(event.target.name, event.target.value);
   };
 
-  const handleSubmit = async (event: React.SyntheticEvent) => {
-    const txtBtn = (event.currentTarget.textContent ?? '').toLocaleLowerCase();
-    const orderData = {
-      symbol: 'NEARUSDT',
-      price: parseFloat(price),
-      quantity: parseFloat(size),
-      side: '',
-    };
-
-    if (txtBtn.includes('buy')) {
-      setSubmitting('buy');
-      orderData.side = 'BUY';
-    } else if (txtBtn.includes('sell')) {
-      setSubmitting('sell');
-      orderData.side = 'SELL';
-    }
+  const handleSubmit = async () => {
+    setSubmitting(true);
     try {
-      const res = await apiService.post('bnb/order', orderData);
+      const res = await apiService.post('bnb/order', {
+        symbol: 'NEARUSDT',
+        price: parseFloat(price),
+        quantity: parseFloat(size),
+        side: props.side.toUpperCase(),
+      });
       props.onSuccess(res.data);
     } catch (err) {}
-    setSubmitting('');
+    setSubmitting(false);
   };
 
   const enableSubmit = () => {
@@ -74,6 +77,13 @@ const OrderForm = (props: OrderFormProps) => {
         Avbl: {round2Dec(props.usdtAvailable)} USDT
       </Typography>
       <FormControl variant="outlined" fullWidth size="small">
+        <InputLabel>Side</InputLabel>
+        <Select label="Side" name="side" value={props.side} onChange={handleSelectChange}>
+          <MenuItem value={'buy'}>Long</MenuItem>
+          <MenuItem value={'sell'}>Short</MenuItem>
+        </Select>
+      </FormControl>
+      <FormControl variant="outlined" fullWidth size="small" margin="dense">
         <InputLabel>Price</InputLabel>
         <OutlinedInput
           label="Price"
@@ -97,24 +107,15 @@ const OrderForm = (props: OrderFormProps) => {
       </FormControl>
       <Stack direction="row" justifyContent="space-between" sx={{ paddingTop: 1 }}>
         <LoadingButton
+          fullWidth
           variant="contained"
-          color="buy"
+          color={props.side}
           sx={{ textTransform: 'none' }}
           disabled={!enableSubmit()}
-          loading={submitting === 'buy'}
+          loading={submitting}
           onClick={handleSubmit}
         >
-          Buy/Long
-        </LoadingButton>
-        <LoadingButton
-          variant="contained"
-          color="sell"
-          sx={{ textTransform: 'none', marginLeft: 1 }}
-          disabled={!enableSubmit()}
-          loading={submitting === 'sell'}
-          onClick={handleSubmit}
-        >
-          Sell/Short
+          {props.side === 'buy' ? 'Buy/Long' : 'Sell/Short'}
         </LoadingButton>
       </Stack>
     </Box>

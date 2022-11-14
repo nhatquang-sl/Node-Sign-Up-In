@@ -33,6 +33,7 @@ const Binance = () => {
   const [openOrders, setOpenOrders] = useState<OpenOrder[]>([]);
   const [klineWSes, setKlineWSes] = useState<WebSocket[]>([]);
 
+  const [side, setSide] = useState(localStorage.orderSide ?? 'buy');
   const [curPrice, setCurPrice] = useState(0);
   const [entryEstimate, setEntryEstimate] = useState(0);
   const [liqEstimate, setLiqEstimate] = useState(0);
@@ -42,34 +43,41 @@ const Binance = () => {
     const res = await apiService.post('bnb/listenKey');
     setInterval(() => {
       try {
-        apiService.put(`bnb/listenKeyv/${res.data.listenKey}`);
+        apiService.put(`bnb/listenKey/${res.data.listenKey}`);
       } catch (err) {}
     }, TIMESTAMP.HOUR);
     return `wss://fstream.binance.com/ws/${res.data.listenKey}`;
   }, []);
   const { lastMessage } = useWebSocket(getListenKey);
 
-  const estimateLiqAndEntry = useCallback((positions: Position[], orders: OpenOrder[]) => {
-    let quantityTotal = 0;
-    let sizeTotal = 0;
-    console.log('estimateLiqAndEntry', positions.length, orders.length);
-    for (const p of positions) {
-      quantityTotal += p.positionAmt;
-      sizeTotal += p.positionAmt * p.entryPrice;
-    }
+  const estimateLiqAndEntry = useCallback(
+    (side: string, positions: Position[], orders: OpenOrder[]) => {
+      let quantityTotal = 0;
+      let sizeTotal = 0;
+      console.log('estimateLiqAndEntry', positions.length, orders.length);
+      for (const p of positions) {
+        quantityTotal += Math.abs(p.positionAmt);
+        sizeTotal += Math.abs(p.positionAmt * p.entryPrice);
+      }
 
-    for (const o of orders) {
-      quantityTotal += o.origQty;
-      sizeTotal += o.origQty * o.price;
-    }
+      for (const o of orders) {
+        quantityTotal += o.origQty;
+        sizeTotal += o.origQty * o.price;
+      }
 
-    if (positions.length || orders.length) {
-      const entry = round3Dec(sizeTotal / quantityTotal);
-      const liq = round3Dec(entry - ((80 / 20) * entry) / 100);
-      setEntryEstimate(entry);
-      setLiqEstimate(liq);
-    }
-  }, []);
+      if (positions.length || orders.length) {
+        const entry = round3Dec(sizeTotal / quantityTotal);
+        let liq = round3Dec(entry - ((79 / 20) * entry) / 100);
+        if (side === 'sell') {
+          liq = round3Dec(entry + ((76 / 20) * entry) / 100);
+        }
+        console.log({ entry, liq });
+        setEntryEstimate(entry);
+        setLiqEstimate(liq);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     if (!lastMessage) return;
@@ -97,6 +105,7 @@ const Binance = () => {
             setOpenOrders((orders) => orders.concat(order));
             break;
           case 'CANCELED':
+          case 'TRADE':
             const orderId = parseFloat(json['o']['i']);
             setOpenOrders((orders) => orders.filter((o) => o.orderId !== orderId));
             break;
@@ -204,20 +213,34 @@ const Binance = () => {
     return indicator;
   };
 
-  const getPositions = async () => {
-    const res = await apiService.get<Position[]>(`bnb/positions/nearusdt`);
-
+  const getPositions = useCallback(async (side: string) => {
+    const res = await apiService.get<Position[]>(`bnb/positions/NEARUSDT`);
+    const data = res.data.filter((d) => (side === 'buy' ? d.positionAmt > 0 : d.positionAmt < 0));
     setPositions((positions) => {
+      if (positions.length === 0 && data.length !== 0) return data;
       positions.splice(0);
-      for (const d of res.data) positions.push(d);
+      for (const d of data) positions.push(d);
       return positions;
     });
-  };
+  }, []);
 
-  const getOpenOrders = async () => {
-    const res = await apiService.get(`bnb/openOrders/nearusdt`);
-    setOpenOrders(res.data);
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      getPositions(side);
+    }, 3 * TIMESTAMP.SECOND);
+    return () => clearInterval(interval);
+  }, [side, getPositions]);
+
+  const getOpenOrders = useCallback(async (side: string) => {
+    const res = await apiService.get<OpenOrder[]>(`bnb/openOrders/nearusdt`);
+    setOpenOrders(
+      res.data.filter(
+        (d) =>
+          (d.side.toLocaleLowerCase() === side && d.type !== 'TAKE_PROFIT_MARKET') ||
+          (d.side.toLocaleLowerCase() !== side && d.type === 'TAKE_PROFIT_MARKET')
+      )
+    );
+  }, []);
 
   const getBalance = async () => {
     const res = await apiService.get('bnb/balance');
@@ -231,15 +254,11 @@ const Binance = () => {
     getAndCalculateKlines('NEARUSDT', '30m');
     getAndCalculateKlines('NEARUSDT', '1h');
     getAndCalculateKlines('NEARUSDT', '4h');
-    getPositions();
-    getOpenOrders();
+    getPositions(side);
+    getOpenOrders(side);
     getBalance();
-    const getPositionsInterval = setInterval(() => {
-      // console.log('getPositions');
-      getPositions();
-    }, 3 * TIMESTAMP.SECOND);
+
     return () => {
-      clearInterval(getPositionsInterval);
       klineWSes.forEach((x) => x.close());
     };
   }, [navigate, getAndCalculateKlines]);
@@ -260,8 +279,8 @@ const Binance = () => {
   }, []);
 
   useEffect(() => {
-    estimateLiqAndEntry(positions, openOrders);
-  }, [positions, openOrders, estimateLiqAndEntry]);
+    estimateLiqAndEntry(side, positions, openOrders);
+  }, [side, positions, openOrders, estimateLiqAndEntry]);
 
   const handleCreateOrderSuccess = (order: OpenOrder) => {
     getBalance();
@@ -279,6 +298,14 @@ const Binance = () => {
     getBalance();
   };
 
+  const handleChangeSide = (side: string) => {
+    console.log({ side });
+    localStorage.orderSide = side;
+    getPositions(side);
+    getOpenOrders(side);
+    setSide(side);
+  };
+
   return (
     <>
       <Indicators
@@ -290,6 +317,8 @@ const Binance = () => {
           usdtAvailable={usdtAvailable}
           entryEstimate={entryEstimate}
           liqEstimate={liqEstimate}
+          side={side}
+          onChangeSide={handleChangeSide}
           onSuccess={handleCreateOrderSuccess}
         />
         <Box sx={{ flexGrow: 1 }}>

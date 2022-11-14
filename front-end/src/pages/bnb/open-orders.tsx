@@ -78,7 +78,12 @@ const OpenOrders = (props: OpenOrdersProps) => {
                   <TableCell>{formatDateNumber(p.time)}</TableCell>
                   <TableCell>{p.symbol}</TableCell>
                   <TableCell align="right">{p.origType}</TableCell>
-                  <TableCell align="right">{p.side}</TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{ color: p.side === 'BUY' ? 'buy.main' : 'sell.main' }}
+                  >
+                    {p.side}
+                  </TableCell>
                   <TableCell align="right">{getPrice(p)}</TableCell>
                   <TableCell align="right">{round3Dec(p.origQty * p.price)}</TableCell>
                   <TableCell align="right">{round3Dec(p.origQty)}</TableCell>
