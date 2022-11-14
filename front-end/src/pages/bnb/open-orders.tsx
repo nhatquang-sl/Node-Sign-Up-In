@@ -27,15 +27,15 @@ const OpenOrders = (props: OpenOrdersProps) => {
     return round3Dec(price);
   };
 
-  const handleCancelAll = async (symbol: string) => {
+  const handleCancelAll = async () => {
     setCancellingAll(true);
-    await props.cancelAll(symbol);
+    await props.cancelAll();
     setCancellingAll(false);
   };
 
-  const handleCancel = async (symbol: string, orderId: number) => {
+  const handleCancel = async (orderId: number) => {
     setCancelling([...cancelling, orderId]);
-    await props.cancel(symbol, orderId);
+    await props.cancel(orderId);
     setCancelling(cancelling.filter((x) => x !== orderId));
   };
 
@@ -59,7 +59,7 @@ const OpenOrders = (props: OpenOrdersProps) => {
                 sx={{ textTransform: 'none' }}
                 disabled={!props.orders.length}
                 loading={cancellingAll}
-                onClick={() => handleCancelAll('nearusdt')}
+                onClick={() => handleCancelAll()}
               >
                 Cancel All
               </LoadingButton>
@@ -93,7 +93,7 @@ const OpenOrders = (props: OpenOrdersProps) => {
                       size="small"
                       loading={cancelling.includes(p.orderId) || cancellingAll}
                       sx={{ textTransform: 'none' }}
-                      onClick={() => handleCancel(p.symbol, p.orderId)}
+                      onClick={() => handleCancel(p.orderId)}
                     >
                       Cancel
                     </LoadingButton>
