@@ -42,5 +42,7 @@ export type OrderFormProps = {
   entryEstimate: number;
   liqEstimate: number;
   usdtAvailable: number;
+  side: 'buy' | 'sell';
   onSuccess(order: OpenOrder): void;
+  onChangeSide(side: string): void;
 };

@@ -25,8 +25,8 @@ export class GetPositionsCommandHandler implements ICommandHandler<GetPositionsC
       baseURL: 'https://fapi.binance.com',
       headers: { 'X-MBX-APIKEY': ENV.BNB_API_KEY },
     });
-    var res = await fapi.get(`/fapi/v2/positionRisk?${query}&signature=${signature}`);
-    console.log(res.data);
-    return res.data.map((x: any) => new Position(x)).filter((x: Position) => x.positionAmt > 0);
+    var res = await fapi.get(`/fapi/v1/positionRisk?${query}&signature=${signature}`);
+    // console.log(res.data);
+    return res.data.map((x: any) => new Position(x)); //.filter((x: Position) => x.positionAmt > 0);
   }
 }
