@@ -39,6 +39,7 @@ const Binance = () => {
   const [liqEstimate, setLiqEstimate] = useState(0);
   const [value, setValue] = useState('1');
   const [usdtAvailable, setUsdtAvailable] = useState(0);
+
   const getListenKey = useCallback(async () => {
     const res = await apiService.post('bnb/listenKey');
     setInterval(() => {
@@ -47,7 +48,7 @@ const Binance = () => {
       } catch (err) {}
     }, TIMESTAMP.HOUR);
     return `wss://fstream.binance.com/ws/${res.data.listenKey}`;
-  }, []);
+  }, [apiService]);
   const { lastMessage } = useWebSocket(getListenKey);
 
   const estimateLiqAndEntry = useCallback(
@@ -213,16 +214,19 @@ const Binance = () => {
     return indicator;
   };
 
-  const getPositions = useCallback(async (side: string) => {
-    const res = await apiService.get<Position[]>(`bnb/positions/NEARUSDT`);
-    const data = res.data.filter((d) => (side === 'buy' ? d.positionAmt > 0 : d.positionAmt < 0));
-    setPositions((positions) => {
-      if (positions.length === 0 && data.length !== 0) return data;
-      positions.splice(0);
-      for (const d of data) positions.push(d);
-      return positions;
-    });
-  }, []);
+  const getPositions = useCallback(
+    async (side: string) => {
+      const res = await apiService.get<Position[]>(`bnb/positions/NEARUSDT`);
+      const data = res.data.filter((d) => (side === 'buy' ? d.positionAmt > 0 : d.positionAmt < 0));
+      setPositions((positions) => {
+        if (positions.length === 0 && data.length !== 0) return data;
+        positions.splice(0);
+        for (const d of data) positions.push(d);
+        return positions;
+      });
+    },
+    [apiService]
+  );
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -231,16 +235,19 @@ const Binance = () => {
     return () => clearInterval(interval);
   }, [side, getPositions]);
 
-  const getOpenOrders = useCallback(async (side: string) => {
-    const res = await apiService.get<OpenOrder[]>(`bnb/openOrders/nearusdt`);
-    setOpenOrders(
-      res.data.filter(
-        (d) =>
-          (d.side.toLocaleLowerCase() === side && d.type !== 'TAKE_PROFIT_MARKET') ||
-          (d.side.toLocaleLowerCase() !== side && d.type === 'TAKE_PROFIT_MARKET')
-      )
-    );
-  }, []);
+  const getOpenOrders = useCallback(
+    async (side: string) => {
+      const res = await apiService.get<OpenOrder[]>(`bnb/openOrders/nearusdt`);
+      setOpenOrders(
+        res.data.filter(
+          (d) =>
+            (d.side.toLocaleLowerCase() === side && d.type !== 'TAKE_PROFIT_MARKET') ||
+            (d.side.toLocaleLowerCase() !== side && d.type === 'TAKE_PROFIT_MARKET')
+        )
+      );
+    },
+    [apiService]
+  );
 
   const getBalance = async () => {
     const res = await apiService.get('bnb/balance');
