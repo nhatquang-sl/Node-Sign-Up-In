@@ -29,8 +29,8 @@ export type PositionProps = {
 
 export type OpenOrdersProps = {
   orders: OpenOrder[];
-  cancel: (symbol: string, orderId: number) => Promise<number>;
-  cancelAll: (symbol: string) => Promise<void>;
+  cancel: (orderId: number) => Promise<number>;
+  cancelAll: () => Promise<void>;
 };
 
 export type IndicatorsProps = {
@@ -43,6 +43,8 @@ export type OrderFormProps = {
   liqEstimate: number;
   usdtAvailable: number;
   side: 'buy' | 'sell';
+  symbol: string;
   onSuccess(order: OpenOrder): void;
   onChangeSide(side: string): void;
+  onChangeSymbol(symbol: string): void;
 };

@@ -31,6 +31,9 @@ const OrderForm = (props: OrderFormProps) => {
       case 'side':
         props.onChangeSide(value);
         break;
+      case 'symbol':
+        props.onChangeSymbol(value);
+        break;
     }
   };
 
@@ -53,7 +56,7 @@ const OrderForm = (props: OrderFormProps) => {
     setSubmitting(true);
     try {
       const res = await apiService.post('bnb/order', {
-        symbol: 'NEARUSDT',
+        symbol: props.symbol.toUpperCase(),
         price: parseFloat(price),
         quantity: parseFloat(size),
         side: props.side.toUpperCase(),
@@ -77,6 +80,13 @@ const OrderForm = (props: OrderFormProps) => {
         Avbl: {round2Dec(props.usdtAvailable)} USDT
       </Typography>
       <FormControl variant="outlined" fullWidth size="small">
+        <InputLabel>Symbol</InputLabel>
+        <Select label="Symbol" name="symbol" value={props.symbol} onChange={handleSelectChange}>
+          <MenuItem value={'nearusdt'}>NEARUSDT</MenuItem>
+          <MenuItem value={'c98usdt'}>C98USDT</MenuItem>
+        </Select>
+      </FormControl>
+      <FormControl variant="outlined" fullWidth size="small" margin="dense">
         <InputLabel>Side</InputLabel>
         <Select label="Side" name="side" value={props.side} onChange={handleSelectChange}>
           <MenuItem value={'buy'}>Long</MenuItem>

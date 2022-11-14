@@ -34,6 +34,7 @@ const Binance = () => {
   const [klineWSes, setKlineWSes] = useState<WebSocket[]>([]);
 
   const [side, setSide] = useState(localStorage.orderSide ?? 'buy');
+  const [symbol, setSymbol] = useState(localStorage.orderSymbol ?? 'nearusdt');
   const [curPrice, setCurPrice] = useState(0);
   const [entryEstimate, setEntryEstimate] = useState(0);
   const [liqEstimate, setLiqEstimate] = useState(0);
@@ -215,9 +216,10 @@ const Binance = () => {
   };
 
   const getPositions = useCallback(
-    async (side: string) => {
-      const res = await apiService.get<Position[]>(`bnb/positions/NEARUSDT`);
+    async (symbol: string, side: string) => {
+      const res = await apiService.get<Position[]>(`bnb/positions/${symbol}`);
       const data = res.data.filter((d) => (side === 'buy' ? d.positionAmt > 0 : d.positionAmt < 0));
+
       setPositions((positions) => {
         if (positions.length === 0 && data.length !== 0) return data;
         positions.splice(0);
@@ -230,14 +232,14 @@ const Binance = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      getPositions(side);
+      getPositions(symbol, side);
     }, 3 * TIMESTAMP.SECOND);
     return () => clearInterval(interval);
-  }, [side, getPositions]);
+  }, [symbol, side, getPositions]);
 
   const getOpenOrders = useCallback(
-    async (side: string) => {
-      const res = await apiService.get<OpenOrder[]>(`bnb/openOrders/nearusdt`);
+    async (symbol: string, side: string) => {
+      const res = await apiService.get<OpenOrder[]>(`bnb/openOrders/${symbol}`);
       setOpenOrders(
         res.data.filter(
           (d) =>
@@ -261,8 +263,8 @@ const Binance = () => {
     getAndCalculateKlines('NEARUSDT', '30m');
     getAndCalculateKlines('NEARUSDT', '1h');
     getAndCalculateKlines('NEARUSDT', '4h');
-    getPositions(side);
-    getOpenOrders(side);
+    getPositions(symbol, side);
+    getOpenOrders(symbol, side);
     getBalance();
 
     return () => {
@@ -293,14 +295,14 @@ const Binance = () => {
     getBalance();
   };
 
-  const handleCancelOrder = async (symbol: string, orderId: number): Promise<number> => {
+  const handleCancelOrder = async (orderId: number): Promise<number> => {
     await apiService.delete(`bnb/order/${symbol}/${orderId}`);
     setOpenOrders(openOrders.filter((x) => x.orderId !== orderId));
     getBalance();
     return orderId;
   };
 
-  const handleCancelAllOrders = async (symbol: string): Promise<void> => {
+  const handleCancelAllOrders = async (): Promise<void> => {
     await apiService.delete(`bnb/all-orders/${symbol}`);
     getBalance();
   };
@@ -308,9 +310,17 @@ const Binance = () => {
   const handleChangeSide = (side: string) => {
     console.log({ side });
     localStorage.orderSide = side;
-    getPositions(side);
-    getOpenOrders(side);
+    getPositions(symbol, side);
+    getOpenOrders(symbol, side);
     setSide(side);
+  };
+
+  const handleChangeSymbol = (symbol: string) => {
+    console.log({ symbol });
+    localStorage.orderSymbol = symbol;
+    getPositions(symbol, side);
+    getOpenOrders(symbol, side);
+    setSymbol(symbol);
   };
 
   return (
@@ -325,7 +335,9 @@ const Binance = () => {
           entryEstimate={entryEstimate}
           liqEstimate={liqEstimate}
           side={side}
+          symbol={symbol}
           onChangeSide={handleChangeSide}
+          onChangeSymbol={handleChangeSymbol}
           onSuccess={handleCreateOrderSuccess}
         />
         <Box sx={{ flexGrow: 1 }}>
