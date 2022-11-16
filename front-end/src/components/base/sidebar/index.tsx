@@ -1,5 +1,4 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { styled, useTheme } from '@mui/material/styles';
 import Drawer from '@mui/material/Drawer';
@@ -14,8 +13,8 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 
 import { sidebarWidth } from 'store/constants';
-
-import { Props, mapStateToProps, mapDispatchToProps } from './types';
+import { setSidebar } from 'store/settings-slice';
+import { RootState } from 'store';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -26,16 +25,17 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
-function Sidebar(props: Props) {
+function Sidebar() {
   const theme = useTheme();
-
+  const dispatch = useDispatch();
+  const sideBarOpen = useSelector((state: RootState) => state.settings.sideBarOpen);
   const transitionDuration = {
     enter: theme.transitions.duration.enteringScreen,
     exit: theme.transitions.duration.leavingScreen,
   };
 
   const handleDrawerClose = () => {
-    props.closeSidebar();
+    dispatch(setSidebar(false));
   };
 
   return (
@@ -50,11 +50,11 @@ function Sidebar(props: Props) {
       }}
       variant="persistent"
       anchor="left"
-      open={props.settings.sideBarOpen}
+      open={sideBarOpen}
     >
       <DrawerHeader>
         <Zoom
-          in={props.settings.sideBarOpen}
+          in={sideBarOpen}
           timeout={transitionDuration}
           style={{
             transitionDelay: `${transitionDuration.exit}ms`,
@@ -68,7 +68,7 @@ function Sidebar(props: Props) {
       <Divider />
       <Divider />
       <List>
-        {['Binance'].map((text, index) => (
+        {['Binance'].map((text) => (
           <ListItem
             key={text}
             disablePadding
@@ -90,4 +90,4 @@ function Sidebar(props: Props) {
   );
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Sidebar);
+export default Sidebar;

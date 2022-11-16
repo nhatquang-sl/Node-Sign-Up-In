@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -20,7 +19,7 @@ function App() {
             <CssBaseline />
             <Header />
             <Sidebar />
-            <Main />
+            {/* <Main /> */}
           </BrowserRouter>
         </Box>
       </ThemeProvider>
