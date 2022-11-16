@@ -1,18 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
+import store from 'store';
 
-import store from './store/index';
-import App from 'components/base/app';
+import Dashboard from 'pages/dashboard';
 import reportWebVitals from 'reportWebVitals';
 import { AuthProvider } from 'context/auth-provider';
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   // <React.StrictMode>
   <Provider store={store}>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
+    {/* <AuthProvider> */}
+    <Dashboard />
+    {/* </AuthProvider> */}
   </Provider>
   // </React.StrictMode>
 );

@@ -1,43 +1,66 @@
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { openHeader } from 'store/settings/actions';
-import { connect } from 'react-redux';
-import useApiService from 'hooks/use-api-service';
+import { useSelector, useDispatch } from 'react-redux';
+// import { openHeader } from 'store/settings/actions';
+// import useApiService from 'hooks/use-api-service';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { Props, mapStateToProps, mapDispatchToProps } from './types';
+import { decrement, increment, incrementByAmount } from 'store/counter-slice';
+import { RootState } from 'store';
 
-const Dashboard = (props: Props) => {
+const Dashboard = () => {
   const dispatch = useDispatch();
-  const apiService = useApiService();
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    dispatch(openHeader());
-  }, [dispatch]);
+  const count = useSelector((state: RootState) => state.counter.count);
+  const [incrementAmount, setIncrementAmount] = useState('');
 
-  const getSessions = async () => {
-    try {
-      setLoading(true);
-      const res = await apiService.get(`user/sessions`);
-      console.log(res.data);
-    } catch (err) {
-      console.log({ err });
-    }
-    setLoading(false);
+  const addValue = Number(incrementAmount) || 0;
+
+  const resetAll = () => {
+    setIncrementAmount('');
+    dispatch(incrementByAmount(0));
   };
+
+  // useEffect(() => {
+  //   dispatch(openHeader());
+  // }, [dispatch]);
+
+  // const getSessions = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const res = await apiService.get(`user/sessions`);
+  //     console.log(res.data);
+  //   } catch (err) {
+  //     console.log({ err });
+  //   }
+  //   setLoading(false);
+  // };
 
   return (
     <div>
-      <LoadingButton
+      {/* <LoadingButton
         variant="contained"
         sx={{ mt: 3, mb: 2 }}
         loading={loading}
         onClick={getSessions}
       >
         Get Sessions
-      </LoadingButton>
+      </LoadingButton> */}
+      <section>
+        <p>{count}</p>
+        <div>
+          <button onClick={() => dispatch(increment())}>+</button>
+          <button onClick={() => dispatch(decrement())}>-</button>
+        </div>
+        <input
+          type="text"
+          value={incrementAmount}
+          onChange={(e) => setIncrementAmount(e.target.value)}
+        />
+        <div>
+          <button onClick={() => dispatch(incrementByAmount(addValue))}>Add Amount</button>
+        </div>
+      </section>
     </div>
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
+export default Dashboard;
