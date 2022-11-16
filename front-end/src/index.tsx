@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import store from 'store';
 
 import Dashboard from 'pages/dashboard';
+import App from 'components/base/app';
 import reportWebVitals from 'reportWebVitals';
 import { AuthProvider } from 'context/auth-provider';
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
@@ -11,7 +12,7 @@ root.render(
   // <React.StrictMode>
   <Provider store={store}>
     {/* <AuthProvider> */}
-    <Dashboard />
+    <App />
     {/* </AuthProvider> */}
   </Provider>
   // </React.StrictMode>

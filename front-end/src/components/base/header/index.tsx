@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { styled, useTheme } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
@@ -18,10 +18,12 @@ import {
 import Zoom from '@mui/material/Zoom';
 import { sidebarWidth } from 'store/constants';
 
-import { useAuth, useApiService } from 'hooks';
-import { Props, mapStateToProps, mapDispatchToProps } from './types';
+import { useAuth } from 'hooks';
+
 import { AuthState } from 'context/auth-provider';
 import { TokenType } from 'shared/user';
+import { setHeader, setLoading, setSidebar, setSidebarAndHeader } from 'store/settings-slice';
+import { RootState } from 'store';
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -45,44 +47,45 @@ const AppBar = styled(MuiAppBar, {
 }));
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
-function Header(props: Props) {
+function Header() {
   const theme = useTheme();
   const navigate = useNavigate();
-  const { auth, setAuth } = useAuth();
-  const apiService = useApiService();
-  const { openHeader, closeSidebarAndHeader } = props;
+  const dispatch = useDispatch();
+  // const { auth, setAuth } = useAuth();
+  const sideBarOpen = useSelector((state: RootState) => state.settings.sideBarOpen);
+  const headerOpen = useSelector((state: RootState) => state.settings.headerOpen);
 
   const transitionDuration = {
     enter: theme.transitions.duration.enteringScreen,
     exit: theme.transitions.duration.leavingScreen,
   };
-  const { accessToken } = auth;
+  // const { accessToken } = auth;
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
-  useEffect(() => {
-    accessToken ? openHeader() : closeSidebarAndHeader();
-  }, [accessToken, openHeader, closeSidebarAndHeader]);
+  // useEffect(() => {
+  //   accessToken ? dispatch(setHeader(true)) : dispatch(setSidebarAndHeader(false));
+  // }, [accessToken]);
 
   const handleDrawerOpen = () => {
-    props.openSidebar();
+    dispatch(setSidebar(true));
   };
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
 
-  const logOut = async () => {
-    props.loading(true);
-    try {
-      await apiService.get('/auth/log-out');
-      setAuth(new AuthState());
-    } catch (err) {}
-    props.loading(false);
-  };
+  // const logOut = async () => {
+  //   dispatch(setLoading(true));
+  //   try {
+  //     await apiService.get('/auth/log-out');
+  //     setAuth(new AuthState());
+  //   } catch (err) {}
+  //   dispatch(setLoading(false));
+  // };
 
   const handleCloseUserMenu = (setting: string | undefined) => {
     switch (setting?.toLocaleLowerCase()) {
       case 'logout':
-        logOut();
+        // logOut();
         break;
       case 'profile':
         navigate('/profile');
@@ -91,12 +94,12 @@ function Header(props: Props) {
     setAnchorElUser(null);
   };
   return (
-    <Slide in={props.settings.headerOpen}>
-      <AppBar position="fixed" open={props.settings.sideBarOpen}>
+    <Slide in={headerOpen}>
+      <AppBar position="fixed" open={sideBarOpen}>
         <Toolbar>
-          {auth.type === TokenType.Login && (
+          {TokenType.Login === TokenType.Login && (
             <Zoom
-              in={!props.settings.sideBarOpen}
+              in={!sideBarOpen}
               timeout={transitionDuration}
               style={{
                 transitionDelay: `${transitionDuration.exit}ms`,
@@ -107,7 +110,7 @@ function Header(props: Props) {
                 aria-label="open drawer"
                 onClick={handleDrawerOpen}
                 edge="start"
-                sx={{ mr: 2, ...(props.settings.sideBarOpen && { display: 'none' }) }}
+                sx={{ mr: 2, ...(sideBarOpen && { display: 'none' }) }}
               >
                 <Icon>menu</Icon>
               </IconButton>
@@ -124,7 +127,7 @@ function Header(props: Props) {
           </Typography>
           <Typography sx={{ flexGrow: 1 }} />
           <Box>
-            {accessToken ? (
+            {/* {accessToken ? (
               <Tooltip title="Open settings">
                 <IconButton
                   size="large"
@@ -141,7 +144,7 @@ function Header(props: Props) {
               <Button onClick={() => navigate('/login')} color="inherit">
                 Login
               </Button>
-            )}
+            )} */}
             <Menu
               sx={{ mt: '45px' }}
               id="menu-appbar"
@@ -171,4 +174,4 @@ function Header(props: Props) {
   );
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Header);
+export default Header;
