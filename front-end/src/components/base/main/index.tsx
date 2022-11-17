@@ -1,14 +1,11 @@
 import { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Routes, Route, useLocation } from 'react-router-dom';
 
 import ConsecutiveSnackBars from 'components/consecutive-snackbars';
 import Loading from 'components/loading';
 
 import { DrawerHeader, Container } from './styles';
-import { Props, mapStateToProps, mapDispatchToProps } from './types';
-
-import useRefreshToken from 'hooks/use-refresh-token';
 
 import Dashboard from 'pages/dashboard';
 import Binance from 'pages/bnb';
@@ -20,20 +17,25 @@ import RegisterConfirm from 'pages/auth/register-confirm';
 import Unauthorized from 'pages/auth/unauthorized';
 import { ForgotPassword, ResetPassword } from 'pages/auth/password';
 import RequireAuth from './require-auth';
+import { RootState } from 'store';
+import { setLoading } from 'store/settings-slice';
 
-function Main(props: Props) {
+import useRefreshToken from 'hooks/use-refresh-token';
+
+function Main() {
   console.log('main');
   const location = useLocation();
+  const dispatch = useDispatch();
   const { refresh } = useRefreshToken();
+  const { headerOpen, sideBarOpen } = useSelector((state: RootState) => state.settings);
   const [init, setInit] = useState(true);
-  const { loading } = props;
 
   useEffect(() => {
-    loading(true);
+    dispatch(setLoading(true));
     const refreshToken = async () => {
       if (!location.pathname.includes('register-confirm')) await refresh();
 
-      loading(false);
+      dispatch(setLoading(false));
       setInit(false);
     };
 
@@ -43,8 +45,8 @@ function Main(props: Props) {
   return init ? (
     <Loading />
   ) : (
-    <Container open={props.settings.sideBarOpen}>
-      {props.settings.headerOpen && <DrawerHeader />}
+    <Container open={sideBarOpen}>
+      {headerOpen && <DrawerHeader />}
       <Routes>
         <Route element={<RequireAuth />}>
           <Route path="/request-activate-email" element={<RequestActivateEmail />} />
@@ -66,4 +68,4 @@ function Main(props: Props) {
     </Container>
   );
 }
-export default connect(mapStateToProps, mapDispatchToProps)(Main);
+export default Main;

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { apiService } from 'store/services';
-import useAuth from './use-auth';
-import { AuthState } from 'context/auth-provider';
+import { useDispatch } from 'react-redux';
+import { apiService } from './use-api-service';
+import { setAuth } from 'store/auth-slice';
 
 export const useRefreshToken = () => {
-  const { setAuth } = useAuth();
+  const dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
 
   const refresh = async () => {
@@ -19,7 +19,7 @@ export const useRefreshToken = () => {
       accessToken = res.data.accessToken;
     } catch (err) {}
 
-    setAuth(new AuthState(accessToken));
+    dispatch(setAuth(accessToken));
     setRefreshing(false);
     return accessToken;
   };

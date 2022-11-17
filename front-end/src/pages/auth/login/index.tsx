@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import {
@@ -20,23 +20,26 @@ import {
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import { AuthState } from 'context/auth-provider';
 import LANG from 'shared/lang';
-import { TokenType, validateEmailAddress } from 'shared/user';
-import { apiService } from 'store/services';
-import useAuth from 'hooks/use-auth';
+import { TokenType, validateEmailAddress, UserLoginDto } from 'shared/user';
 
-import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
+import { apiService } from 'hooks';
 
-type LoginError = {
-  message: string;
-};
+import { RootState } from 'store';
+import { setAuth } from 'store/auth-slice';
+import { showSnackbar, SnackbarMessage } from 'store/snackbar-slice';
 
-const Login = (props: Props) => {
+interface State extends UserLoginDto {
+  emailAddressError: string | undefined;
+  passwordError: string | undefined;
+  showPassword: boolean;
+}
+
+const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const auth = useSelector((state: RootState) => state.auth);
   const location = useLocation();
-
-  const { auth, setAuth } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const [values, setValues] = useState<State>({
@@ -89,13 +92,13 @@ const Login = (props: Props) => {
           withCredentials: true,
         });
 
-        setAuth(new AuthState(res.data.accessToken));
+        dispatch(setAuth(res.data.accessToken));
       } catch (err) {
-        const res = (err as AxiosError<LoginError>).response;
+        const res = (err as AxiosError<{ message: string }>).response;
         const status = res?.status ?? 0;
         if ([400, 401].includes(status)) {
-          const errMsg = res?.data.message;
-          errMsg && props.showSnackbar(errMsg, 'error');
+          const message = res?.data.message;
+          message && dispatch(showSnackbar({ message, severity: 'error' } as SnackbarMessage));
         }
       }
     }
@@ -188,4 +191,4 @@ const Login = (props: Props) => {
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default Login;

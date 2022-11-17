@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import store from 'store';
 
-import Dashboard from 'pages/dashboard';
 import App from 'components/base/app';
 import reportWebVitals from 'reportWebVitals';
 import { AuthProvider } from 'context/auth-provider';

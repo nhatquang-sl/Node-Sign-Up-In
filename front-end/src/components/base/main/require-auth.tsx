@@ -1,15 +1,15 @@
+import { useSelector } from 'react-redux';
 import { useLocation, Navigate, Outlet } from 'react-router-dom';
-import useAuth from 'hooks/use-auth';
 import { TokenType } from 'shared/user';
+import { RootState } from 'store';
 
 class Props {
   allowedRoles?: string[] = [];
 }
 
 const RequireAuth = (props: Props) => {
-  const { auth } = useAuth();
   const location = useLocation();
-  const isAuth = auth.id > 0;
+  const auth = useSelector((state: RootState) => state.auth);
   const { allowedRoles } = props;
   const author = !allowedRoles?.length || !!auth.roles.find((r) => props.allowedRoles?.includes(r));
   const needActivatePath = '/request-activate-email';
@@ -27,7 +27,7 @@ const RequireAuth = (props: Props) => {
   //   needActivatePath,
   // });
 
-  return isAuth ? (
+  return auth.id > 0 ? (
     needActivate ? (
       <Navigate to={needActivatePath} replace={true} />
     ) : author ? (

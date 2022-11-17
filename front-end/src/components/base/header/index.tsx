@@ -18,12 +18,10 @@ import {
 import Zoom from '@mui/material/Zoom';
 import { sidebarWidth } from 'store/constants';
 
-import { useAuth } from 'hooks';
-
-import { AuthState } from 'context/auth-provider';
 import { TokenType } from 'shared/user';
 import { setHeader, setLoading, setSidebar, setSidebarAndHeader } from 'store/settings-slice';
 import { RootState } from 'store';
+import { apiService } from 'hooks';
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -51,20 +49,18 @@ function Header() {
   const theme = useTheme();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  // const { auth, setAuth } = useAuth();
-  const sideBarOpen = useSelector((state: RootState) => state.settings.sideBarOpen);
-  const headerOpen = useSelector((state: RootState) => state.settings.headerOpen);
+  const { accessToken, firstName, lastName } = useSelector((state: RootState) => state.auth);
+  const { sideBarOpen, headerOpen } = useSelector((state: RootState) => state.settings);
 
   const transitionDuration = {
     enter: theme.transitions.duration.enteringScreen,
     exit: theme.transitions.duration.leavingScreen,
   };
-  // const { accessToken } = auth;
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
-  // useEffect(() => {
-  //   accessToken ? dispatch(setHeader(true)) : dispatch(setSidebarAndHeader(false));
-  // }, [accessToken]);
+  useEffect(() => {
+    accessToken ? dispatch(setHeader(true)) : dispatch(setSidebarAndHeader(false));
+  }, [accessToken]);
 
   const handleDrawerOpen = () => {
     dispatch(setSidebar(true));
@@ -73,19 +69,19 @@ function Header() {
     setAnchorElUser(event.currentTarget);
   };
 
-  // const logOut = async () => {
-  //   dispatch(setLoading(true));
-  //   try {
-  //     await apiService.get('/auth/log-out');
-  //     setAuth(new AuthState());
-  //   } catch (err) {}
-  //   dispatch(setLoading(false));
-  // };
+  const logOut = async () => {
+    dispatch(setLoading(true));
+    try {
+      await apiService.get('/auth/log-out');
+      localStorage.clear();
+    } catch (err) {}
+    dispatch(setLoading(false));
+  };
 
   const handleCloseUserMenu = (setting: string | undefined) => {
     switch (setting?.toLocaleLowerCase()) {
       case 'logout':
-        // logOut();
+        logOut();
         break;
       case 'profile':
         navigate('/profile');
@@ -126,8 +122,11 @@ function Header() {
             Application
           </Typography>
           <Typography sx={{ flexGrow: 1 }} />
+          <Typography>
+            {firstName} {lastName}
+          </Typography>
           <Box>
-            {/* {accessToken ? (
+            {accessToken ? (
               <Tooltip title="Open settings">
                 <IconButton
                   size="large"
@@ -144,7 +143,7 @@ function Header() {
               <Button onClick={() => navigate('/login')} color="inherit">
                 Login
               </Button>
-            )} */}
+            )}
             <Menu
               sx={{ mt: '45px' }}
               id="menu-appbar"

@@ -19,7 +19,7 @@ function App() {
             <CssBaseline />
             <Header />
             <Sidebar />
-            {/* <Main /> */}
+            <Main />
           </BrowserRouter>
         </Box>
       </ThemeProvider>
