@@ -41,7 +41,6 @@ const Register = () => {
   const apiService = useApiService();
   const [submitting, setSubmitting] = useState(false);
   const auth = useSelector((state: RootState) => state.auth);
-  // const { auth, setAuth } = useAuth();
 
   const [values, setValues] = useState<State>({
     firstName: process.env.REACT_APP_ENV === 'development' ? 'quang' : '',
