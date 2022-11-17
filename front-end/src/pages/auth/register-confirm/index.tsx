@@ -7,7 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import useApiService from 'hooks/use-api-service';
 
-import { showSnackbarError, showSnackbarSuccess } from 'store/snackbar-slice';
+import { showSnackbar } from 'store/snackbar-slice';
 const RegisterConfirm = () => {
   const { activationCode } = useParams();
   const navigate = useNavigate();
@@ -18,11 +18,11 @@ const RegisterConfirm = () => {
     const registerConfirm = async () => {
       try {
         await apiService.get(`auth/activate/${activationCode}`);
-        dispatch(showSnackbarSuccess('Activate your account success'));
+        dispatch(showSnackbar('Activate your account success', 'success'));
       } catch (err) {
         if (err instanceof AxiosError) {
           const { data } = err.response as AxiosResponse<{ message: string }>;
-          dispatch(showSnackbarError(data.message));
+          dispatch(showSnackbar(data.message, 'error'));
         }
       }
       navigate('/login', { replace: true });
