@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -20,17 +20,28 @@ import {
 import LoadingButton from '@mui/lab/LoadingButton';
 
 import { validateUserRegister, UserRegisterDto, TokenType } from 'shared/user';
-import { useAuth, useApiService } from 'hooks';
+import { useApiService } from 'hooks';
 
-import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
 import { AxiosError, AxiosResponse } from 'axios';
-import { AuthState } from 'context/auth-provider';
+import { RootState } from 'store';
+import { setAuth } from 'store/auth-slice';
 
-const Register = (props: Props) => {
+interface State extends UserRegisterDto {
+  firstNameError: string | undefined;
+  lastNameError: string | undefined;
+  emailAddressError: string | undefined;
+  passwordError: string[];
+  showPassword: boolean;
+  submitted: boolean;
+}
+
+const Register = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const apiService = useApiService();
   const [submitting, setSubmitting] = useState(false);
-  const { auth, setAuth } = useAuth();
+  const auth = useSelector((state: RootState) => state.auth);
+  // const { auth, setAuth } = useAuth();
 
   const [values, setValues] = useState<State>({
     firstName: process.env.REACT_APP_ENV === 'development' ? 'quang' : '',
@@ -107,7 +118,7 @@ const Register = (props: Props) => {
 
     try {
       const res = await apiService.post(`auth/register`, new UserRegisterDto(values));
-      setAuth(new AuthState(res.data.accessToken));
+      dispatch(setAuth(res.data.accessToken));
     } catch (err) {
       if (err instanceof AxiosError) {
         const { data } = err.response as AxiosResponse<State>;
@@ -240,4 +251,4 @@ const Register = (props: Props) => {
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Register);
+export default Register;
