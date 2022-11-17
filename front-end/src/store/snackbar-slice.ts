@@ -24,6 +24,22 @@ export const snackbarSlice = createSlice({
       action.payload.key = new Date().getTime();
       state.snackPack.push(action.payload);
     },
+    showSnackbarSuccess: (state: SnackbarState, action: PayloadAction<string>) => {
+      const msg = {
+        key: new Date().getTime(),
+        message: action.payload,
+        severity: 'success',
+      } as SnackbarMessage;
+      state.snackPack.push(msg);
+    },
+    showSnackbarError: (state: SnackbarState, action: PayloadAction<string>) => {
+      const msg = {
+        key: new Date().getTime(),
+        message: action.payload,
+        severity: 'error',
+      } as SnackbarMessage;
+      state.snackPack.push(msg);
+    },
     openSnackbar: (state: SnackbarState) => {
       state.open = true;
       state.messageInfo = state.snackPack[0];
@@ -38,6 +54,13 @@ export const snackbarSlice = createSlice({
   },
 });
 
-export const { showSnackbar, openSnackbar, closeSnackbar, cleanUpSnackbar } = snackbarSlice.actions;
+export const {
+  showSnackbar,
+  showSnackbarSuccess,
+  showSnackbarError,
+  openSnackbar,
+  closeSnackbar,
+  cleanUpSnackbar,
+} = snackbarSlice.actions;
 
 export default snackbarSlice.reducer;

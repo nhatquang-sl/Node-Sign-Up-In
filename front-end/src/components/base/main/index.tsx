@@ -40,7 +40,7 @@ function Main() {
     };
 
     refreshToken();
-  }, []);
+  }, [dispatch]);
 
   return init ? (
     <Loading />

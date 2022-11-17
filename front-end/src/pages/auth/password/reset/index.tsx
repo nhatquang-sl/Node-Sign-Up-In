@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 import React, { useState } from 'react';
-import { connect } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -19,11 +19,19 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import LANG from 'shared/lang';
 import { validatePassword } from 'shared/user/validate';
 import { useApiService } from 'hooks';
+import { showSnackbarError, showSnackbarSuccess } from 'store/snackbar-slice';
 
-import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
+class State {
+  password: string = '';
+  passwordError: string[] = [];
+  showPassword: boolean = false;
+  submitted: boolean = false;
+  submitting: boolean = false;
+}
 
-const ResetPassword = (props: Props) => {
+const ResetPassword = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const apiService = useApiService();
   const { token } = useParams();
   const [values, setValues] = useState<State>({
@@ -68,12 +76,12 @@ const ResetPassword = (props: Props) => {
         password: values.password,
       });
       setValues({ ...values, submitting: false });
-      props.showSnackbar(LANG.USER_RESET_PASSWORD_SUCCESS, 'success');
+      dispatch(showSnackbarSuccess(LANG.USER_RESET_PASSWORD_SUCCESS));
       navigate('/login', { replace: true });
     } catch (err) {
       if (err instanceof AxiosError) {
         const { message, passwordError } = err.response?.data;
-        message && props.showSnackbar(message, 'error');
+        message && dispatch(showSnackbarError(message));
         setValues({ ...values, submitting: false, passwordError: passwordError ?? [] });
       }
     }
@@ -142,4 +150,4 @@ const ResetPassword = (props: Props) => {
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ResetPassword);
+export default ResetPassword;
