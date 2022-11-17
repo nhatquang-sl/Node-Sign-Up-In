@@ -19,7 +19,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import LANG from 'shared/lang';
 import { validatePassword } from 'shared/user/validate';
 import { useApiService } from 'hooks';
-import { showSnackbarError, showSnackbarSuccess } from 'store/snackbar-slice';
+import { showSnackbar } from 'store/snackbar-slice';
 
 class State {
   password: string = '';
@@ -76,12 +76,12 @@ const ResetPassword = () => {
         password: values.password,
       });
       setValues({ ...values, submitting: false });
-      dispatch(showSnackbarSuccess(LANG.USER_RESET_PASSWORD_SUCCESS));
+      dispatch(showSnackbar(LANG.USER_RESET_PASSWORD_SUCCESS, 'success'));
       navigate('/login', { replace: true });
     } catch (err) {
       if (err instanceof AxiosError) {
         const { message, passwordError } = err.response?.data;
-        message && dispatch(showSnackbarError(message));
+        message && dispatch(showSnackbar(message, 'error'));
         setValues({ ...values, submitting: false, passwordError: passwordError ?? [] });
       }
     }

@@ -27,7 +27,7 @@ import { apiService } from 'hooks';
 
 import { RootState } from 'store';
 import { setAuth } from 'store/auth-slice';
-import { showSnackbar, SnackbarMessage } from 'store/snackbar-slice';
+import { showSnackbar } from 'store/snackbar-slice';
 
 interface State extends UserLoginDto {
   emailAddressError: string | undefined;
@@ -98,7 +98,7 @@ const Login = () => {
         const status = res?.status ?? 0;
         if ([400, 401].includes(status)) {
           const message = res?.data.message;
-          message && dispatch(showSnackbar({ message, severity: 'error' } as SnackbarMessage));
+          message && dispatch(showSnackbar(message, 'error'));
         }
       }
     }
