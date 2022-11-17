@@ -1,32 +1,18 @@
 import React, { useEffect } from 'react';
-import { connect, useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Snackbar, IconButton, Icon } from '@mui/material';
-// import Alert from '@mui/material/Alert';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
-
-import { openSnackbar, closeSnackbar } from 'store/snackbar/actions';
-
-import { Props, mapStateToProps, mapDispatchToProps } from './types';
-
-export interface SnackbarMessage {
-  message: string;
-  key: number;
-}
-
-export interface State {
-  open: boolean;
-  snackPack: readonly SnackbarMessage[];
-  messageInfo?: SnackbarMessage;
-}
+import { RootState } from 'store';
+import { cleanUpSnackbar, closeSnackbar, openSnackbar } from 'store/snackbar-slice';
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const ConsecutiveSnackBars = (props: Props) => {
+const ConsecutiveSnackBars = () => {
   const dispatch = useDispatch();
 
-  const { snackPack, messageInfo, open } = props.snackbar;
+  const { snackPack, messageInfo, open } = useSelector((state: RootState) => state.snackbar);
   const vertical = messageInfo?.vertical ?? 'bottom';
   const horizontal = messageInfo?.horizontal ?? 'center';
   const severity = messageInfo?.severity ?? 'info';
@@ -58,7 +44,7 @@ const ConsecutiveSnackBars = (props: Props) => {
   };
 
   const handleExited = () => {
-    props.cleanUpSnackbar();
+    dispatch(cleanUpSnackbar());
   };
 
   return (
@@ -68,7 +54,7 @@ const ConsecutiveSnackBars = (props: Props) => {
       <Snackbar
         key={messageInfo?.key}
         anchorOrigin={{ vertical, horizontal }}
-        open={props.snackbar.open}
+        open={open}
         autoHideDuration={4000}
         onClose={handleClose}
         TransitionProps={{ onExited: handleExited }}
@@ -88,4 +74,4 @@ const ConsecutiveSnackBars = (props: Props) => {
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ConsecutiveSnackBars);
+export default ConsecutiveSnackBars;

@@ -1,19 +1,14 @@
-import React from 'react';
-import { connect } from 'react-redux';
-
 import { CircularProgress, Backdrop } from '@mui/material';
+import { useSelector } from 'react-redux';
+import { RootState } from 'store';
 
-import { Props, mapStateToProps, mapDispatchToProps } from './types';
-
-const Loading = (props: Props) => {
+const Loading = () => {
+  const loading = useSelector((state: RootState) => state.settings.loading);
   return (
-    <Backdrop
-      sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-      open={props.settings.loading}
-    >
+    <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={loading}>
       <CircularProgress color="inherit" />
     </Backdrop>
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Loading);
+export default Loading;

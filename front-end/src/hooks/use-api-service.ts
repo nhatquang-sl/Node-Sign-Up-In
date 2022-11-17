@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import axios, { AxiosError, AxiosRequestHeaders, AxiosResponse } from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { API_ENDPOINT } from 'store/constants';
 import useRefreshToken from './use-refresh-token';
-import useAuth from './use-auth';
+import { RootState } from 'store';
 
-const apiService = axios.create({
+export const apiService = axios.create({
   baseURL: API_ENDPOINT,
   withCredentials: true,
 });
@@ -15,7 +16,7 @@ export const useApiService = () => {
   const location = useLocation();
   const { refresh } = useRefreshToken();
 
-  const { auth } = useAuth();
+  const auth = useSelector((state: RootState) => state.auth);
 
   const buildHeaders = (accessToken: string, headers: AxiosRequestHeaders = {}) => {
     return {

@@ -1,6 +1,6 @@
 import { USER_TYPE } from './types';
 
-import { apiService } from '../services';
+import { apiService } from 'hooks';
 
 const getUserSessions = () => ({
   type: USER_TYPE.GET_USER_SESSIONS,
