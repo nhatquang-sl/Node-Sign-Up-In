@@ -45,6 +45,11 @@ router.get('/health-check', (req, res) => {
     APP_HOST: ENV.APP_HOST,
   });
 });
+
+router.get('/meet', (req, res) => {
+  res.redirect('https://meet.google.com/ekv-nqss-pky');
+});
+
 router.get('*', (req, res) => {
   res.sendFile(path.join(fePath, 'index.html'));
 });
