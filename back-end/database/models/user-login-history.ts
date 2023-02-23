@@ -19,6 +19,7 @@ class UserLoginHistory extends Model<
   declare userAgent: string | null;
   declare accessToken: string | null;
   declare refreshToken: string | null;
+  declare createdAt: CreationOptional<Date>;
 }
 
 // https://sequelize.org/docs/v6/core-concepts/model-basics/#data-types
@@ -47,6 +48,9 @@ UserLoginHistory.init(
     },
     refreshToken: {
       type: DataTypes.STRING(300),
+    },
+    createdAt: {
+      type: DataTypes.DATE,
     },
   },
   {

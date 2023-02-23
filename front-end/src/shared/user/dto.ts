@@ -36,6 +36,7 @@ export interface UserSession {
   userAgent: string | null;
   accessToken: string | null;
   refreshToken: string | null;
+  createdAt: string;
 }
 
 export interface UserForgotPasswordDto {
