@@ -14,7 +14,7 @@ const user = {
   password: '123456x@X',
 };
 
-beforeAll(async () => {
+beforeEach(async () => {
   await dbContext.connect();
   await initializeDb();
 
@@ -60,6 +60,60 @@ test('refresh token not found', async () => {
   await rejects.toThrow(JSON.stringify({ message: 'Forbidden' }));
 });
 
+test('refresh token ipAddress changed', async () => {
+  const accessToken = jwt.sign({ id: 1, roles: ['user'], type: 'LOGIN' }, ENV.ACCESS_TOKEN_SECRET, {
+    expiresIn: '15m',
+  });
+  const refreshToken = jwt.sign(
+    { id: 1, roles: ['user'], type: 'LOGIN' },
+    ENV.REFRESH_TOKEN_SECRET,
+    { expiresIn: '1d' }
+  );
+  await UserLoginHistory.create({
+    userId: 1,
+    accessToken: accessToken,
+    refreshToken,
+    ipAddress: 'ipAddress',
+    userAgent: 'userAgent',
+  });
+
+  let command = new UserRefreshTokenCommand(refreshToken, {
+    ipAddress: 'ipAddress 01',
+    userAgent: 'userAgent',
+  });
+
+  const rejects = expect(mediator.send(command)).rejects;
+  await rejects.toThrow(ForbiddenError);
+  await rejects.toThrow(JSON.stringify({ message: 'Forbidden' }));
+});
+
+test('refresh token userAgent changed', async () => {
+  const accessToken = jwt.sign({ id: 1, roles: ['user'], type: 'LOGIN' }, ENV.ACCESS_TOKEN_SECRET, {
+    expiresIn: '15m',
+  });
+  const refreshToken = jwt.sign(
+    { id: 1, roles: ['user'], type: 'LOGIN' },
+    ENV.REFRESH_TOKEN_SECRET,
+    { expiresIn: '1d' }
+  );
+  await UserLoginHistory.create({
+    userId: 1,
+    accessToken: accessToken,
+    refreshToken,
+    ipAddress: 'ipAddress',
+    userAgent: 'userAgent',
+  });
+
+  let command = new UserRefreshTokenCommand(refreshToken, {
+    ipAddress: 'ipAddress',
+    userAgent: 'userAgent 01',
+  });
+
+  const rejects = expect(mediator.send(command)).rejects;
+  await rejects.toThrow(ForbiddenError);
+  await rejects.toThrow(JSON.stringify({ message: 'Forbidden' }));
+});
+
 test('refresh token success', async () => {
   const refreshToken = jwt.sign(
     { id: 1, roles: ['user'], type: 'LOGIN' },
@@ -74,8 +128,8 @@ test('refresh token success', async () => {
     userAgent: 'userAgent',
   });
   let command = new UserRefreshTokenCommand(refreshToken, {
-    ipAddress: 'ipAddress 02',
-    userAgent: 'userAgent 02',
+    ipAddress: 'ipAddress',
+    userAgent: 'userAgent',
   });
 
   const accessToken = (await mediator.send(command)) as string;
@@ -96,8 +150,47 @@ test('refresh token success', async () => {
 
   expect(loginHistories[1].id).toBe(2);
   expect(loginHistories[1].userId).toBe(1);
-  expect(loginHistories[1].ipAddress).toBe('ipAddress 02');
-  expect(loginHistories[1].userAgent).toBe('userAgent 02');
+  expect(loginHistories[1].ipAddress).toBe('ipAddress');
+  expect(loginHistories[1].userAgent).toBe('userAgent');
   expect(loginHistories[1].accessToken).toBe(accessToken);
   expect(loginHistories[1].refreshToken).toBe(refreshToken);
+});
+
+test('refresh token success [access token valid]', async () => {
+  const accessToken = jwt.sign({ id: 1, roles: ['user'], type: 'LOGIN' }, ENV.ACCESS_TOKEN_SECRET, {
+    expiresIn: '15m',
+  });
+  const refreshToken = jwt.sign(
+    { id: 1, roles: ['user'], type: 'LOGIN' },
+    ENV.REFRESH_TOKEN_SECRET,
+    { expiresIn: '1d' }
+  );
+  await UserLoginHistory.create({
+    userId: 1,
+    accessToken: accessToken,
+    refreshToken,
+    ipAddress: 'ipAddress',
+    userAgent: 'userAgent',
+  });
+  let command = new UserRefreshTokenCommand(refreshToken, {
+    ipAddress: 'ipAddress',
+    userAgent: 'userAgent',
+  });
+
+  const newAccessToken = (await mediator.send(command)) as string;
+  const { id, roles, type } = await decodeAccessToken(newAccessToken);
+
+  expect(id).toBe(1);
+  expect(roles).toEqual(['user']);
+  expect(type).toBe('LOGIN');
+
+  const loginHistories = await UserLoginHistory.findAll({ where: { refreshToken } });
+  expect(loginHistories.length).toBe(1);
+  expect(loginHistories[0].id).toBe(1);
+  expect(loginHistories[0].userId).toBe(1);
+  expect(loginHistories[0].ipAddress).toBe('ipAddress');
+  expect(loginHistories[0].userAgent).toBe('userAgent');
+  expect(loginHistories[0].accessToken).toBe(accessToken);
+  expect(loginHistories[0].accessToken).toBe(newAccessToken);
+  expect(loginHistories[0].refreshToken).toBe(refreshToken);
 });

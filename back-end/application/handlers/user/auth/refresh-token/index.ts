@@ -1,4 +1,9 @@
-import { generateTokens, decodeRefreshToken, TokenParam } from '@application/common/utils';
+import {
+  generateTokens,
+  decodeRefreshToken,
+  TokenParam,
+  decodeAccessToken,
+} from '@application/common/utils';
 import { BadRequestError, ForbiddenError } from '@application/common/exceptions';
 import {
   RegisterHandler,
@@ -29,12 +34,25 @@ export class UserRefreshTokenCommandHandler
   async handle(command: UserRefreshTokenCommand): Promise<string> {
     const loginHis = await UserLoginHistory.findOne({
       where: { refreshToken: command.refreshToken },
-      attributes: ['userId'],
+      attributes: ['userId', 'accessToken', 'ipAddress', 'userAgent'],
+      order: [['id', 'DESC']],
     });
-    if (!loginHis) throw new ForbiddenError();
+    if (
+      !loginHis ||
+      loginHis.ipAddress !== command.ipAddress ||
+      loginHis.userAgent !== command.userAgent
+    )
+      throw new ForbiddenError();
+
+    // access token still valid
+    try {
+      if (loginHis.accessToken) {
+        await decodeAccessToken(loginHis.accessToken);
+        return loginHis.accessToken;
+      }
+    } catch (err) {}
 
     const { accessToken } = generateTokens(command.decoded);
-    console.log({ accessToken, length: accessToken.length });
     await UserLoginHistory.create({
       userId: loginHis.userId,
       accessToken,

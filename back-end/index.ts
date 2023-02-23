@@ -80,7 +80,8 @@ const errorLogger = (error: Error, request: Request, response: Response, next: N
 };
 app.use(errorLogger);
 
-dbContext.connect().then(async () => {
+dbContext.connect().then(async (er) => {
+  console.log(er);
   // await initializeDb();
   app.listen(ENV.PORT, () => console.log(`Server running on port ${ENV.PORT}`));
 });

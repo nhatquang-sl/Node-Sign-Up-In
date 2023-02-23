@@ -9,7 +9,7 @@
     "build": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json && shx cp -R node-sign-up-in-credentials dist/back-end",
     "build-fe": "cd ../front-end && yarn run build && shx mv build/* ../back-end/public && cd ../back-end",
     "build:heroku": "yarn run clean && yarn run build && yarn run build-fe && shx cp -R public dist/back-end",
-    "test": "set NODE_ENV=test&& jest",
+    "test": "set NODE_ENV=test&& jest --watch",
     "test-watch": "set NODE_ENV=test&& jest --watchAll",
     "start": "yarn run build && node dist/back-end/index.js"
   },

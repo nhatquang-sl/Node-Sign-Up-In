@@ -91,7 +91,10 @@ router.post('/reset-password/set-new', async (request: Request, response: Respon
 
 router.get('/refresh-token', async (request: Request, response: Response) => {
   console.log(JSON.stringify(request.cookies));
-  const command = new UserRefreshTokenCommand(request.cookies['jwt'], request);
+  const command = new UserRefreshTokenCommand(request.cookies['jwt'], {
+    ipAddress: request.ip,
+    userAgent: request.get('User-Agent'),
+  });
   response.json({ accessToken: await mediator.send(command) });
 });
 
