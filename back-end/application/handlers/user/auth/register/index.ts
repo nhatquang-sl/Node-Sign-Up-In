@@ -37,7 +37,7 @@ export class UserRegisterCommandHandler
   async handle(command: UserRegisterCommand): Promise<UserRegisterResult> {
     const { ipAddress, userAgent } = command;
     // encrypt the password
-    const salt = uuid().split('-')[0];
+    const salt = await bcrypt.genSalt();
     const password = await bcrypt.hash(command.password + salt, 10);
     const securityStamp = uuid();
 

@@ -6,8 +6,12 @@ import { getAccessToken } from '@controllers/utils';
 const router = express.Router();
 
 router.get('/sessions', async (request: Request, response: Response) => {
-  console.log(JSON.stringify(request.cookies));
-  response.json(await mediator.send(new UserGetAllSessionCommand(getAccessToken(request))));
+  const { page, size } = request.query as { page: string; size: string };
+  response.json(
+    await mediator.send(
+      new UserGetAllSessionCommand(getAccessToken(request), parseInt(page), parseInt(size))
+    )
+  );
 });
 
 export default router;
