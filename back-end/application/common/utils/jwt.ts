@@ -21,9 +21,9 @@ export const generateTokens = (
   return { accessToken, refreshToken };
 };
 
-export const decodeAccessToken = async (accessToken: string) => {
+export const decodeAccessToken = async (accessToken: string | null) => {
   return new Promise<TokenData>((resolve, reject) =>
-    jwt.verify(accessToken, ENV.ACCESS_TOKEN_SECRET, (err: any, decoded: any) => {
+    jwt.verify(accessToken ?? '', ENV.ACCESS_TOKEN_SECRET, (err: any, decoded: any) => {
       if (err) reject(err);
       resolve(decoded as TokenData);
     })
