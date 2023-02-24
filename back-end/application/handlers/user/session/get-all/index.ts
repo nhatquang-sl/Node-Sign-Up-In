@@ -32,7 +32,7 @@ export class UserGetAllSessionCommandHandler
     const { page, size } = command;
     const { count, rows } = await UserLoginHistory.findAndCountAll({
       order: [['id', 'DESC']],
-      offset: page,
+      offset: page * size,
       limit: size,
     });
     return new PaginationResult(rows, page, size, count);
