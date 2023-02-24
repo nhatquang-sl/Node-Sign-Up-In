@@ -45,7 +45,10 @@ function Main() {
   return init ? (
     <Loading />
   ) : (
-    <Container open={sideBarOpen}>
+    <Container
+      open={sideBarOpen}
+      sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}
+    >
       {headerOpen && <DrawerHeader />}
       <Routes>
         <Route element={<RequireAuth />}>
