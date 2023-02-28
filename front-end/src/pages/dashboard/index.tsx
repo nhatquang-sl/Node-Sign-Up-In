@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setHeader } from 'store/settings-slice';
 import { fetchUserSessions, getStatus, getSessions } from 'store/users-slice';
@@ -17,12 +17,14 @@ import {
 } from '@mui/material';
 import { UserSession } from 'shared/user';
 import { columns } from './type';
+import SessionDetail from './session-detail';
 
 const Dashboard = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { accessToken } = useSelector((state: RootState) => state.auth);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [sessionSelected, setSessionSelected] = useState(0);
 
   const sessionData = useSelector(getSessions);
   console.log({ sessions: sessionData });
@@ -49,6 +51,15 @@ const Dashboard = () => {
     setPage(0);
     dispatch(fetchUserSessions({ accessToken, page: 0, size: +event.target.value }));
   };
+
+  const handleSelectSession = (sessionId: number) => {
+    setSessionSelected(sessionId);
+  };
+
+  const handleDeselectSession = () => {
+    setSessionSelected(0);
+  };
+
   return (
     <Paper
       sx={{
@@ -80,11 +91,17 @@ const Dashboard = () => {
           <TableBody>
             {sessionData.sessions.map((row: UserSession) => {
               return (
-                <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
+                <TableRow
+                  hover
+                  role="checkbox"
+                  tabIndex={-1}
+                  key={row.id}
+                  onClick={() => handleSelectSession(row.id)}
+                >
                   {columns.map((column) => {
                     const value = row[column.id];
                     return (
-                      <TableCell key={column.id} align={column.align}>
+                      <TableCell key={column.id} align={column.align} sx={{ cursor: 'pointer' }}>
                         {column.format ? column.format((value ?? '').toString()) : value}
                       </TableCell>
                     );
@@ -112,6 +129,7 @@ const Dashboard = () => {
       >
         <CircularProgress color="inherit" />
       </Backdrop>
+      <SessionDetail sessionId={sessionSelected} onClose={handleDeselectSession} />
     </Paper>
   );
 };
