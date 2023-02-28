@@ -2,6 +2,7 @@ import { RootState } from './index';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import { API_ENDPOINT } from './constants';
+import { UserSession } from 'shared/user';
 
 export const apiService = axios.create({
   baseURL: API_ENDPOINT,
@@ -10,7 +11,7 @@ export const apiService = axios.create({
 
 type UsersState = {
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
-  sessions: [];
+  sessions: UserSession[];
   total: number;
   page: number;
   size: number;
@@ -70,6 +71,8 @@ export const getSessions = (state: RootState) => {
 };
 export const getStatus = (state: RootState) => state.users.status;
 export const getError = (state: RootState) => state.users.error;
+export const selectSession = (state: RootState, sessionId: number) =>
+  state.users.sessions.find((s) => s.id === sessionId);
 
 // export const {} = usersSlice.actions;
 

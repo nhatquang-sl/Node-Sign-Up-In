@@ -50,20 +50,21 @@ export interface UserForgotPasswordDto {
   updatedAt: string;
 }
 
-export type TokenData = {
-  id: number;
-  firstName: string;
-  lastName: string;
-  emailAddress: string;
-  roles: string[];
-  type: keyof typeof TokenType;
-  exp: number;
-  iat: number;
-};
-
 export enum TokenType {
   Login = 'LOGIN',
   NeedActivate = 'NEED_ACTIVATE',
   ResetPassword = 'RESET_PASSWORD',
 }
+
+export class TokenData {
+  id: number = 0;
+  firstName: string = '';
+  lastName: string = '';
+  emailAddress: string = '';
+  roles: string[] = [];
+  type: TokenType = TokenType.NeedActivate;
+  exp: number = 0;
+  iat: number = 0;
+}
+
 // export type { UserDto, UserAuthDto, UserLoginDto };
