@@ -1,31 +1,32 @@
 import { RootState } from './index';
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import { API_ENDPOINT } from './constants';
-import { UserSession } from 'shared/user';
+import { Session } from 'shared/user';
+import { PaginationDto } from 'shared/utilities/dto';
 
 export const apiService = axios.create({
   baseURL: API_ENDPOINT,
   withCredentials: true,
 });
 
-type UsersState = {
+type SessionsState = {
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
-  sessions: UserSession[];
-  total: number;
-  page: number;
-  size: number;
   error: string;
+  pagination: PaginationDto;
 };
 
-const initialState: UsersState = {
+const userSessionsAdapter = createEntityAdapter<Session>({});
+
+const initialState = userSessionsAdapter.getInitialState<SessionsState>({
   status: 'idle',
   error: '',
-  sessions: [],
-  total: 0,
-  page: 1,
-  size: 10,
-};
+  pagination: {
+    total: 0,
+    page: 1,
+    size: 10,
+  },
+});
 
 export const fetchUserSessions = createAsyncThunk(
   `user/sessions`,
@@ -43,17 +44,15 @@ export const fetchUserSessions = createAsyncThunk(
 );
 
 export const usersSlice = createSlice({
-  name: 'users',
+  name: 'userSessions',
   initialState,
   reducers: {},
   extraReducers(builder) {
     builder
       .addCase(fetchUserSessions.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.sessions = action.payload.items;
-        state.total = action.payload.total;
-        state.page = action.payload.page;
-        state.size = action.payload.size;
+        state.pagination = action.payload;
+        userSessionsAdapter.upsertMany(state, action.payload.items);
       })
       .addCase(fetchUserSessions.pending, (state, action) => {
         state.status = 'loading';
@@ -65,15 +64,14 @@ export const usersSlice = createSlice({
   },
 });
 
-export const getSessions = (state: RootState) => {
-  const { sessions, page, size, total } = state.users;
-  return { sessions, page, size, total };
-};
-export const getStatus = (state: RootState) => state.users.status;
-export const getError = (state: RootState) => state.users.error;
-export const selectSession = (state: RootState, sessionId: number) =>
-  state.users.sessions.find((s) => s.id === sessionId);
+export const getStatus = (state: RootState) => state.sessions.status;
+export const getError = (state: RootState) => state.sessions.error;
+export const getPagination = (state: RootState) => state.sessions.pagination;
 
-// export const {} = usersSlice.actions;
+export const {
+  selectAll: selectSessions,
+  selectById: selectSessionById,
+  selectIds: selectSessionIds,
+} = userSessionsAdapter.getSelectors<RootState>((state) => state.sessions);
 
 export default usersSlice.reducer;

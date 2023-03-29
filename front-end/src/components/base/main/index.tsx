@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 
 import ConsecutiveSnackBars from 'components/consecutive-snackbars';
 import Loading from 'components/loading';
@@ -65,6 +65,8 @@ function Main() {
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/register-confirm/:activationCode" element={<RegisterConfirm />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
+        {/* Catch all - redirect to home page */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <ConsecutiveSnackBars />
       <Loading />
