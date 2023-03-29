@@ -29,7 +29,7 @@ export class UserRegisterDto extends UserLoginDto {
   lastName: string;
 }
 
-export interface UserSession {
+export interface Session {
   id: number;
   userId: number;
   ipAddress: string;

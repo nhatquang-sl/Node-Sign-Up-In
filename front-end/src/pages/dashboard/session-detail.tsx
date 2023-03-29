@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { selectSessionById } from 'store/sessions-slice';
 import jwtDecode from 'jwt-decode';
 import {
   Avatar,
@@ -16,7 +17,6 @@ import {
 } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
 import { RootState } from 'store';
-import { selectSession } from 'store/users-slice';
 import { TokenData } from 'shared/user';
 import { TIMESTAMP } from 'shared/constant';
 
@@ -56,9 +56,9 @@ const DetailItem = (props: {
 };
 
 const SessionDetail = (props: SessionDetailProps) => {
-  const session = useSelector((state: RootState) => selectSession(state, props.sessionId));
   let atDecoded: TokenData = new TokenData();
   let rtDecoded: TokenData = new TokenData();
+  const session = useSelector((state: RootState) => selectSessionById(state, props.sessionId));
   if (session) {
     atDecoded = jwtDecode<TokenData>(session?.accessToken ?? '');
     rtDecoded = jwtDecode<TokenData>(session?.refreshToken ?? '');

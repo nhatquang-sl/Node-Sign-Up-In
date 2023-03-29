@@ -17,3 +17,24 @@ Redux is a global state manager that allows you manage your app state in a singl
 
 ### Install Redux Toolkit
 `yarn add @reduxjs/toolkit react-redux`
+
+## Normalization
+- Normalized state structure is a recommended approach for storing items.
+- And normalization 
+  - means no duplication of data 
+  - and it also means keeping the items stored in a lookup table by item id
+
+### [Normalized state shape](https://redux.js.org/usage/structuring-reducers/normalizing-state-shape)
+```JSON
+{
+  // The unique IDs of each item. Must be strings or numbers
+  ids: []
+  // A lookup table mapping entity IDs to the corresponding entity objects
+  entities: {
+  }
+}
+```
+- Normalized state shape is comprised of an object with an `ids` array and then a nested `entities` object that contains all of the items
+- The best part of using normalized data with Redux Toolkit is that Redux Toolkit offers a create entity adapter api and that will make your slices less complicated and easier to manage.
+- [Normalizing with createEntityAdapter](https://redux-toolkit.js.org/usage/usage-guide#normalizing-with-createentityadapter)
+- [createEntityAdapter API](https://redux-toolkit.js.org/api/createEntityAdapter)

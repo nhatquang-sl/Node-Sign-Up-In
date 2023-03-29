@@ -3,7 +3,7 @@ import counterReducer from './counter-slice';
 import settingsSlice from './settings-slice';
 import authSlice from './auth-slice';
 import snackbarSlice from './snackbar-slice';
-import usersSlice from './users-slice';
+import sessionsSlice from './sessions-slice';
 
 const store = configureStore({
   reducer: {
@@ -11,7 +11,7 @@ const store = configureStore({
     settings: settingsSlice,
     auth: authSlice,
     snackbar: snackbarSlice,
-    users: usersSlice,
+    sessions: sessionsSlice,
   },
 });
 
