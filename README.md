@@ -4,6 +4,7 @@
   - [Back End](#back-end)
   - [Front End](#front-end)
 - [Features](#features)
+  - [Login Page](/front-end/docs/features/login.md)
   - [JWT](/back-end/docs/jwt.md)
   - [Forgot Password](#forgot-password)
   - [Salt Password](/back-end/docs/salt-password.md)
@@ -16,7 +17,7 @@
 - `npm init -y`: generate `package.json`
 
 ```
-npm i typescript ts-node nodemon tsc-alias tsconfig-paths prettier shx -D
+npm i typescript ts-node nodemon tsc-alias tsconfig-paths prettier shx jest @types/jest ts-jest -D
 npm i express @types/express -S
 ```
 - `npx tsc --init`: create `tsconfig.json` for typescript compiler

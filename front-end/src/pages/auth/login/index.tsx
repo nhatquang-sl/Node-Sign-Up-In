@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { AxiosError } from 'axios';
 import {
   Container,
   Box,
@@ -23,11 +22,8 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import LANG from 'shared/lang';
 import { TokenType, validateEmailAddress, UserLoginDto } from 'shared/user';
 
-import { apiService } from 'hooks';
-
-import { RootState } from 'store';
-import { setAuth } from 'store/auth-slice';
-import { showSnackbar } from 'store/snackbar-slice';
+import { useLoginMutation } from 'store/auth-api-slice';
+import { selectAuthType } from 'store/auth-slice';
 
 interface State extends UserLoginDto {
   emailAddressError: string | undefined;
@@ -37,10 +33,10 @@ interface State extends UserLoginDto {
 
 const Login = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const auth = useSelector((state: RootState) => state.auth);
+
+  const authType = useSelector(selectAuthType);
   const location = useLocation();
-  const [loading, setLoading] = useState(false);
+  const [login, { isLoading }] = useLoginMutation();
 
   const [values, setValues] = useState<State>({
     emailAddress: process.env.REACT_APP_ENV === 'development' ? 'sunlight479@yahoo.com' : '',
@@ -51,7 +47,7 @@ const Login = () => {
   });
 
   useEffect(() => {
-    switch (auth.type) {
+    switch (authType) {
       case TokenType.Login:
         const from = location.state?.from?.pathname ?? '/';
         navigate(from, { replace: true });
@@ -60,7 +56,7 @@ const Login = () => {
         navigate('/request-activate-email', { replace: true });
         break;
     }
-  }, [auth.type, location, navigate]);
+  }, [authType, location, navigate]);
 
   const handleClickShowPassword = () => {
     setValues({
@@ -79,30 +75,13 @@ const Login = () => {
 
   const handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
-    setLoading(true);
 
     const emailAddressError = validateEmailAddress(values.emailAddress);
     const passwordError = values.password ? undefined : LANG.USER_PASSWORD_MISSING_ERROR;
     setValues({ ...values, emailAddressError, passwordError });
 
     const isValid = !emailAddressError && !passwordError;
-    if (isValid) {
-      try {
-        const res = await apiService.post(`auth/login`, values, {
-          withCredentials: true,
-        });
-
-        dispatch(setAuth(res.data.accessToken));
-      } catch (err) {
-        const res = (err as AxiosError<{ message: string }>).response;
-        const status = res?.status ?? 0;
-        if ([400, 401].includes(status)) {
-          const message = res?.data.message;
-          message && dispatch(showSnackbar(message, 'error'));
-        }
-      }
-    }
-    setLoading(false);
+    if (isValid) await login(values);
   };
 
   return (
@@ -169,7 +148,7 @@ const Login = () => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            loading={loading}
+            loading={isLoading}
           >
             Submit
           </LoadingButton>

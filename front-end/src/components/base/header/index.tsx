@@ -75,6 +75,7 @@ function Header() {
       await apiService.get('/auth/log-out');
       localStorage.clear();
     } catch (err) {}
+    window.location.reload();
     dispatch(setLoading(false));
   };
 
