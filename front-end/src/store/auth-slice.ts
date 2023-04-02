@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import jwtDecode from 'jwt-decode';
-import { TokenData } from 'shared/user';
+import { TokenData, TokenType } from 'shared/user';
+import { RootState } from 'store';
 
 type AuthState = {
   id: number;
@@ -9,7 +10,7 @@ type AuthState = {
   lastName: string;
   emailAddress: string;
   roles: string[];
-  type: string;
+  type: TokenType | null;
   exp: number;
   iat: number;
 };
@@ -21,7 +22,7 @@ const initialState: AuthState = {
   lastName: '',
   emailAddress: '',
   roles: [],
-  type: '',
+  type: null,
   exp: 0,
   iat: 0,
 };
@@ -48,5 +49,6 @@ export const authSlice = createSlice({
 });
 
 export const { setAuth } = authSlice.actions;
+export const selectAuthType = (state: RootState) => state.auth.type;
 
 export default authSlice.reducer;
