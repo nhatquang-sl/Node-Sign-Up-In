@@ -1,13 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setHeader } from 'store/settings-slice';
-import {
-  fetchUserSessions,
-  getStatus,
-  getPagination,
-  selectSessionIds,
-} from 'store/sessions-slice';
-import { AppDispatch, RootState } from 'store';
 import {
   Backdrop,
   CircularProgress,
@@ -20,38 +12,44 @@ import {
   TablePagination,
   TableRow,
 } from '@mui/material';
+import { AppDispatch } from 'store';
+import { setHeader } from 'store/settings-slice';
+import sessionsApi from 'store/sessions-api';
+import { getPagination, selectSessions, setSessionsPage } from 'store/sessions-slice';
+import { PAGE } from 'shared/utilities';
 import { columns } from './type';
 import SessionRow from './session-row';
 
 const Dashboard = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { accessToken } = useSelector((state: RootState) => state.auth);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const sessionIds = useSelector(selectSessionIds);
+  const sessions = useSelector(selectSessions);
   const pagination = useSelector(getPagination);
-  const sessionsStatus = useSelector(getStatus);
+  const [isLoading, setIsLoading] = useState(false);
+
+  console.log({ isLoading, sessions });
+  const fetchSessions = useCallback(
+    async (page: number = PAGE.START, size: number = PAGE.SIZE) => {
+      setIsLoading(true);
+      const result = await dispatch(sessionsApi.endpoints.getSessions.initiate({ page, size }));
+      if (result.data) dispatch(setSessionsPage(result.data));
+      setIsLoading(false);
+    },
+    [dispatch]
+  );
 
   useEffect(() => {
+    console.log('Dashboard');
     dispatch(setHeader(true));
-  }, [dispatch]);
 
-  useEffect(() => {
-    if (sessionsStatus === 'idle') {
-      dispatch(fetchUserSessions({ accessToken, page: page, size: rowsPerPage }));
-    }
-  }, [sessionsStatus, accessToken, page, rowsPerPage, dispatch]);
+    fetchSessions();
+  }, [dispatch, fetchSessions]);
 
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-    console.log({ newPage });
-    dispatch(fetchUserSessions({ accessToken, page: newPage, size: rowsPerPage }));
+  const handleChangePage = async (_: any, newPage: number) => {
+    await fetchSessions(newPage, pagination.size);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-    dispatch(fetchUserSessions({ accessToken, page: 0, size: +event.target.value }));
+  const handleChangeRowsPerPage = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    await fetchSessions(0, +event.target.value);
   };
 
   return (
@@ -83,8 +81,8 @@ const Dashboard = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {sessionIds.map((id) => {
-              return <SessionRow key={id} sessionId={id} />;
+            {sessions.map((session) => {
+              return <SessionRow key={session.id} session={session} />;
             })}
           </TableBody>
         </Table>
@@ -92,9 +90,9 @@ const Dashboard = () => {
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={pagination.total}
-        rowsPerPage={rowsPerPage}
-        page={page}
+        count={pagination?.total}
+        rowsPerPage={pagination.size}
+        page={pagination.page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
         sx={{ alignSelf: 'normal' }}
@@ -102,7 +100,7 @@ const Dashboard = () => {
 
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1, position: 'absolute' }}
-        open={sessionsStatus === 'loading'}
+        open={isLoading}
       >
         <CircularProgress color="inherit" />
       </Backdrop>

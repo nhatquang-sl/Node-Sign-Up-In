@@ -19,27 +19,26 @@ import { ForgotPassword, ResetPassword } from 'pages/auth/password';
 import RequireAuth from './require-auth';
 import { RootState } from 'store';
 import { setLoading } from 'store/settings-slice';
-
-import useRefreshToken from 'hooks/use-refresh-token';
+import { useRefreshTokenMutation } from 'store/auth-api-slice';
 
 function Main() {
   console.log('main');
   const location = useLocation();
   const dispatch = useDispatch();
-  const { refresh } = useRefreshToken();
+  const [refreshToken] = useRefreshTokenMutation();
   const { headerOpen, sideBarOpen } = useSelector((state: RootState) => state.settings);
   const [init, setInit] = useState(true);
 
   useEffect(() => {
     dispatch(setLoading(true));
-    const refreshToken = async () => {
-      if (!location.pathname.includes('register-confirm')) await refresh();
+    const refreshTokenAsync = async () => {
+      if (!location.pathname.includes('register-confirm')) await refreshToken();
 
       dispatch(setLoading(false));
       setInit(false);
     };
 
-    refreshToken();
+    refreshTokenAsync();
   }, [dispatch]);
 
   return init ? (
