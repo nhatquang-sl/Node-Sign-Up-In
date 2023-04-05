@@ -1,14 +1,9 @@
 import { apiSlice } from 'store/api-slice';
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AxiosError } from 'axios';
-import { apiService } from 'hooks/use-api-service';
-import jwtDecode from 'jwt-decode';
-import { TokenData, UserAuthDto, UserLoginDto } from 'shared/user';
-import { RootState } from 'store';
+import { UserAuthDto, UserLoginDto } from 'shared/user';
 import { setAuth } from 'store/auth-slice';
 import { showSnackbar } from './snackbar-slice';
 import { QueryFulfilledRejectionReason } from '@reduxjs/toolkit/dist/query/endpointDefinitions';
-import { BaseQueryFn, FetchBaseQueryError } from '@reduxjs/toolkit/dist/query';
+import { BaseQueryFn } from '@reduxjs/toolkit/dist/query';
 
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -18,7 +13,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
         method: 'POST',
         body: userLogin,
       }),
-      async onQueryStarted(userLogin, { dispatch, queryFulfilled }) {
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
           dispatch(setAuth(data.accessToken));
@@ -38,8 +33,14 @@ export const authApiSlice = apiSlice.injectEndpoints({
     refreshToken: builder.mutation<UserAuthDto, void>({
       query: () => ({
         url: '/auth/refresh-token',
-        method: 'POST',
+        method: 'GET',
       }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setAuth(data.accessToken));
+        } catch (err) {}
+      },
     }),
   }),
 });

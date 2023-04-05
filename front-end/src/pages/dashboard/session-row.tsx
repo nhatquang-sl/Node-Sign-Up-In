@@ -1,21 +1,19 @@
 import { useState } from 'react';
 import { TableCell, TableRow } from '@mui/material';
+import { Session } from 'shared/user';
 import { columns } from './type';
 import SessionDetail from './session-detail';
-import { selectSessionById } from 'store/sessions-slice';
-import { useSelector } from 'react-redux';
-import { RootState } from 'store';
 
-const SessionRow = (props: { sessionId: any }) => {
-  const session = useSelector((state: RootState) => selectSessionById(state, props.sessionId));
-  const [sessionSelected, setSessionSelected] = useState(0);
+const SessionRow = (props: { session: Session }) => {
+  const { session } = props;
+  const [openDetail, setOpenDetail] = useState(false);
 
   const handleSelectSession = () => {
-    setSessionSelected(props.sessionId);
+    setOpenDetail(true);
   };
 
   const handleDeselectSession = () => {
-    setSessionSelected(0);
+    setOpenDetail(false);
   };
 
   return (
@@ -24,7 +22,7 @@ const SessionRow = (props: { sessionId: any }) => {
         hover
         role="checkbox"
         tabIndex={-1}
-        key={props.sessionId}
+        key={session.id}
         onClick={() => handleSelectSession()}
       >
         {session &&
@@ -37,7 +35,7 @@ const SessionRow = (props: { sessionId: any }) => {
             );
           })}
       </TableRow>
-      <SessionDetail sessionId={sessionSelected} onClose={handleDeselectSession} />
+      <SessionDetail session={session} open={openDetail} onClose={handleDeselectSession} />
     </>
   );
 };
