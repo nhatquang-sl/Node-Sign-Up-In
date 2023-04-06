@@ -1,4 +1,4 @@
-import { apiSlice } from 'store/api-slice';
+import { appApi } from 'store/app-api';
 import { configureStore } from '@reduxjs/toolkit';
 import counterReducer from './counter-slice';
 import settingsSlice from './settings-slice';
@@ -13,11 +13,11 @@ const store = configureStore({
     auth: authReducer,
     snackbar: snackbarSlice,
     sessions: sessionsReducer,
-    [apiSlice.reducerPath]: apiSlice.reducer,
+    [appApi.reducerPath]: appApi.reducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({}).concat([apiSlice.middleware]),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({}).concat([appApi.middleware]),
   devTools: process.env.NODE_ENV === 'development',
 });
 

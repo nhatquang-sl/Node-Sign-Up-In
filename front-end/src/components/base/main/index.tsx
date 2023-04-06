@@ -19,7 +19,7 @@ import { ForgotPassword, ResetPassword } from 'pages/auth/password';
 import RequireAuth from './require-auth';
 import { RootState } from 'store';
 import { setLoading } from 'store/settings-slice';
-import { useRefreshTokenMutation } from 'store/auth-api-slice';
+import { useRefreshTokenMutation } from 'store/auth-api';
 
 function Main() {
   console.log('main');

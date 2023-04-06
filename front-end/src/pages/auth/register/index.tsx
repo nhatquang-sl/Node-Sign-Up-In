@@ -19,18 +19,18 @@ import {
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import { validateUserRegister, UserRegisterDto, TokenType } from 'shared/user';
-import { useApiService } from 'hooks';
+import {
+  validateUserRegister,
+  UserRegisterDto,
+  UserRegisterErrorDto,
+  TokenType,
+} from 'shared/user';
 
-import { AxiosError, AxiosResponse } from 'axios';
 import { RootState } from 'store';
 import { setAuth } from 'store/auth-slice';
+import { useRegisterMutation } from 'store/auth-api';
 
-interface State extends UserRegisterDto {
-  firstNameError: string | undefined;
-  lastNameError: string | undefined;
-  emailAddressError: string | undefined;
-  passwordError: string[];
+interface State extends UserRegisterErrorDto {
   showPassword: boolean;
   submitted: boolean;
 }
@@ -38,8 +38,7 @@ interface State extends UserRegisterDto {
 const Register = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const apiService = useApiService();
-  const [submitting, setSubmitting] = useState(false);
+  const [register, { isLoading }] = useRegisterMutation();
   const auth = useSelector((state: RootState) => state.auth);
 
   const [values, setValues] = useState<State>({
@@ -47,7 +46,7 @@ const Register = () => {
     firstNameError: '',
     lastName: process.env.REACT_APP_ENV === 'development' ? 'nguyen' : '',
     lastNameError: '',
-    emailAddress: process.env.REACT_APP_ENV === 'development' ? 'sunlight479@yahoo.com' : '',
+    emailAddress: process.env.REACT_APP_ENV === 'development' ? `${Date.now()}@yopmail.com` : '',
     emailAddressError: '',
     password: process.env.REACT_APP_ENV === 'development' ? '123456x@X' : '',
     passwordError: [],
@@ -95,7 +94,6 @@ const Register = () => {
   };
 
   const handleSubmit = async (event: React.SyntheticEvent) => {
-    setSubmitting(true);
     event.preventDefault();
 
     const { firstNameError, lastNameError, emailAddressError, passwordError } =
@@ -111,27 +109,23 @@ const Register = () => {
     });
 
     if (firstNameError || lastNameError || emailAddressError || passwordError.length) {
-      setSubmitting(false);
       return;
     }
 
     try {
-      const res = await apiService.post(`auth/register`, new UserRegisterDto(values));
-      dispatch(setAuth(res.data.accessToken));
+      const res = await register(JSON.parse(JSON.stringify(new UserRegisterDto(values)))).unwrap();
+      dispatch(setAuth(res.accessToken));
     } catch (err) {
-      if (err instanceof AxiosError) {
-        const { data } = err.response as AxiosResponse<State>;
-        const { firstNameError, lastNameError, emailAddressError, passwordError } = data;
-        setValues({
-          ...values,
-          firstNameError,
-          lastNameError,
-          emailAddressError,
-          passwordError: passwordError ?? [],
-        });
-      }
+      const { firstNameError, lastNameError, emailAddressError, passwordError } =
+        err as UserRegisterErrorDto;
+      setValues({
+        ...values,
+        firstNameError,
+        lastNameError,
+        emailAddressError,
+        passwordError: passwordError ?? [],
+      });
     }
-    setSubmitting(false);
   };
 
   return (
@@ -233,7 +227,7 @@ const Register = () => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            loading={submitting}
+            loading={isLoading}
           >
             Submit
           </LoadingButton>

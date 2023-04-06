@@ -38,7 +38,7 @@ export class UserRegisterCommandHandler
     const { ipAddress, userAgent } = command;
     // encrypt the password
     const salt = await bcrypt.genSalt();
-    const password = await bcrypt.hash(command.password + salt, 10);
+    const password = await bcrypt.hash(command.password + salt, bcrypt.getRounds(salt));
     const securityStamp = uuid();
 
     // Create and store the new user

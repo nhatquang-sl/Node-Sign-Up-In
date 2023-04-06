@@ -29,6 +29,20 @@ export class UserRegisterDto extends UserLoginDto {
   lastName: string;
 }
 
+export class UserRegisterErrorDto extends UserRegisterDto {
+  constructor(obj: any) {
+    super(obj);
+    this.firstName = obj.firstName;
+    this.lastName = obj.lastName;
+  }
+  firstName: string;
+  lastName: string;
+  firstNameError: string | undefined;
+  lastNameError: string | undefined;
+  emailAddressError: string | undefined;
+  passwordError: string[] = [];
+}
+
 export interface Session {
   id: number;
   userId: number;

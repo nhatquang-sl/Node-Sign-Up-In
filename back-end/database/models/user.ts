@@ -56,7 +56,7 @@ User.init(
     },
     emailAddress: { type: DataTypes.STRING, allowNull: false },
     password: { type: DataTypes.STRING, allowNull: false },
-    salt: { type: DataTypes.STRING(8), allowNull: false },
+    salt: { type: DataTypes.STRING(30), allowNull: false },
     firstName: {
       type: DataTypes.STRING,
       allowNull: false, // allowNull defaults to true

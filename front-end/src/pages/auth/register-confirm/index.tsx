@@ -1,35 +1,30 @@
 import { useEffect } from 'react';
-import { AxiosError, AxiosResponse } from 'axios';
 import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Container, Box } from '@mui/material';
-import CircularProgress from '@mui/material/CircularProgress';
-
-import useApiService from 'hooks/use-api-service';
+import { Container, Box, CircularProgress } from '@mui/material';
 
 import { showSnackbar } from 'store/snackbar-slice';
+import { useActivateMutation } from 'store/auth-api';
 const RegisterConfirm = () => {
   const { activationCode } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const apiService = useApiService();
+  const [activate] = useActivateMutation();
 
   useEffect(() => {
     const registerConfirm = async () => {
       try {
-        await apiService.get(`auth/activate/${activationCode}`);
+        await activate(activationCode ?? '').unwrap();
         dispatch(showSnackbar('Activate your account success', 'success'));
       } catch (err) {
-        if (err instanceof AxiosError) {
-          const { data } = err.response as AxiosResponse<{ message: string }>;
-          dispatch(showSnackbar(data.message, 'error'));
-        }
+        const { message } = err as { message: string };
+        dispatch(showSnackbar(message, 'error'));
       }
       navigate('/login', { replace: true });
     };
 
     registerConfirm();
-  }, [activationCode, navigate, dispatch, apiService]);
+  }, [activationCode, navigate, dispatch]);
 
   return (
     <Container component="main" maxWidth="xs">

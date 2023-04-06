@@ -61,7 +61,7 @@ const baseQueryWithReAuth: BaseQueryFn<
   return result;
 };
 
-export const apiSlice = createApi({
+export const appApi = createApi({
   baseQuery: baseQueryWithReAuth,
   endpoints: () => ({}),
 });

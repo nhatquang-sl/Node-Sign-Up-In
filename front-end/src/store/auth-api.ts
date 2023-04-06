@@ -1,11 +1,12 @@
-import { apiSlice } from 'store/api-slice';
+import { UserRegisterDto, UserRegisterErrorDto } from 'shared/user/dto';
+import { appApi } from 'store/app-api';
 import { UserAuthDto, UserLoginDto } from 'shared/user';
 import { setAuth } from 'store/auth-slice';
 import { showSnackbar } from './snackbar-slice';
 import { QueryFulfilledRejectionReason } from '@reduxjs/toolkit/dist/query/endpointDefinitions';
 import { BaseQueryFn } from '@reduxjs/toolkit/dist/query';
 
-export const authApiSlice = apiSlice.injectEndpoints({
+export const authApi = appApi.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation<UserAuthDto, UserLoginDto>({
       query: (userLogin: UserLoginDto) => ({
@@ -42,7 +43,38 @@ export const authApiSlice = apiSlice.injectEndpoints({
         } catch (err) {}
       },
     }),
+    register: builder.mutation<UserAuthDto, UserRegisterDto>({
+      query: (registerData: UserRegisterDto) => ({
+        url: `auth/register`,
+        method: 'POST',
+        body: registerData,
+      }),
+      transformErrorResponse: (response): UserRegisterErrorDto => {
+        return response.data as UserRegisterErrorDto;
+      },
+    }),
+    sendActivateEmail: builder.mutation<any, void>({
+      query: () => ({
+        url: `auth/send-activation-email`,
+        method: 'POST',
+      }),
+    }),
+    activate: builder.mutation<void, string>({
+      query: (activationCode: string) => ({
+        url: `auth/activate/${activationCode}`,
+        method: 'GET',
+      }),
+      transformErrorResponse: (response): { message: string } => {
+        return response.data as { message: string };
+      },
+    }),
   }),
 });
 
-export const { useLoginMutation, useRefreshTokenMutation } = authApiSlice;
+export const {
+  useLoginMutation,
+  useRefreshTokenMutation,
+  useRegisterMutation,
+  useSendActivateEmailMutation,
+  useActivateMutation,
+} = authApi;
