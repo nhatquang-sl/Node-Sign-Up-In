@@ -1,11 +1,8 @@
-import { useState } from 'react';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { styled } from '@mui/material/styles';
 import { Box, Avatar, TextField, Grid } from '@mui/material';
 
-import { useAuth } from 'hooks';
-
-import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
+import { selectAuth } from 'store/auth-slice';
 
 const CssTextField = styled(TextField)({
   '& .Mui-disabled': {
@@ -17,26 +14,15 @@ const CssTextField = styled(TextField)({
   },
 });
 
-const Profile = (props: Props) => {
-  const { auth } = useAuth();
+const Profile = () => {
+  const auth = useSelector(selectAuth);
   const { firstName, lastName, emailAddress } = auth;
-
-  const [values] = useState<State>({
-    firstName: firstName,
-    firstNameError: '',
-    lastName: lastName,
-    lastNameError: '',
-    emailAddress: emailAddress,
-    emailAddressError: '',
-    password: '',
-    submitted: false,
-  });
 
   return (
     <Grid container spacing={2} justifyContent="center">
       <Grid item>
         <Avatar
-          src={`https://joeschmoe.io/api/v1/male/${values.firstName}`}
+          src={`https://joeschmoe.io/api/v1/male/${firstName}`}
           sx={{ width: 156, height: 156 }}
         />
       </Grid>
@@ -51,10 +37,7 @@ const Profile = (props: Props) => {
                 id="firstName"
                 label="First Name"
                 name="firstName"
-                value={values.firstName}
-                // onChange={handleChange('firstName')}
-                error={!!values.firstNameError?.length}
-                helperText={values.firstNameError}
+                value={firstName}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -65,10 +48,7 @@ const Profile = (props: Props) => {
                 id="lastName"
                 label="Last Name"
                 name="lastName"
-                value={values.lastName}
-                // onChange={handleChange('lastName')}
-                error={!!values.lastNameError?.length}
-                helperText={values.lastNameError}
+                value={lastName}
               />
             </Grid>
             <Grid item xs={12}>
@@ -79,7 +59,7 @@ const Profile = (props: Props) => {
                 name="email"
                 autoComplete="email"
                 disabled
-                value={values.emailAddress}
+                value={emailAddress}
               />
             </Grid>
           </Grid>
@@ -89,4 +69,4 @@ const Profile = (props: Props) => {
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Profile);
+export default Profile;
