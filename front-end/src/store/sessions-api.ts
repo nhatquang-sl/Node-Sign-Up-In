@@ -1,8 +1,8 @@
-import { apiSlice } from 'store/api-slice';
+import { appApi } from 'store/app-api';
 import { Session } from 'shared/user';
 import { PaginationWithData } from 'shared/utilities';
 
-export const sessionsApi = apiSlice.injectEndpoints({
+export const sessionsApi = appApi.injectEndpoints({
   endpoints: (builder) => ({
     // getSessions: builder.mutation<PaginationWithData<Session>, Pagination>({
     //   query: ({ page, size }: Pagination) => ({

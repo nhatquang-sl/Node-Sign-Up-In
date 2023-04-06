@@ -22,7 +22,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import LANG from 'shared/lang';
 import { TokenType, validateEmailAddress, UserLoginDto } from 'shared/user';
 
-import { useLoginMutation } from 'store/auth-api-slice';
+import { useLoginMutation } from 'store/auth-api';
 import { selectAuthType } from 'store/auth-slice';
 
 interface State extends UserLoginDto {

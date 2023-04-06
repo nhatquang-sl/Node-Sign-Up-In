@@ -1,22 +1,20 @@
-import { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Container, Box } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import { useAuth, useApiService } from 'hooks';
-
-import { Props, mapStateToProps, mapDispatchToProps } from './types';
+import { selectAuthType } from 'store/auth-slice';
+import { useSendActivateEmailMutation } from 'store/auth-api';
 import { TokenType } from 'shared/user';
 
-const RequestActivateEmail = (props: Props) => {
+const RequestActivateEmail = () => {
   const navigate = useNavigate();
-  const apiService = useApiService();
-  const [loading, setLoading] = useState(false);
-  const { auth } = useAuth();
+  const [sendActivateEmail, { isLoading }] = useSendActivateEmailMutation();
+  const authType = useSelector(selectAuthType);
 
   useEffect(() => {
-    switch (auth.type) {
+    switch (authType) {
       case TokenType.Login:
         navigate('/', { replace: true });
         break;
@@ -24,14 +22,10 @@ const RequestActivateEmail = (props: Props) => {
         navigate('/request-activate-email', { replace: true });
         break;
     }
-  }, [auth.type, navigate]);
+  }, [authType, navigate]);
 
   const handleSendActivateEmail = async () => {
-    setLoading(true);
-    try {
-      await apiService.post(`auth/send-activation-email`);
-    } catch (err) {}
-    setLoading(false);
+    await sendActivateEmail();
   };
 
   return (
@@ -43,7 +37,7 @@ const RequestActivateEmail = (props: Props) => {
           alignItems: 'center',
         }}
       >
-        <LoadingButton loading={loading} onClick={handleSendActivateEmail}>
+        <LoadingButton loading={isLoading} onClick={handleSendActivateEmail}>
           Send active link to my email
         </LoadingButton>
       </Box>
@@ -51,4 +45,4 @@ const RequestActivateEmail = (props: Props) => {
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(RequestActivateEmail);
+export default RequestActivateEmail;
