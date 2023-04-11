@@ -1,22 +1,21 @@
-import { AxiosError } from 'axios';
 import { useState, useEffect, useCallback } from 'react';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Container, Box, Avatar, Icon, Typography, TextField, Grid } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { useAuth, useApiService } from 'hooks';
-import { validateEmailAddress } from 'shared/user/validate';
 
-import { TokenType } from 'shared/user';
+import { TokenType, validateEmailAddress } from 'shared/user';
 import { FORGOT_PASSWORD_WAIT_SECONDS } from 'shared/constant';
-import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
+import { selectAuthType } from 'store/auth-slice';
+import { useForgotPasswordMutation } from 'store/auth-api';
+import { State } from './types';
 
-const ForgotPassword = (props: Props) => {
+const ForgotPassword = () => {
   const DEFAULT_COUNTDOWN = 0;
 
   const navigate = useNavigate();
-  const { auth } = useAuth();
-  const apiService = useApiService();
+  const authType = useSelector(selectAuthType);
+  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
 
   const [countdown, setCountdown] = useState(DEFAULT_COUNTDOWN);
   const [values, setValues] = useState(new State());
@@ -28,7 +27,7 @@ const ForgotPassword = (props: Props) => {
   );
 
   useEffect(() => {
-    switch (auth.type) {
+    switch (authType) {
       case TokenType.Login:
         navigate('/', { replace: true });
         break;
@@ -36,7 +35,7 @@ const ForgotPassword = (props: Props) => {
         navigate('/request-activate-email', { replace: true });
         break;
     }
-  }, [auth.type, navigate]);
+  }, [authType, navigate]);
 
   useEffect(() => {
     let seconds = calculateCountdownSeconds();
@@ -77,20 +76,14 @@ const ForgotPassword = (props: Props) => {
     });
 
     if (emailAddressError) return;
-    setValues({ ...values, submitting: true });
-    try {
-      const res = await apiService.post(`auth/reset-password/send-email`, {
-        emailAddress: values.emailAddress,
-      });
 
-      const { lastDate } = res.data;
+    try {
+      const res = await forgotPassword(values.emailAddress).unwrap();
+      const { lastDate } = res;
       setLastDate(lastDate);
-      setValues({ ...values, submitting: false });
     } catch (err) {
-      if (err instanceof AxiosError) {
-        const { message } = err.response?.data;
-        setValues((v) => ({ ...v, emailAddressError: message, submitting: false }));
-      }
+      const { message } = err as { message: string };
+      setValues((v) => ({ ...v, emailAddressError: message }));
     }
   };
 
@@ -134,8 +127,8 @@ const ForgotPassword = (props: Props) => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            loading={values.submitting || countdown > DEFAULT_COUNTDOWN}
-            loadingPosition={values.submitting ? 'center' : 'start'}
+            loading={isLoading || countdown > DEFAULT_COUNTDOWN}
+            loadingPosition={isLoading ? 'center' : 'start'}
             startIcon={<div></div>}
           >
             {countdown > DEFAULT_COUNTDOWN ? countdown : 'Submit'}
@@ -146,4 +139,4 @@ const ForgotPassword = (props: Props) => {
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ForgotPassword);
+export default ForgotPassword;

@@ -1,4 +1,3 @@
-import { AxiosError } from 'axios';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -18,28 +17,28 @@ import LoadingButton from '@mui/lab/LoadingButton';
 
 import LANG from 'shared/lang';
 import { validatePassword } from 'shared/user/validate';
-import { useApiService } from 'hooks';
+
 import { showSnackbar } from 'store/snackbar-slice';
+import { useResetPasswordMutation } from 'store/auth-api';
 
 class State {
   password: string = '';
   passwordError: string[] = [];
   showPassword: boolean = false;
   submitted: boolean = false;
-  submitting: boolean = false;
 }
 
 const ResetPassword = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const apiService = useApiService();
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
+
   const { token } = useParams();
   const [values, setValues] = useState<State>({
     password: process.env.REACT_APP_ENV === 'development' ? '123456x@X' : '',
     passwordError: [],
     showPassword: false,
     submitted: false,
-    submitting: false,
   });
 
   const handleChange = (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,22 +67,16 @@ const ResetPassword = () => {
     setValues({ ...values, submitted: true, passwordError });
 
     if (passwordError.length) return;
-    setValues({ ...values, submitted: true, submitting: true });
 
     try {
-      await apiService.post(`auth/reset-password/set-new`, {
-        token,
-        password: values.password,
-      });
-      setValues({ ...values, submitting: false });
+      await resetPassword({ token: token ?? '', password: values.password }).unwrap();
+
       dispatch(showSnackbar(LANG.USER_RESET_PASSWORD_SUCCESS, 'success'));
       navigate('/login', { replace: true });
     } catch (err) {
-      if (err instanceof AxiosError) {
-        const { message, passwordError } = err.response?.data;
-        message && dispatch(showSnackbar(message, 'error'));
-        setValues({ ...values, submitting: false, passwordError: passwordError ?? [] });
-      }
+      const { message, passwordError } = err as { message: string; passwordError: string[] };
+      message && dispatch(showSnackbar(message, 'error'));
+      setValues({ ...values, passwordError: passwordError ?? [] });
     }
   };
 
@@ -140,7 +133,7 @@ const ResetPassword = () => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            loading={values.submitting}
+            loading={isLoading}
           >
             Submit
           </LoadingButton>

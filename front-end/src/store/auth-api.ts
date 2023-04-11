@@ -68,6 +68,26 @@ export const authApi = appApi.injectEndpoints({
         return response.data as { message: string };
       },
     }),
+    forgotPassword: builder.mutation<{ lastDate: number }, string>({
+      query: (emailAddress: string) => ({
+        url: `auth/reset-password/send-email`,
+        method: 'POST',
+        body: { emailAddress },
+      }),
+      transformErrorResponse: (response): { message: string } => {
+        return response.data as { message: string };
+      },
+    }),
+    resetPassword: builder.mutation<void, { token: string; password: string }>({
+      query: (req: { token: string; password: string }) => ({
+        url: `auth/reset-password/set-new`,
+        method: 'POST',
+        body: req,
+      }),
+      transformErrorResponse: (response): { message: string; passwordError: string[] } => {
+        return response.data as { message: string; passwordError: string[] };
+      },
+    }),
   }),
 });
 
@@ -77,4 +97,6 @@ export const {
   useRegisterMutation,
   useSendActivateEmailMutation,
   useActivateMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
 } = authApi;
