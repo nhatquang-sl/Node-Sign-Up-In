@@ -4,8 +4,9 @@ import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 // Import your own reducer
-import settings from 'store/settings/reducer';
-import auth from 'store/auth/reducer';
+import { appApi } from 'store/app-api';
+import settings from 'store/settings-slice';
+import auth from 'store/auth-slice';
 
 function render(
   ui,
@@ -15,7 +16,7 @@ function render(
       reducer: { settings, auth },  
       middleware: (getDefaultMiddleware) => getDefaultMiddleware({ 
         immutableCheck: false,
-        serializableCheck: false,}),
+        serializableCheck: false,}).concat(appApi.middleware),
       preloadedState }),
     ...renderOptions
   } = {}
