@@ -27,12 +27,6 @@ export type PositionProps = {
   positions: Position[];
 };
 
-export type OpenOrdersProps = {
-  orders: OpenOrder[];
-  cancel: (orderId: number) => Promise<number>;
-  cancelAll: () => Promise<void>;
-};
-
 export type IndicatorsProps = {
   indicators: Indicator[];
   currentPrice: number;
