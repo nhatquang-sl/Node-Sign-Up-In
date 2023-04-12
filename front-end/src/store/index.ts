@@ -5,6 +5,7 @@ import settingsSlice from './settings-slice';
 import authReducer from './auth-slice';
 import snackbarSlice from './snackbar-slice';
 import sessionsReducer from './sessions-slice';
+import bnbReducer from './bnb-slice';
 
 const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ const store = configureStore({
     auth: authReducer,
     snackbar: snackbarSlice,
     sessions: sessionsReducer,
+    bnb: bnbReducer,
     [appApi.reducerPath]: appApi.reducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   TableContainer,
   Table,
@@ -11,11 +10,17 @@ import {
 import LoadingButton from '@mui/lab/LoadingButton';
 import { round3Dec, formatDateNumber } from 'shared/utilities';
 import { OpenOrder } from 'shared/bnb';
-import { OpenOrdersProps } from './types';
+import { selectCancelling, selectOpenOrders, selectSymbol } from 'store/bnb-slice';
+import { useSelector } from 'react-redux';
+import { useCancelAllOrdersMutation, useCancelOrderMutation } from 'store/bnb-api';
 
-const OpenOrders = (props: OpenOrdersProps) => {
-  const [cancelling, setCancelling] = useState<number[]>([]);
-  const [cancellingAll, setCancellingAll] = useState(false);
+const OpenOrders = () => {
+  const symbol = useSelector(selectSymbol);
+  const openOrders = useSelector(selectOpenOrders);
+  const { cancellingAll, cancellingOrderIds: cancelling } = useSelector(selectCancelling);
+
+  const [cancelOrder] = useCancelOrderMutation();
+  const [cancelAllOrders] = useCancelAllOrdersMutation();
 
   const getPrice = (p: OpenOrder) => {
     let price = p.price;
@@ -28,15 +33,11 @@ const OpenOrders = (props: OpenOrdersProps) => {
   };
 
   const handleCancelAll = async () => {
-    setCancellingAll(true);
-    await props.cancelAll();
-    setCancellingAll(false);
+    await cancelAllOrders(symbol);
   };
 
   const handleCancel = async (orderId: number) => {
-    setCancelling([...cancelling, orderId]);
-    await props.cancel(orderId);
-    setCancelling(cancelling.filter((x) => x !== orderId));
+    await cancelOrder({ symbol, orderId });
   };
 
   return (
@@ -57,7 +58,7 @@ const OpenOrders = (props: OpenOrdersProps) => {
                 aria-label="delete"
                 size="small"
                 sx={{ textTransform: 'none' }}
-                disabled={!props.orders.length}
+                disabled={!openOrders.length}
                 loading={cancellingAll}
                 onClick={() => handleCancelAll()}
               >
@@ -67,40 +68,42 @@ const OpenOrders = (props: OpenOrdersProps) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.orders
-            .sort((a: OpenOrder, b: OpenOrder) => b.price - a.price)
-            .map((p: OpenOrder) => {
-              return (
-                <TableRow
-                  key={p.orderId}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                >
-                  <TableCell>{formatDateNumber(p.time)}</TableCell>
-                  <TableCell>{p.symbol}</TableCell>
-                  <TableCell align="right">{p.origType}</TableCell>
-                  <TableCell
-                    align="right"
-                    sx={{ color: p.side === 'BUY' ? 'buy.main' : 'sell.main' }}
+          {openOrders.length &&
+            openOrders
+              .slice()
+              .sort((a: OpenOrder, b: OpenOrder) => b.price - a.price)
+              .map((p: OpenOrder) => {
+                return (
+                  <TableRow
+                    key={p.orderId}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
-                    {p.side}
-                  </TableCell>
-                  <TableCell align="right">{getPrice(p)}</TableCell>
-                  <TableCell align="right">{round3Dec(p.origQty * p.price)}</TableCell>
-                  <TableCell align="right">{round3Dec(p.origQty)}</TableCell>
-                  {/* <TableCell align="right">{round3Dec(p.executedQty)}</TableCell> */}
-                  <TableCell align="right">
-                    <LoadingButton
-                      size="small"
-                      loading={cancelling.includes(p.orderId) || cancellingAll}
-                      sx={{ textTransform: 'none' }}
-                      onClick={() => handleCancel(p.orderId)}
+                    <TableCell>{formatDateNumber(p.time)}</TableCell>
+                    <TableCell>{p.symbol}</TableCell>
+                    <TableCell align="right">{p.origType}</TableCell>
+                    <TableCell
+                      align="right"
+                      sx={{ color: p.side === 'BUY' ? 'buy.main' : 'sell.main' }}
                     >
-                      Cancel
-                    </LoadingButton>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+                      {p.side}
+                    </TableCell>
+                    <TableCell align="right">{getPrice(p)}</TableCell>
+                    <TableCell align="right">{round3Dec(p.origQty * p.price)}</TableCell>
+                    <TableCell align="right">{round3Dec(p.origQty)}</TableCell>
+                    {/* <TableCell align="right">{round3Dec(p.executedQty)}</TableCell> */}
+                    <TableCell align="right">
+                      <LoadingButton
+                        size="small"
+                        loading={cancelling.includes(p.orderId) || cancellingAll}
+                        sx={{ textTransform: 'none' }}
+                        onClick={() => handleCancel(p.orderId)}
+                      >
+                        Cancel
+                      </LoadingButton>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
         </TableBody>
       </Table>
     </TableContainer>
