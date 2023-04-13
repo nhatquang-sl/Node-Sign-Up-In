@@ -1,5 +1,5 @@
 import { appApi } from 'store/app-api';
-import { OpenOrder, Position } from 'shared/bnb';
+import { Balance, OpenOrder, Position } from 'shared/bnb';
 
 export const bnbApi = appApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -45,6 +45,12 @@ export const bnbApi = appApi.injectEndpoints({
         method: 'DELETE',
       }),
     }),
+    getUsdtBalance: builder.mutation<Balance[], void>({
+      query: () => ({
+        url: 'bnb/balance',
+        method: 'GET',
+      }),
+    }),
   }),
 });
 
@@ -54,4 +60,5 @@ export const {
   useGetOpenOrdersQuery,
   useCancelOrderMutation,
   useCancelAllOrdersMutation,
+  useGetUsdtBalanceMutation,
 } = bnbApi;

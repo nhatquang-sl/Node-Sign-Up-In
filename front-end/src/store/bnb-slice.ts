@@ -3,23 +3,17 @@ import { OpenOrder } from 'shared/bnb';
 import { RootState } from 'store';
 import { bnbApi } from './bnb-api';
 
-type BnbState = {
-  symbol: string;
-  side: string;
-  listenKey: string;
-  openOrders: OpenOrder[];
-  cancellingOrderIds: number[];
-  cancellingAll: boolean;
-};
+class BnbState {
+  symbol: string = localStorage.orderSymbol ?? 'nearusdt';
+  side: string = localStorage.orderSide ?? 'buy';
+  usdtBalance: number = 0;
+  listenKey: string = '';
+  openOrders: OpenOrder[] = [];
+  cancellingOrderIds: number[] = [];
+  cancellingAll: boolean = false;
+}
 
-const initialState: BnbState = {
-  symbol: localStorage.orderSymbol ?? 'nearusdt',
-  side: localStorage.orderSide ?? 'buy',
-  listenKey: '',
-  openOrders: [],
-  cancellingOrderIds: [],
-  cancellingAll: false,
-};
+const initialState = JSON.parse(JSON.stringify(new BnbState())) as BnbState;
 
 export const bnbSlice = createSlice({
   name: 'bnb',
@@ -58,6 +52,9 @@ export const bnbSlice = createSlice({
     builder.addMatcher(bnbApi.endpoints.cancelAllOrders.matchRejected, (state) => {
       state.cancellingAll = false;
     });
+    builder.addMatcher(bnbApi.endpoints.getUsdtBalance.matchFulfilled, (state, { payload }) => {
+      state.usdtBalance = payload.filter((x) => x.asset === 'USDT')[0].availableBalance;
+    });
   },
 });
 
@@ -69,5 +66,6 @@ export const selectCancelling = (state: RootState) => ({
   cancellingAll: state.bnb.cancellingAll,
   cancellingOrderIds: state.bnb.cancellingOrderIds,
 });
+export const selectUsdtBalance = (state: RootState) => state.bnb.usdtBalance;
 
 export default bnbSlice.reducer;
