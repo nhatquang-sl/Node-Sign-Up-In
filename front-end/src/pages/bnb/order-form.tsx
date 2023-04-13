@@ -12,9 +12,15 @@ import {
   MenuItem,
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { OrderFormProps } from './types';
 import { round2Dec } from 'shared/utilities';
-import { selectSide, selectSymbol, selectUsdtBalance, setSide, setSymbol } from 'store/bnb-slice';
+import {
+  selectEstLiqAndEntry,
+  selectSide,
+  selectSymbol,
+  selectUsdtBalance,
+  setSide,
+  setSymbol,
+} from 'store/bnb-slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useCreateOrderMutation, useGetUsdtBalanceMutation } from 'store/bnb-api';
 import { Order, OrderSide } from 'shared/bnb';
@@ -42,20 +48,22 @@ const SYMBOLS = [
   },
 ];
 
-const OrderForm = (props: OrderFormProps) => {
+const OrderForm = () => {
   const dispatch = useDispatch();
-  const [price, setPrice] = useState('');
-  const [size, setSize] = useState(localStorage.orderSize ?? '');
   const symbol = useSelector(selectSymbol);
   const side = useSelector(selectSide);
   const usdtBalance = useSelector(selectUsdtBalance);
+  const est = useSelector(selectEstLiqAndEntry);
+  console.log({ est });
+  const [price, setPrice] = useState(est.liq);
+  const [size, setSize] = useState(localStorage.orderSize ?? '');
 
   const [getUsdtBalance] = useGetUsdtBalanceMutation();
   const [createOrder, { isLoading }] = useCreateOrderMutation();
 
   useEffect(() => {
-    setPrice(props.liqEstimate + '');
-  }, [props.liqEstimate]);
+    setPrice(est.liq);
+  }, [est.liq]);
 
   const handleSelectChange = (event: SelectChangeEvent) => {
     let value = event.target.value;
@@ -74,7 +82,7 @@ const OrderForm = (props: OrderFormProps) => {
     console.log(value, event.target.name);
     switch (event.target.name) {
       case 'price':
-        setPrice(value);
+        setPrice(parseFloat(value));
         break;
       case 'size':
         localStorage.orderSize = value;
@@ -87,7 +95,7 @@ const OrderForm = (props: OrderFormProps) => {
     try {
       await createOrder({
         symbol: symbol.toUpperCase(),
-        price: parseFloat(price),
+        price: price,
         quantity: parseFloat(size),
         side: side.toUpperCase(),
       } as Order);
@@ -97,7 +105,7 @@ const OrderForm = (props: OrderFormProps) => {
 
   const enableSubmit = () => {
     try {
-      return parseFloat(price) > 0 && parseFloat(size) > 0;
+      return price > 0 && parseFloat(size) > 0;
     } catch (err) {
       return false;
     }
@@ -121,8 +129,8 @@ const OrderForm = (props: OrderFormProps) => {
       <FormControl variant="outlined" fullWidth size="small" margin="dense">
         <InputLabel>Side</InputLabel>
         <Select label="Side" name="side" value={side} onChange={handleSelectChange}>
-          <MenuItem value={'buy'}>Long</MenuItem>
-          <MenuItem value={'sell'}>Short</MenuItem>
+          <MenuItem value={OrderSide.BUY}>Long</MenuItem>
+          <MenuItem value={OrderSide.SELL}>Short</MenuItem>
         </Select>
       </FormControl>
       <FormControl variant="outlined" fullWidth size="small" margin="dense">
@@ -144,7 +152,6 @@ const OrderForm = (props: OrderFormProps) => {
           type="number"
           value={size}
           onChange={handleChange}
-          endAdornment={<InputAdornment position="end">USDT</InputAdornment>}
         />
       </FormControl>
       <Stack direction="row" justifyContent="space-between" sx={{ paddingTop: 1 }}>
@@ -160,6 +167,15 @@ const OrderForm = (props: OrderFormProps) => {
           {side === OrderSide.BUY ? 'Buy/Long' : 'Sell/Short'}
         </LoadingButton>
       </Stack>
+      <FormControl variant="outlined" fullWidth size="small" margin="dense">
+        <InputLabel>Entry</InputLabel>
+        <OutlinedInput
+          label="Entry"
+          value={est.entry}
+          disabled
+          endAdornment={<InputAdornment position="end">USDT</InputAdornment>}
+        />
+      </FormControl>
     </Box>
   );
 };

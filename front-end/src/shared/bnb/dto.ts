@@ -169,14 +169,14 @@ export class Balance {
   }
 }
 
+export enum OrderSide {
+  BUY = 'BUY',
+  SELL = 'SELL',
+}
+
 export class Order {
   symbol: string = '';
   price: number = 0;
   quantity: number = 0;
   side: OrderSide = OrderSide.BUY;
-}
-
-export enum OrderSide {
-  BUY = 'BUY',
-  SELL = 'SELL',
 }
