@@ -1,5 +1,5 @@
 import { appApi } from 'store/app-api';
-import { Balance, OpenOrder, Position } from 'shared/bnb';
+import { Balance, OpenOrder, Order, Position } from 'shared/bnb';
 
 export const bnbApi = appApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -7,6 +7,13 @@ export const bnbApi = appApi.injectEndpoints({
       query: () => ({
         url: 'bnb/listenKey',
         method: 'POST',
+      }),
+    }),
+    createOrder: builder.mutation<void, Order>({
+      query: (order: Order) => ({
+        url: 'bnb/order',
+        method: 'POST',
+        body: order,
       }),
     }),
     getPositions: builder.query<Position[], { symbol: string; side: string }>({
@@ -56,6 +63,7 @@ export const bnbApi = appApi.injectEndpoints({
 
 export const {
   useCreateListenKeyMutation,
+  useCreateOrderMutation,
   useGetPositionsQuery,
   useGetOpenOrdersQuery,
   useCancelOrderMutation,

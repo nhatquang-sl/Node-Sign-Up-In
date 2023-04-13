@@ -35,10 +35,4 @@ export type IndicatorsProps = {
 export type OrderFormProps = {
   entryEstimate: number;
   liqEstimate: number;
-  usdtAvailable: number;
-  side: 'buy' | 'sell';
-  symbol: string;
-  onSuccess(order: OpenOrder): void;
-  onChangeSide(side: string): void;
-  onChangeSymbol(symbol: string): void;
 };

@@ -1,3 +1,4 @@
+import { OrderSide } from './../shared/bnb/dto';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { OpenOrder } from 'shared/bnb';
 import { RootState } from 'store';
@@ -5,7 +6,7 @@ import { bnbApi } from './bnb-api';
 
 class BnbState {
   symbol: string = localStorage.orderSymbol ?? 'nearusdt';
-  side: string = localStorage.orderSide ?? 'buy';
+  side: OrderSide = localStorage.orderSide ?? OrderSide.BUY;
   usdtBalance: number = 0;
   listenKey: string = '';
   openOrders: OpenOrder[] = [];
@@ -21,6 +22,11 @@ export const bnbSlice = createSlice({
   reducers: {
     setSymbol: (state: BnbState, action: PayloadAction<string>) => {
       state.symbol = action.payload;
+      localStorage.orderSymbol = action.payload;
+    },
+    setSide: (state: BnbState, action: PayloadAction<OrderSide>) => {
+      state.side = action.payload;
+      localStorage.orderSide = action.payload;
     },
     setListenKey: (state: BnbState, action: PayloadAction<string>) => {
       state.listenKey = action.payload;
@@ -58,8 +64,9 @@ export const bnbSlice = createSlice({
   },
 });
 
-export const { setSymbol, setListenKey } = bnbSlice.actions;
+export const { setSymbol, setSide, setListenKey } = bnbSlice.actions;
 export const selectSymbol = (state: RootState) => state.bnb.symbol;
+export const selectSide = (state: RootState) => state.bnb.side;
 export const selectListenKey = (state: RootState) => state.bnb.listenKey;
 export const selectOpenOrders = (state: RootState) => state.bnb.openOrders;
 export const selectCancelling = (state: RootState) => ({

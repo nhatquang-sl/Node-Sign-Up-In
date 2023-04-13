@@ -75,42 +75,41 @@ const OpenOrders = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {openOrders.length &&
-            openOrders
-              .slice()
-              .sort((a: OpenOrder, b: OpenOrder) => b.price - a.price)
-              .map((p: OpenOrder) => {
-                return (
-                  <TableRow
-                    key={p.orderId}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+          {openOrders
+            .slice()
+            .sort((a: OpenOrder, b: OpenOrder) => b.price - a.price)
+            .map((p: OpenOrder) => {
+              return (
+                <TableRow
+                  key={p.orderId}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                >
+                  <TableCell>{formatDateNumber(p.time)}</TableCell>
+                  <TableCell>{p.symbol}</TableCell>
+                  <TableCell align="right">{p.origType}</TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{ color: p.side === 'BUY' ? 'buy.main' : 'sell.main' }}
                   >
-                    <TableCell>{formatDateNumber(p.time)}</TableCell>
-                    <TableCell>{p.symbol}</TableCell>
-                    <TableCell align="right">{p.origType}</TableCell>
-                    <TableCell
-                      align="right"
-                      sx={{ color: p.side === 'BUY' ? 'buy.main' : 'sell.main' }}
+                    {p.side}
+                  </TableCell>
+                  <TableCell align="right">{getPrice(p)}</TableCell>
+                  <TableCell align="right">{round3Dec(p.origQty * p.price)}</TableCell>
+                  <TableCell align="right">{round3Dec(p.origQty)}</TableCell>
+                  {/* <TableCell align="right">{round3Dec(p.executedQty)}</TableCell> */}
+                  <TableCell align="right">
+                    <LoadingButton
+                      size="small"
+                      loading={cancelling.includes(p.orderId) || cancellingAll}
+                      sx={{ textTransform: 'none' }}
+                      onClick={() => handleCancel(p.orderId)}
                     >
-                      {p.side}
-                    </TableCell>
-                    <TableCell align="right">{getPrice(p)}</TableCell>
-                    <TableCell align="right">{round3Dec(p.origQty * p.price)}</TableCell>
-                    <TableCell align="right">{round3Dec(p.origQty)}</TableCell>
-                    {/* <TableCell align="right">{round3Dec(p.executedQty)}</TableCell> */}
-                    <TableCell align="right">
-                      <LoadingButton
-                        size="small"
-                        loading={cancelling.includes(p.orderId) || cancellingAll}
-                        sx={{ textTransform: 'none' }}
-                        onClick={() => handleCancel(p.orderId)}
-                      >
-                        Cancel
-                      </LoadingButton>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+                      Cancel
+                    </LoadingButton>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
         </TableBody>
       </Table>
     </TableContainer>

@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useState } from 'react';
 import useWebSocket from 'react-use-websocket';
 import _ from 'lodash';
-import { connect } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { Box, Tab } from '@mui/material';
@@ -19,37 +19,44 @@ import OrderForm from './order-form';
 import Indicators from './indicators';
 
 import { Indicator, mapStateToProps, mapDispatchToProps } from './types';
+import {
+  useCreateListenKeyMutation,
+  useGetUsdtBalanceMutation,
+  useGetOpenOrdersQuery,
+  useGetPositionsQuery,
+} from 'store/bnb-api';
+import { selectSide, selectSymbol, setSymbol } from 'store/bnb-slice';
 
 const Binance = () => {
   const navigate = useNavigate();
-  const apiService = useApiService();
+  const dispatch = useDispatch();
 
+  const leverage = 20;
   const [m5State, setM5State] = useState(new Indicator('5m'));
   const [m15State, setM15State] = useState(new Indicator('15m'));
   const [m30State, setM30State] = useState(new Indicator('30m'));
   const [h1State, setH1State] = useState(new Indicator('1h'));
   const [h4State, setH4State] = useState(new Indicator('4h'));
   const [positions, setPositions] = useState<Position[]>([]);
-  const [openOrders, setOpenOrders] = useState<OpenOrder[]>([]);
+  // const [openOrders, setOpenOrders] = useState<OpenOrder[]>([]);
   const [klineWSes, setKlineWSes] = useState<WebSocket[]>([]);
 
-  const [side, setSide] = useState(localStorage.orderSide ?? 'buy');
-  const [symbol, setSymbol] = useState(localStorage.orderSymbol ?? 'nearusdt');
+  // const [side, setSide] = useState(localStorage.orderSide ?? 'buy');
+  const symbol = useSelector(selectSymbol);
+  const side = useSelector(selectSide);
   const [curPrice, setCurPrice] = useState(0);
   const [entryEstimate, setEntryEstimate] = useState(0);
   const [liqEstimate, setLiqEstimate] = useState(0);
   const [value, setValue] = useState('1');
-  const [usdtAvailable, setUsdtAvailable] = useState(0);
+  const [createListenKey] = useCreateListenKeyMutation();
+  const { data: aa } = useGetPositionsQuery({ symbol, side });
+  const { data: openOrders } = useGetOpenOrdersQuery({ symbol, side });
+  const [getUsdtBalance] = useGetUsdtBalanceMutation();
 
   const getListenKey = useCallback(async () => {
-    const res = await apiService.post('bnb/listenKey');
-    setInterval(() => {
-      try {
-        apiService.put(`bnb/listenKey/${res.data.listenKey}`);
-      } catch (err) {}
-    }, TIMESTAMP.HOUR);
-    return `wss://fstream.binance.com/ws/${res.data.listenKey}`;
-  }, [apiService]);
+    const listenKey = await createListenKey().unwrap();
+    return `wss://fstream.binance.com/ws/${listenKey}`;
+  }, []);
   const { lastMessage } = useWebSocket(getListenKey);
 
   const estimateLiqAndEntry = useCallback(
@@ -69,9 +76,15 @@ const Binance = () => {
 
       if (positions.length || orders.length) {
         const entry = round3Dec(sizeTotal / quantityTotal);
-        let liq = round3Dec(entry - ((79 / 20) * entry) / 100);
+        console.log({ quantityTotal, sizeTotal, entry });
+        console.log(
+          entry / 100,
+          (80 * entry) / (100 * leverage),
+          entry + (56 * entry) / (100 * leverage)
+        );
+        let liq = round3Dec(entry - ((79 / leverage) * entry) / 100);
         if (side === 'sell') {
-          liq = round3Dec(entry + ((76 / 20) * entry) / 100);
+          liq = round3Dec(entry + ((76 / leverage) * entry) / 100);
         }
         console.log({ entry, liq });
         setEntryEstimate(entry);
@@ -104,12 +117,12 @@ const Binance = () => {
               price: parseFloat(json['o']['p']),
             });
 
-            setOpenOrders((orders) => orders.concat(order));
+            // setOpenOrders((orders) => orders.concat(order));
             break;
           case 'CANCELED':
           case 'TRADE':
             const orderId = parseFloat(json['o']['i']);
-            setOpenOrders((orders) => orders.filter((o) => o.orderId !== orderId));
+            // setOpenOrders((orders) => orders.filter((o) => o.orderId !== orderId));
             break;
           default:
             console.log(lastMessage?.data);
@@ -215,47 +228,41 @@ const Binance = () => {
     return indicator;
   };
 
-  const getPositions = useCallback(
-    async (symbol: string, side: string) => {
-      const res = await apiService.get<Position[]>(`bnb/positions/${symbol}`);
-      const data = res.data.filter((d) => (side === 'buy' ? d.positionAmt > 0 : d.positionAmt < 0));
+  // const getPositions = useCallback(
+  //   async (symbol: string, side: string) => {
+  //     const res = await apiService.get<Position[]>(`bnb/positions/${symbol}`);
+  //     const data = res.data.filter((d) => (side === 'buy' ? d.positionAmt > 0 : d.positionAmt < 0));
 
-      setPositions((positions) => {
-        if (positions.length === 0 && data.length !== 0) return data;
-        positions.splice(0);
-        for (const d of data) positions.push(d);
-        return positions;
-      });
-    },
-    [apiService]
-  );
+  //     setPositions((positions) => {
+  //       if (positions.length === 0 && data.length !== 0) return data;
+  //       positions.splice(0);
+  //       for (const d of data) positions.push(d);
+  //       return positions;
+  //     });
+  //   },
+  //   [apiService]
+  // );
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      getPositions(symbol, side);
-    }, 3 * TIMESTAMP.SECOND);
-    return () => clearInterval(interval);
-  }, [symbol, side, getPositions]);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     getPositions(symbol, side);
+  //   }, 3 * TIMESTAMP.SECOND);
+  //   return () => clearInterval(interval);
+  // }, [symbol, side, getPositions]);
 
-  const getOpenOrders = useCallback(
-    async (symbol: string, side: string) => {
-      const res = await apiService.get<OpenOrder[]>(`bnb/openOrders/${symbol}`);
-      setOpenOrders(
-        res.data.filter(
-          (d) =>
-            (d.side.toLocaleLowerCase() === side && d.type !== 'TAKE_PROFIT_MARKET') ||
-            (d.side.toLocaleLowerCase() !== side && d.type === 'TAKE_PROFIT_MARKET')
-        )
-      );
-    },
-    [apiService]
-  );
-
-  const getBalance = async () => {
-    const res = await apiService.get('bnb/balance');
-    // console.log(res.data.filter((x: Balance) => x.asset === 'USDT'));
-    setUsdtAvailable(res.data.filter((x: Balance) => x.asset === 'USDT')[0].availableBalance);
-  };
+  // const getOpenOrders = useCallback(
+  //   async (symbol: string, side: string) => {
+  //     const res = await apiService.get<OpenOrder[]>(`bnb/openOrders/${symbol}`);
+  //     setOpenOrders(
+  //       res.data.filter(
+  //         (d) =>
+  //           (d.side.toLocaleLowerCase() === side && d.type !== 'TAKE_PROFIT_MARKET') ||
+  //           (d.side.toLocaleLowerCase() !== side && d.type === 'TAKE_PROFIT_MARKET')
+  //       )
+  //     );
+  //   },
+  //   [apiService]
+  // );
 
   useEffect(() => {
     getAndCalculateKlines('NEARUSDT', '5m');
@@ -263,9 +270,9 @@ const Binance = () => {
     getAndCalculateKlines('NEARUSDT', '30m');
     getAndCalculateKlines('NEARUSDT', '1h');
     getAndCalculateKlines('NEARUSDT', '4h');
-    getPositions(symbol, side);
-    getOpenOrders(symbol, side);
-    getBalance();
+    // getPositions(symbol, side);
+    // getOpenOrders(symbol, side);
+    getUsdtBalance();
 
     return () => {
       klineWSes.forEach((x) => x.close());
@@ -288,39 +295,23 @@ const Binance = () => {
   }, []);
 
   useEffect(() => {
-    estimateLiqAndEntry(side, positions, openOrders);
+    estimateLiqAndEntry(side, positions, openOrders ?? []);
   }, [side, positions, openOrders, estimateLiqAndEntry]);
 
-  const handleCreateOrderSuccess = (order: OpenOrder) => {
-    getBalance();
-  };
-
-  const handleCancelOrder = async (orderId: number): Promise<number> => {
-    await apiService.delete(`bnb/order/${symbol}/${orderId}`);
-    setOpenOrders(openOrders.filter((x) => x.orderId !== orderId));
-    getBalance();
-    return orderId;
-  };
-
-  const handleCancelAllOrders = async (): Promise<void> => {
-    await apiService.delete(`bnb/all-orders/${symbol}`);
-    getBalance();
-  };
-
-  const handleChangeSide = (side: string) => {
-    console.log({ side });
-    localStorage.orderSide = side;
-    getPositions(symbol, side);
-    getOpenOrders(symbol, side);
-    setSide(side);
-  };
+  // const handleChangeSide = (side: string) => {
+  //   console.log({ side });
+  //   localStorage.orderSide = side;
+  //   // getPositions(symbol, side);
+  //   // getOpenOrders(symbol, side);
+  //   setSide(side);
+  // };
 
   const handleChangeSymbol = (symbol: string) => {
     console.log({ symbol });
     localStorage.orderSymbol = symbol;
-    getPositions(symbol, side);
-    getOpenOrders(symbol, side);
-    setSymbol(symbol);
+    // getPositions(symbol, side);
+    // getOpenOrders(symbol, side);
+    dispatch(setSymbol(symbol));
   };
 
   return (
@@ -330,16 +321,7 @@ const Binance = () => {
         currentPrice={curPrice}
       />
       <Box sx={{ display: 'flex', flexGrow: 1, paddingTop: 2 }}>
-        <OrderForm
-          usdtAvailable={usdtAvailable}
-          entryEstimate={entryEstimate}
-          liqEstimate={liqEstimate}
-          side={side}
-          symbol={symbol}
-          onChangeSide={handleChangeSide}
-          onChangeSymbol={handleChangeSymbol}
-          onSuccess={handleCreateOrderSuccess}
-        />
+        <OrderForm entryEstimate={entryEstimate} liqEstimate={liqEstimate} />
         <Box sx={{ flexGrow: 1 }}>
           <TabContext value={value}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -349,7 +331,9 @@ const Binance = () => {
                   value="1"
                 />
                 <Tab
-                  label={`Open orders${openOrders.length > 0 ? ` (${openOrders.length})` : ''}`}
+                  label={`Open orders${
+                    openOrders && openOrders.length > 0 ? ` (${openOrders.length})` : ''
+                  }`}
                   value="2"
                 />
               </TabList>
@@ -358,11 +342,7 @@ const Binance = () => {
               <Positions positions={positions} />
             </TabPanel>
             <TabPanel value="2" sx={{ padding: 0 }}>
-              <OpenOrders
-                orders={openOrders}
-                cancel={handleCancelOrder}
-                cancelAll={handleCancelAllOrders}
-              />
+              <OpenOrders />
             </TabPanel>
           </TabContext>
         </Box>
@@ -377,4 +357,4 @@ const Binance = () => {
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Binance);
+export default Binance;
