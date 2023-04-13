@@ -168,3 +168,15 @@ export class Balance {
     this.updateTime = o.updateTime;
   }
 }
+
+export class Order {
+  symbol: string = '';
+  price: number = 0;
+  quantity: number = 0;
+  side: OrderSide = OrderSide.BUY;
+}
+
+export enum OrderSide {
+  BUY = 'BUY',
+  SELL = 'SELL',
+}

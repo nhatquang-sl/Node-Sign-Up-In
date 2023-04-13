@@ -12,15 +12,47 @@ import {
   MenuItem,
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { useApiService } from 'hooks';
 import { OrderFormProps } from './types';
 import { round2Dec } from 'shared/utilities';
+import { selectSide, selectSymbol, selectUsdtBalance, setSide, setSymbol } from 'store/bnb-slice';
+import { useDispatch, useSelector } from 'react-redux';
+import { useCreateOrderMutation, useGetUsdtBalanceMutation } from 'store/bnb-api';
+import { Order, OrderSide } from 'shared/bnb';
+
+const SYMBOLS = [
+  {
+    value: 'maskusdt',
+    text: 'MASKUSDT',
+  },
+  {
+    value: 'aptusdt',
+    text: 'APTUSDT',
+  },
+  {
+    value: 'galausdt',
+    text: 'GALAUSDT',
+  },
+  {
+    value: 'nearusdt',
+    text: 'NEARUSDT',
+  },
+  {
+    value: 'c98usdt',
+    text: 'C98USDT',
+  },
+];
 
 const OrderForm = (props: OrderFormProps) => {
+  const dispatch = useDispatch();
   const [price, setPrice] = useState('');
   const [size, setSize] = useState(localStorage.orderSize ?? '');
-  const [submitting, setSubmitting] = useState(false);
-  const apiService = useApiService();
+  const symbol = useSelector(selectSymbol);
+  const side = useSelector(selectSide);
+  const usdtBalance = useSelector(selectUsdtBalance);
+
+  const [getUsdtBalance] = useGetUsdtBalanceMutation();
+  const [createOrder, { isLoading }] = useCreateOrderMutation();
+
   useEffect(() => {
     setPrice(props.liqEstimate + '');
   }, [props.liqEstimate]);
@@ -29,10 +61,10 @@ const OrderForm = (props: OrderFormProps) => {
     let value = event.target.value;
     switch (event.target.name) {
       case 'side':
-        props.onChangeSide(value);
+        dispatch(setSide(value as OrderSide));
         break;
       case 'symbol':
-        props.onChangeSymbol(value);
+        dispatch(setSymbol(value));
         break;
     }
   };
@@ -49,21 +81,18 @@ const OrderForm = (props: OrderFormProps) => {
         setSize(value);
         break;
     }
-    // console.log(event.target.name, event.target.value);
   };
 
   const handleSubmit = async () => {
-    setSubmitting(true);
     try {
-      const res = await apiService.post('bnb/order', {
-        symbol: props.symbol.toUpperCase(),
+      await createOrder({
+        symbol: symbol.toUpperCase(),
         price: parseFloat(price),
         quantity: parseFloat(size),
-        side: props.side.toUpperCase(),
-      });
-      props.onSuccess(res.data);
+        side: side.toUpperCase(),
+      } as Order);
+      getUsdtBalance();
     } catch (err) {}
-    setSubmitting(false);
   };
 
   const enableSubmit = () => {
@@ -77,18 +106,21 @@ const OrderForm = (props: OrderFormProps) => {
   return (
     <Box component="form" sx={{ width: 200 }} noValidate autoComplete="off">
       <Typography variant="subtitle2" gutterBottom>
-        Avbl: {round2Dec(props.usdtAvailable)} USDT
+        Avbl: {round2Dec(usdtBalance)} USDT
       </Typography>
       <FormControl variant="outlined" fullWidth size="small">
         <InputLabel>Symbol</InputLabel>
-        <Select label="Symbol" name="symbol" value={props.symbol} onChange={handleSelectChange}>
-          <MenuItem value={'nearusdt'}>NEARUSDT</MenuItem>
-          <MenuItem value={'c98usdt'}>C98USDT</MenuItem>
+        <Select label="Symbol" name="symbol" value={symbol} onChange={handleSelectChange}>
+          {SYMBOLS.map((s) => (
+            <MenuItem key={s.value} value={s.value}>
+              {s.text}
+            </MenuItem>
+          ))}
         </Select>
       </FormControl>
       <FormControl variant="outlined" fullWidth size="small" margin="dense">
         <InputLabel>Side</InputLabel>
-        <Select label="Side" name="side" value={props.side} onChange={handleSelectChange}>
+        <Select label="Side" name="side" value={side} onChange={handleSelectChange}>
           <MenuItem value={'buy'}>Long</MenuItem>
           <MenuItem value={'sell'}>Short</MenuItem>
         </Select>
@@ -119,13 +151,13 @@ const OrderForm = (props: OrderFormProps) => {
         <LoadingButton
           fullWidth
           variant="contained"
-          color={props.side}
+          color={side === OrderSide.BUY ? 'buy' : 'sell'}
           sx={{ textTransform: 'none' }}
           disabled={!enableSubmit()}
-          loading={submitting}
+          loading={isLoading}
           onClick={handleSubmit}
         >
-          {props.side === 'buy' ? 'Buy/Long' : 'Sell/Short'}
+          {side === OrderSide.BUY ? 'Buy/Long' : 'Sell/Short'}
         </LoadingButton>
       </Stack>
     </Box>
