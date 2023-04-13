@@ -1,5 +1,5 @@
 import { appApi } from 'store/app-api';
-import { Balance, OpenOrder, Order, Position } from 'shared/bnb';
+import { Balance, OpenOrder, Order, Position, OrderSide } from 'shared/bnb';
 
 export const bnbApi = appApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -8,6 +8,10 @@ export const bnbApi = appApi.injectEndpoints({
         url: 'bnb/listenKey',
         method: 'POST',
       }),
+      transformResponse: (responseData: { listenKey: string }, _, arg) => {
+        console.log('responseData', responseData.listenKey);
+        return responseData.listenKey;
+      },
     }),
     createOrder: builder.mutation<void, Order>({
       query: (order: Order) => ({
@@ -16,27 +20,27 @@ export const bnbApi = appApi.injectEndpoints({
         body: order,
       }),
     }),
-    getPositions: builder.query<Position[], { symbol: string; side: string }>({
-      query: ({ symbol }: { symbol: string; side: string }) => ({
+    getPositions: builder.query<Position[], { symbol: string; side: OrderSide }>({
+      query: ({ symbol }: { symbol: string; side: OrderSide }) => ({
         url: `bnb/positions/${symbol}`,
         method: 'GET',
       }),
       transformResponse: (responseData: Position[], _, arg) => {
         return responseData.filter((d) =>
-          arg.side === 'buy' ? d.positionAmt > 0 : d.positionAmt < 0
+          arg.side === OrderSide.BUY ? d.positionAmt > 0 : d.positionAmt < 0
         );
       },
     }),
-    getOpenOrders: builder.query<OpenOrder[], { symbol: string; side: string }>({
-      query: ({ symbol }: { symbol: string; side: string }) => ({
+    getOpenOrders: builder.query<OpenOrder[], { symbol: string; side: OrderSide }>({
+      query: ({ symbol }: { symbol: string; side: OrderSide }) => ({
         url: `bnb/openOrders/${symbol}`,
         method: 'GET',
       }),
       transformResponse: (responseData: OpenOrder[], _, arg) => {
         return responseData.filter(
           (d) =>
-            (d.side.toLocaleLowerCase() === arg.side && d.type !== 'TAKE_PROFIT_MARKET') ||
-            (d.side.toLocaleLowerCase() !== arg.side && d.type === 'TAKE_PROFIT_MARKET')
+            (d.side.toUpperCase() === arg.side && d.type !== 'TAKE_PROFIT_MARKET') ||
+            (d.side.toUpperCase() !== arg.side && d.type === 'TAKE_PROFIT_MARKET')
         );
       },
     }),

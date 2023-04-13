@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useState } from 'react';
 import useWebSocket from 'react-use-websocket';
 import _ from 'lodash';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { Box, Tab } from '@mui/material';
@@ -10,7 +10,6 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { TIMESTAMP } from 'shared/constant';
 import { bnbService, Kline, Position, OpenOrder, Balance } from 'shared/bnb';
 import { round2Dec, round3Dec } from 'shared/utilities';
-import { useApiService } from 'hooks';
 import relativeStrengthIndex from './relative-strength-index';
 import standardDeviation from './standard-deviation';
 import Positions from './positions';
@@ -18,85 +17,54 @@ import OpenOrders from './open-orders';
 import OrderForm from './order-form';
 import Indicators from './indicators';
 
-import { Indicator, mapStateToProps, mapDispatchToProps } from './types';
+import { Indicator } from './types';
 import {
   useCreateListenKeyMutation,
   useGetUsdtBalanceMutation,
   useGetOpenOrdersQuery,
   useGetPositionsQuery,
 } from 'store/bnb-api';
-import { selectSide, selectSymbol, setSymbol } from 'store/bnb-slice';
+import {
+  addOpenOrder,
+  removeOpenOrder,
+  selectSide,
+  selectSymbol,
+  selectTotalOpenOrders,
+  selectTotalPositions,
+} from 'store/bnb-slice';
 
 const Binance = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const leverage = 20;
   const [m5State, setM5State] = useState(new Indicator('5m'));
   const [m15State, setM15State] = useState(new Indicator('15m'));
   const [m30State, setM30State] = useState(new Indicator('30m'));
   const [h1State, setH1State] = useState(new Indicator('1h'));
   const [h4State, setH4State] = useState(new Indicator('4h'));
-  const [positions, setPositions] = useState<Position[]>([]);
-  // const [openOrders, setOpenOrders] = useState<OpenOrder[]>([]);
   const [klineWSes, setKlineWSes] = useState<WebSocket[]>([]);
 
-  // const [side, setSide] = useState(localStorage.orderSide ?? 'buy');
   const symbol = useSelector(selectSymbol);
   const side = useSelector(selectSide);
-  const [curPrice, setCurPrice] = useState(0);
-  const [entryEstimate, setEntryEstimate] = useState(0);
-  const [liqEstimate, setLiqEstimate] = useState(0);
+  const totalOpenOrders = useSelector(selectTotalOpenOrders);
+  const totalPositions = useSelector(selectTotalPositions);
   const [value, setValue] = useState('1');
   const [createListenKey] = useCreateListenKeyMutation();
-  const { data: aa } = useGetPositionsQuery({ symbol, side });
-  const { data: openOrders } = useGetOpenOrdersQuery({ symbol, side });
+  useGetPositionsQuery({ symbol, side });
+  useGetOpenOrdersQuery({ symbol, side });
   const [getUsdtBalance] = useGetUsdtBalanceMutation();
 
   const getListenKey = useCallback(async () => {
     const listenKey = await createListenKey().unwrap();
+    console.log(`wss://fstream.binance.com/ws/${listenKey}`);
     return `wss://fstream.binance.com/ws/${listenKey}`;
   }, []);
   const { lastMessage } = useWebSocket(getListenKey);
 
-  const estimateLiqAndEntry = useCallback(
-    (side: string, positions: Position[], orders: OpenOrder[]) => {
-      let quantityTotal = 0;
-      let sizeTotal = 0;
-      console.log('estimateLiqAndEntry', positions.length, orders.length);
-      for (const p of positions) {
-        quantityTotal += Math.abs(p.positionAmt);
-        sizeTotal += Math.abs(p.positionAmt * p.entryPrice);
-      }
-
-      for (const o of orders) {
-        quantityTotal += o.origQty;
-        sizeTotal += o.origQty * o.price;
-      }
-
-      if (positions.length || orders.length) {
-        const entry = round3Dec(sizeTotal / quantityTotal);
-        console.log({ quantityTotal, sizeTotal, entry });
-        console.log(
-          entry / 100,
-          (80 * entry) / (100 * leverage),
-          entry + (56 * entry) / (100 * leverage)
-        );
-        let liq = round3Dec(entry - ((79 / leverage) * entry) / 100);
-        if (side === 'sell') {
-          liq = round3Dec(entry + ((76 / leverage) * entry) / 100);
-        }
-        console.log({ entry, liq });
-        setEntryEstimate(entry);
-        setLiqEstimate(liq);
-      }
-    },
-    []
-  );
-
   useEffect(() => {
     if (!lastMessage) return;
     const json = JSON.parse(lastMessage?.data);
+    // console.log(json);
     switch (json['e']) {
       case 'listenKeyExpired':
         window.location.reload();
@@ -106,7 +74,7 @@ const Binance = () => {
         console.log(`${od['s']} ${od['x']} ${od['S']} ${od['p']} ${od['q']}`);
         switch (json['o']['x']) {
           case 'NEW':
-            const order = new OpenOrder({
+            const order = {
               time: json['o']['T'],
               orderId: json['o']['i'],
               symbol: json['o']['s'],
@@ -115,14 +83,13 @@ const Binance = () => {
               executedQty: 0,
               origQty: parseFloat(json['o']['q']),
               price: parseFloat(json['o']['p']),
-            });
-
-            // setOpenOrders((orders) => orders.concat(order));
+            } as OpenOrder;
+            dispatch(addOpenOrder(order));
             break;
           case 'CANCELED':
           case 'TRADE':
             const orderId = parseFloat(json['o']['i']);
-            // setOpenOrders((orders) => orders.filter((o) => o.orderId !== orderId));
+            dispatch(removeOpenOrder(orderId));
             break;
           default:
             console.log(lastMessage?.data);
@@ -135,7 +102,7 @@ const Binance = () => {
     }
   }, [lastMessage]);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleChange = (_: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
 
@@ -228,42 +195,6 @@ const Binance = () => {
     return indicator;
   };
 
-  // const getPositions = useCallback(
-  //   async (symbol: string, side: string) => {
-  //     const res = await apiService.get<Position[]>(`bnb/positions/${symbol}`);
-  //     const data = res.data.filter((d) => (side === 'buy' ? d.positionAmt > 0 : d.positionAmt < 0));
-
-  //     setPositions((positions) => {
-  //       if (positions.length === 0 && data.length !== 0) return data;
-  //       positions.splice(0);
-  //       for (const d of data) positions.push(d);
-  //       return positions;
-  //     });
-  //   },
-  //   [apiService]
-  // );
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     getPositions(symbol, side);
-  //   }, 3 * TIMESTAMP.SECOND);
-  //   return () => clearInterval(interval);
-  // }, [symbol, side, getPositions]);
-
-  // const getOpenOrders = useCallback(
-  //   async (symbol: string, side: string) => {
-  //     const res = await apiService.get<OpenOrder[]>(`bnb/openOrders/${symbol}`);
-  //     setOpenOrders(
-  //       res.data.filter(
-  //         (d) =>
-  //           (d.side.toLocaleLowerCase() === side && d.type !== 'TAKE_PROFIT_MARKET') ||
-  //           (d.side.toLocaleLowerCase() !== side && d.type === 'TAKE_PROFIT_MARKET')
-  //       )
-  //     );
-  //   },
-  //   [apiService]
-  // );
-
   useEffect(() => {
     getAndCalculateKlines('NEARUSDT', '5m');
     getAndCalculateKlines('NEARUSDT', '15m');
@@ -279,79 +210,27 @@ const Binance = () => {
     };
   }, [navigate, getAndCalculateKlines]);
 
-  // WS: get market price
-  useEffect(() => {
-    const markPriceWS = new WebSocket('wss://fstream.binance.com/ws/nearusdt@markPrice');
-    markPriceWS.onmessage = function (event) {
-      try {
-        const json = JSON.parse(event.data);
-        if (json['p']) setCurPrice(round3Dec(parseFloat(json['p'])));
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    return () => markPriceWS.close();
-  }, []);
-
-  useEffect(() => {
-    estimateLiqAndEntry(side, positions, openOrders ?? []);
-  }, [side, positions, openOrders, estimateLiqAndEntry]);
-
-  // const handleChangeSide = (side: string) => {
-  //   console.log({ side });
-  //   localStorage.orderSide = side;
-  //   // getPositions(symbol, side);
-  //   // getOpenOrders(symbol, side);
-  //   setSide(side);
-  // };
-
-  const handleChangeSymbol = (symbol: string) => {
-    console.log({ symbol });
-    localStorage.orderSymbol = symbol;
-    // getPositions(symbol, side);
-    // getOpenOrders(symbol, side);
-    dispatch(setSymbol(symbol));
-  };
-
   return (
     <>
-      <Indicators
-        indicators={[m5State, m15State, m30State, h1State, h4State]}
-        currentPrice={curPrice}
-      />
+      <Indicators indicators={[m5State, m15State, m30State, h1State, h4State]} />
       <Box sx={{ display: 'flex', flexGrow: 1, paddingTop: 2 }}>
-        <OrderForm entryEstimate={entryEstimate} liqEstimate={liqEstimate} />
+        <OrderForm />
         <Box sx={{ flexGrow: 1 }}>
           <TabContext value={value}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
               <TabList onChange={handleChange} aria-label="lab API tabs example">
-                <Tab
-                  label={`Positions${positions.length > 0 ? ` (${positions.length})` : ''}`}
-                  value="1"
-                />
-                <Tab
-                  label={`Open orders${
-                    openOrders && openOrders.length > 0 ? ` (${openOrders.length})` : ''
-                  }`}
-                  value="2"
-                />
+                <Tab label={`Positions (${totalPositions})`} value="1" />
+                <Tab label={`Open orders (${totalOpenOrders})`} value="2" />
               </TabList>
             </Box>
             <TabPanel value="1" sx={{ padding: 0 }}>
-              <Positions positions={positions} />
+              <Positions />
             </TabPanel>
             <TabPanel value="2" sx={{ padding: 0 }}>
               <OpenOrders />
             </TabPanel>
           </TabContext>
         </Box>
-      </Box>
-      <Box sx={{ display: 'flex', flexGrow: 1, paddingTop: 2 }}>
-        <div>
-          Entry Price: {entryEstimate} <br />
-          Liq.Price: {liqEstimate}
-        </div>
       </Box>
     </>
   );

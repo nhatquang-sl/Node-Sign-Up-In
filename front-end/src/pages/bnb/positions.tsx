@@ -7,9 +7,12 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Position } from 'shared/bnb';
 import { round2Dec, round3Dec } from 'shared/utilities';
-import { PositionProps } from './types';
+import { useSelector } from 'react-redux';
+import { selectPositions } from 'store/bnb-slice';
 
-const Positions = (props: PositionProps) => {
+const Positions = () => {
+  const positions = useSelector(selectPositions);
+
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -26,7 +29,7 @@ const Positions = (props: PositionProps) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.positions.map((p: Position) => {
+          {positions.map((p: Position) => {
             const unRealizedProfit = `${round3Dec(p.unRealizedProfit)} (${round2Dec(
               (100 * p.unRealizedProfit) / p.isolatedWallet
             )}%)`;

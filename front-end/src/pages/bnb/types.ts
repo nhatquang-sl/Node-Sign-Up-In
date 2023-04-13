@@ -1,7 +1,5 @@
 import { bindActionCreators, Dispatch } from 'redux';
 
-import { Position, OpenOrder } from 'shared/bnb';
-
 interface PropsFromDispatch {}
 
 interface PropsFromState {}
@@ -23,16 +21,6 @@ export class Indicator {
   bold: number = 0;
 }
 
-export type PositionProps = {
-  positions: Position[];
-};
-
 export type IndicatorsProps = {
   indicators: Indicator[];
-  currentPrice: number;
-};
-
-export type OrderFormProps = {
-  entryEstimate: number;
-  liqEstimate: number;
 };

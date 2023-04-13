@@ -7,8 +7,31 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
 import { IndicatorsProps } from './types';
+import { useEffect, useState } from 'react';
+import { round3Dec } from 'shared/utilities';
+import { useSelector } from 'react-redux';
+import { selectSymbol } from 'store/bnb-slice';
 
 const Indicators = (props: IndicatorsProps) => {
+  const symbol = useSelector(selectSymbol);
+
+  const [curPrice, setCurPrice] = useState(0);
+
+  // WS: get market price
+  useEffect(() => {
+    const markPriceWS = new WebSocket(`wss://fstream.binance.com/ws/${symbol}@markPrice`);
+    markPriceWS.onmessage = function (event) {
+      try {
+        const json = JSON.parse(event.data);
+        if (json['p']) setCurPrice(round3Dec(parseFloat(json['p'])));
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    return () => markPriceWS.close();
+  }, [symbol]);
+
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -34,7 +57,7 @@ const Indicators = (props: IndicatorsProps) => {
             </TableRow>
           ))}
           <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-            <TableCell colSpan={2}>Current Price: {props.currentPrice}</TableCell>
+            <TableCell colSpan={2}>Current Price: {curPrice}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
