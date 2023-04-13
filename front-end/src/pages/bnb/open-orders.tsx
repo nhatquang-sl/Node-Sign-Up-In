@@ -12,7 +12,11 @@ import { round3Dec, formatDateNumber } from 'shared/utilities';
 import { OpenOrder } from 'shared/bnb';
 import { selectCancelling, selectOpenOrders, selectSymbol } from 'store/bnb-slice';
 import { useSelector } from 'react-redux';
-import { useCancelAllOrdersMutation, useCancelOrderMutation } from 'store/bnb-api';
+import {
+  useCancelAllOrdersMutation,
+  useCancelOrderMutation,
+  useGetUsdtBalanceMutation,
+} from 'store/bnb-api';
 
 const OpenOrders = () => {
   const symbol = useSelector(selectSymbol);
@@ -21,6 +25,7 @@ const OpenOrders = () => {
 
   const [cancelOrder] = useCancelOrderMutation();
   const [cancelAllOrders] = useCancelAllOrdersMutation();
+  const [getUsdtBalance] = useGetUsdtBalanceMutation();
 
   const getPrice = (p: OpenOrder) => {
     let price = p.price;
@@ -34,10 +39,12 @@ const OpenOrders = () => {
 
   const handleCancelAll = async () => {
     await cancelAllOrders(symbol);
+    await getUsdtBalance();
   };
 
   const handleCancel = async (orderId: number) => {
     await cancelOrder({ symbol, orderId });
+    await getUsdtBalance();
   };
 
   return (
