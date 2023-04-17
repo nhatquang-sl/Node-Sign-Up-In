@@ -21,7 +21,7 @@ import { sidebarWidth } from 'store/constants';
 import { TokenType } from 'shared/user';
 import { setHeader, setLoading, setSidebar, setSidebarAndHeader } from 'store/settings-slice';
 import { RootState } from 'store';
-import { apiService } from 'hooks';
+import { useLogOutMutation } from 'store/auth-api';
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -49,8 +49,14 @@ function Header() {
   const theme = useTheme();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { accessToken, firstName, lastName } = useSelector((state: RootState) => state.auth);
+  const {
+    accessToken,
+    firstName,
+    lastName,
+    type: authType,
+  } = useSelector((state: RootState) => state.auth);
   const { sideBarOpen, headerOpen } = useSelector((state: RootState) => state.settings);
+  const [logOut] = useLogOutMutation();
 
   const transitionDuration = {
     enter: theme.transitions.duration.enteringScreen,
@@ -60,7 +66,7 @@ function Header() {
 
   useEffect(() => {
     accessToken ? dispatch(setHeader(true)) : dispatch(setSidebarAndHeader(false));
-  }, [accessToken]);
+  }, [accessToken, dispatch]);
 
   const handleDrawerOpen = () => {
     dispatch(setSidebar(true));
@@ -69,10 +75,10 @@ function Header() {
     setAnchorElUser(event.currentTarget);
   };
 
-  const logOut = async () => {
+  const handleLogOut = async () => {
     dispatch(setLoading(true));
     try {
-      await apiService.get('/auth/log-out');
+      await logOut();
       localStorage.clear();
     } catch (err) {}
     window.location.reload();
@@ -82,7 +88,7 @@ function Header() {
   const handleCloseUserMenu = (setting: string | undefined) => {
     switch (setting?.toLocaleLowerCase()) {
       case 'logout':
-        logOut();
+        handleLogOut();
         break;
       case 'profile':
         navigate('/profile');
@@ -94,7 +100,7 @@ function Header() {
     <Slide in={headerOpen}>
       <AppBar position="fixed" open={sideBarOpen}>
         <Toolbar>
-          {TokenType.Login === TokenType.Login && (
+          {authType === TokenType.Login && (
             <Zoom
               in={!sideBarOpen}
               timeout={transitionDuration}

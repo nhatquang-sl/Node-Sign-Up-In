@@ -9,7 +9,6 @@ export const bnbApi = appApi.injectEndpoints({
         method: 'POST',
       }),
       transformResponse: (responseData: { listenKey: string }, _, arg) => {
-        console.log('responseData', responseData.listenKey);
         return responseData.listenKey;
       },
     }),
@@ -25,11 +24,6 @@ export const bnbApi = appApi.injectEndpoints({
         url: `bnb/positions/${symbol}`,
         method: 'GET',
       }),
-      transformResponse: (responseData: Position[], _, arg) => {
-        return responseData.filter((d) =>
-          arg.side === OrderSide.BUY ? d.positionAmt > 0 : d.positionAmt < 0
-        );
-      },
     }),
     getOpenOrders: builder.query<OpenOrder[], { symbol: string; side: OrderSide }>({
       query: ({ symbol }: { symbol: string; side: OrderSide }) => ({

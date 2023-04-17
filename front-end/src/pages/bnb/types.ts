@@ -20,7 +20,3 @@ export class Indicator {
   bolu: number = 0;
   bold: number = 0;
 }
-
-export type IndicatorsProps = {
-  indicators: Indicator[];
-};
