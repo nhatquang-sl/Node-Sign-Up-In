@@ -31,6 +31,12 @@ export const authApi = appApi.injectEndpoints({
         }
       },
     }),
+    logOut: builder.mutation<void, void>({
+      query: () => ({
+        url: '/auth/log-out',
+        method: 'GET',
+      }),
+    }),
     refreshToken: builder.mutation<UserAuthDto, void>({
       query: () => ({
         url: '/auth/refresh-token',
@@ -93,6 +99,7 @@ export const authApi = appApi.injectEndpoints({
 
 export const {
   useLoginMutation,
+  useLogOutMutation,
   useRefreshTokenMutation,
   useRegisterMutation,
   useSendActivateEmailMutation,

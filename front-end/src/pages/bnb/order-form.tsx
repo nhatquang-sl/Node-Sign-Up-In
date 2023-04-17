@@ -55,14 +55,14 @@ const OrderForm = () => {
   const usdtBalance = useSelector(selectUsdtBalance);
   const est = useSelector(selectEstLiqAndEntry);
   console.log({ est });
-  const [price, setPrice] = useState(est.liq);
+  const [price, setPrice] = useState('');
   const [size, setSize] = useState(localStorage.orderSize ?? '');
 
   const [getUsdtBalance] = useGetUsdtBalanceMutation();
   const [createOrder, { isLoading }] = useCreateOrderMutation();
 
   useEffect(() => {
-    setPrice(est.liq);
+    setPrice(est.liq.toString());
   }, [est.liq]);
 
   const handleSelectChange = (event: SelectChangeEvent) => {
@@ -78,11 +78,11 @@ const OrderForm = () => {
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let value = event.target.value;
+    let value = parseFloat(event.target.value);
     console.log(value, event.target.name);
     switch (event.target.name) {
       case 'price':
-        setPrice(parseFloat(value));
+        setPrice(value.toString());
         break;
       case 'size':
         localStorage.orderSize = value;
@@ -95,7 +95,7 @@ const OrderForm = () => {
     try {
       await createOrder({
         symbol: symbol.toUpperCase(),
-        price: price,
+        price: parseFloat(price),
         quantity: parseFloat(size),
         side: side.toUpperCase(),
       } as Order);
@@ -105,7 +105,7 @@ const OrderForm = () => {
 
   const enableSubmit = () => {
     try {
-      return price > 0 && parseFloat(size) > 0;
+      return parseFloat(price) > 0 && parseFloat(size) > 0;
     } catch (err) {
       return false;
     }

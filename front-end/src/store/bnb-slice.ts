@@ -45,6 +45,9 @@ export const bnbSlice = createSlice({
     builder.addMatcher(bnbApi.endpoints.getOpenOrders.matchFulfilled, (state, { payload }) => {
       state.openOrders = payload;
     });
+    builder.addMatcher(bnbApi.endpoints.getPositions.matchFulfilled, (state, { payload }) => {
+      state.positions = payload.filter((p) => p.entryPrice > 0);
+    });
     builder.addMatcher(bnbApi.endpoints.cancelOrder.matchPending, (state, action) => {
       const { orderId } = action.meta.arg.originalArgs;
       state.cancellingOrderIds.push(orderId);
@@ -87,19 +90,22 @@ export const selectEstLiqAndEntry = (state: RootState) => {
     liq = 0,
     quantityTotal = 0,
     sizeTotal = 0;
-  const { side, openOrders, positions, leverage } = state.bnb;
+  const { side, leverage } = state.bnb;
+  const openOrders = state.bnb.openOrders.filter((o) => o.side === side);
+  // const positions = state.bnb.positions.filter((o) => o.entryPrice > 0);
+  // console.log(positions);
+  // for (const p of positions) {
+  //   console.log(p);
+  //   quantityTotal += Math.abs(p.positionAmt);
+  //   sizeTotal += Math.abs(p.positionAmt * p.entryPrice);
+  // }
 
-  for (const p of positions) {
-    quantityTotal += Math.abs(p.positionAmt);
-    sizeTotal += Math.abs(p.positionAmt * p.entryPrice);
-  }
-
-  for (const o of openOrders) {
+  for (const o of openOrders.filter((o) => o.side === side)) {
     quantityTotal += o.origQty;
     sizeTotal += o.origQty * o.price;
   }
 
-  if (positions.length || openOrders.length) {
+  if (openOrders.length) {
     entry = round3Dec(sizeTotal / quantityTotal);
     console.log({ quantityTotal, sizeTotal, entry, side });
     console.log(
