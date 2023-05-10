@@ -47,7 +47,8 @@ const Indicators = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {['5m', '15m', '30m', '1h', '4h'].map((interval) => (
+          {/* ['5m', '15m', '30m', '1h', '4h'] */}
+          {['4h'].map((interval) => (
             <IndicatorRow key={interval} interval={interval} />
           ))}
           <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>

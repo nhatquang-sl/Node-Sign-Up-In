@@ -27,6 +27,10 @@ import { Order, OrderSide } from 'shared/bnb';
 
 const SYMBOLS = [
   {
+    value: 'btcusdt',
+    text: 'BTCUSDT',
+  },
+  {
     value: 'maskusdt',
     text: 'MASKUSDT',
   },
@@ -54,7 +58,6 @@ const OrderForm = () => {
   const side = useSelector(selectSide);
   const usdtBalance = useSelector(selectUsdtBalance);
   const est = useSelector(selectEstLiqAndEntry);
-  console.log({ est });
   const [price, setPrice] = useState('');
   const [size, setSize] = useState(localStorage.orderSize ?? '');
 

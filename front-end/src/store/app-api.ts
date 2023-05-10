@@ -31,7 +31,6 @@ const baseQueryWithReAuth: BaseQueryFn<
 > = async (args, api, extraOptions): Promise<any> => {
   let result = await baseQuery(args, api, extraOptions);
   const { error } = result;
-  console.log(error);
 
   if (error && error.status === 403) {
     console.log('sending refresh token');

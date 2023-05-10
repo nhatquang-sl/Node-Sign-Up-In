@@ -1,62 +1,34 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import _ from 'lodash';
 import { TableCell, TableRow } from '@mui/material';
 
 import { selectSymbol } from 'store/bnb-slice';
-import { round2Dec } from 'shared/utilities';
+import { formatDateNumber, round2Dec } from 'shared/utilities';
 import { bnbService, Kline } from 'shared/bnb';
 
 import standardDeviation from './standard-deviation';
 import relativeStrengthIndex from './relative-strength-index';
 import { Indicator } from './types';
+import { HOUR, SECOND } from 'shared/constant/timestamp';
 
 const IndicatorRow = ({ interval }: { interval: string }) => {
   const symbol = useSelector(selectSymbol);
-  const ws: WebSocket = useMemo(
-    () => new WebSocket(`wss://fstream.binance.com/ws/${symbol}@kline_${interval}`),
-    [symbol, interval]
-  );
+
   const [indicator, setIndicator] = useState(new Indicator(interval));
 
   const getAndCalculateKlines = useCallback(async () => {
     const klines = await bnbService.getKlines(symbol, interval);
     calculateChart(klines, interval);
+  }, [symbol, interval]);
 
-    let handledTime = (new Date().getSeconds() / 30) >> 0;
-    ws.onmessage = function (event) {
-      const json = JSON.parse(event.data);
-      const eventTime = (new Date(json['E']).getSeconds() / 30) >> 0;
-      // console.log({ eventTime, handledTime, currTime: formatDate(new Date(), 'MM:ss') });
-      if (eventTime !== handledTime) {
-        handledTime = eventTime;
-        const lstKline = new Kline();
-        lstKline.openTime = parseFloat(json['k']['t']);
-        lstKline.closeTime = parseFloat(json['k']['T']);
-        lstKline.open = parseFloat(json['k']['o']);
-        lstKline.close = parseFloat(json['k']['c']);
-        lstKline.high = parseFloat(json['k']['h']);
-        lstKline.low = parseFloat(json['k']['l']);
-        lstKline.volume = parseFloat(json['k']['v']);
-        lstKline.quoteAssetVolume = parseFloat(json['k']['q']);
-        lstKline.numberOfTrades = parseFloat(json['k']['n']);
-        lstKline.takerBuyBaseAssetVolume = parseFloat(json['k']['V']);
-        lstKline.takerBuyQuoteAssetVolume = parseFloat(json['k']['Q']);
-
-        if (klines[klines.length - 1].openTime === lstKline.openTime)
-          klines[klines.length - 1] = lstKline;
-        else klines.push(lstKline);
-        calculateChart(klines, interval);
-      }
-    };
-    return ws;
-  }, [symbol, interval, ws]);
-
-  const calculateChart = (klines: Kline[], interval: string): Indicator => {
+  const calculateChart = (klines: Kline[], interval: string) => {
     let avgGain = -1,
       avgLoss = -1;
-    const indicator = new Indicator(interval);
+    const indicators: Indicator[] = [];
+    let indicator = new Indicator(interval);
     for (let i = 1; i < klines.length; i++) {
+      indicator = new Indicator(interval);
       const kline = klines[i];
       let closeChange = parseFloat((kline.close - klines[i - 1].close).toFixed(4));
       closeChange > 0 ? (kline.gain = closeChange) : (kline.loss = Math.abs(closeChange));
@@ -75,22 +47,59 @@ const IndicatorRow = ({ interval }: { interval: string }) => {
         avgGain = gain;
         avgLoss = loss;
 
-        indicator.bold = round2Dec(bold);
-        indicator.bolu = round2Dec(bolu);
-        indicator.rsi = rsi;
-        indicator.sma20 = round2Dec(sma20);
+        kline.bold = indicator.bold = round2Dec(bold);
+        kline.bolu = indicator.bolu = round2Dec(bolu);
+        kline.rsi = indicator.rsi = rsi;
+        kline.sma20 = indicator.sma20 = round2Dec(sma20);
+
+        indicators.push(indicator);
       }
     }
+    // console.log(JSON.stringify(klines));
+    console.log(formatDateNumber(klines[0].openTime));
     setIndicator(indicator);
-    return indicator;
+
+    const peaks: Kline[] = [];
+    let overBuy: Kline | undefined = undefined;
+    for (let i = 1; i < klines.length - 1; i++) {
+      const kline = klines[i];
+      const preKline = klines[i - 1];
+      const nextKline = klines[i + 1];
+
+      if (
+        kline.rsi > 70 &&
+        kline.high > kline.bolu &&
+        kline.rsi > preKline.rsi &&
+        kline.rsi > nextKline.rsi
+      ) {
+        overBuy = kline;
+      }
+      if (kline.rsi > preKline.rsi && kline.rsi > nextKline.rsi) {
+        peaks.push(kline);
+        if (overBuy && overBuy.rsi > kline.rsi && overBuy.high < kline.high) {
+          console.log({
+            longPeak: formatDateNumber(overBuy.openTime),
+            peak: formatDateNumber(kline.openTime),
+          });
+        }
+      }
+    }
   };
 
   useEffect(() => {
     getAndCalculateKlines();
-    return () => {
-      if (ws) ws.close();
-    };
-  }, [getAndCalculateKlines, ws]);
+    const timer = setInterval(async () => {
+      let newKlines = await bnbService.getKlines(symbol, interval, 1);
+      const lstKline = newKlines[0];
+      // if (klines[klines.length - 1].openTime === lstKline.openTime)
+      //   klines[klines.length - 1] = lstKline;
+      // else klines.push(lstKline);
+      // calculateChart(klines, interval);
+    }, HOUR * 4);
+
+    return () => clearInterval(timer);
+  }, [getAndCalculateKlines]);
+
   return (
     <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
       <TableCell component="th" scope="row">
