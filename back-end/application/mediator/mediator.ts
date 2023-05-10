@@ -26,10 +26,10 @@ export class Mediator {
     return await this.executePipeline(i - 1, command, next1);
   }
 
-  public async send(command: ICommand): Promise<Result> {
+  public async send<TResult>(command: ICommand): Promise<TResult> {
     const cmdName = command.constructor.name;
     const handlerClass: any = container.handlers[`${cmdName}Handler`];
-    const handler: ICommandHandler<ICommand, Result> = new handlerClass();
+    const handler: ICommandHandler<ICommand, TResult> = new handlerClass();
 
     const validatorClass: any = container.validators[`${cmdName}Validator`];
 

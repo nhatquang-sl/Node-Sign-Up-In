@@ -8,8 +8,8 @@ export class AuthorizeCommand implements ICommand {
   declare accessTokenType: string;
 }
 export type Result = void | string | {};
-export interface ICommandHandler<T extends ICommand, Result> {
-  handle: (command: T) => Promise<Result>;
+export interface ICommandHandler<T extends ICommand, TResult> {
+  handle: (command: T) => Promise<TResult>;
 }
 
 export interface ICommandValidator<T extends ICommand> {
