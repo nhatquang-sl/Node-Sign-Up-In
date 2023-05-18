@@ -10,9 +10,10 @@ import {
   ICommandHandler,
   RegisterHandler,
   Result,
-} from '@application/mediator';
+  UnauthorizedError,
+  ForbiddenError,
+} from '@qnn92/mediatorts';
 import { AuthorizeBehavior } from './authorize';
-import { UnauthorizedError, ForbiddenError } from '../exceptions';
 
 class TestCommand extends AuthorizeCommand {
   constructor(partyId: number, accessToken: string = '') {
@@ -23,8 +24,8 @@ class TestCommand extends AuthorizeCommand {
 }
 
 @Authorize()
-export class TestCommandHandler implements ICommandHandler<TestCommand, Result> {
-  async handle(command: TestCommand): Promise<Result> {
+export class TestCommandHandler implements ICommandHandler<TestCommand, string> {
+  async handle(command: TestCommand): Promise<string> {
     await delay(0);
     return `message from TestCommandHandler with partyId: ${command.partyId}`;
   }
@@ -39,8 +40,8 @@ class TestRolesCommand extends AuthorizeCommand {
 }
 
 @Authorize(['admin', 'user'])
-export class TestRolesCommandHandler implements ICommandHandler<TestRolesCommand, Result> {
-  async handle(command: TestRolesCommand): Promise<Result> {
+export class TestRolesCommandHandler implements ICommandHandler<TestRolesCommand, string> {
+  async handle(command: TestRolesCommand): Promise<string> {
     await delay(0);
     return `message from TestRolesCommandHandler with partyId: ${command.partyId}`;
   }
@@ -49,8 +50,8 @@ export class TestRolesCommandHandler implements ICommandHandler<TestRolesCommand
 class TestAnonymousCommand implements ICommand {}
 
 @RegisterHandler
-class TestAnonymousCommandHandler implements ICommandHandler<TestAnonymousCommand, Result> {
-  async handle(command: TestAnonymousCommand): Promise<Result> {
+class TestAnonymousCommandHandler implements ICommandHandler<TestAnonymousCommand, string> {
+  async handle(command: TestAnonymousCommand): Promise<string> {
     await delay(0);
     return `message from TestAnonymousCommand`;
   }

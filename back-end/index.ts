@@ -7,17 +7,17 @@ import ENV from '@config';
 import corsOptions from '@config/cors-options';
 import { dbContext, initializeDb } from '@database';
 
-import { mediator } from '@application/mediator';
-import { AuthorizeBehavior } from '@application/common/behaviors/authorize';
-import authRoute from '@controllers/auth';
-import userRoute from '@controllers/user';
-import bnbRoute from '@controllers/bnb';
 import {
+  mediator,
   BadRequestError,
   UnauthorizedError,
   NotFoundError,
   ConflictError,
-} from '@application/common/exceptions';
+} from '@qnn92/mediatorts';
+import { AuthorizeBehavior } from '@application/common/behaviors/authorize';
+import authRoute from '@controllers/auth';
+import userRoute from '@controllers/user';
+import bnbRoute from '@controllers/bnb';
 
 console.log(ENV);
 

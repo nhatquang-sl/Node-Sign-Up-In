@@ -2,8 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import ENV from '@config';
 import { dbContext, initializeDb, User, UserLoginHistory } from '@database';
-import { BadRequestError, ForbiddenError } from '@application/common/exceptions';
-import { mediator } from '@application/mediator';
+import { mediator, BadRequestError, ForbiddenError } from '@qnn92/mediatorts';
 import { UserRefreshTokenCommand } from '.';
 import { decodeAccessToken, delay } from '@application/common/utils';
 

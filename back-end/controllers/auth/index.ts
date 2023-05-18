@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 
-import { mediator } from '@application/mediator';
+import { mediator } from '@qnn92/mediatorts';
 import { UserRegisterCommand, UserRegisterResult } from '@application/handlers/user/auth/register';
 import { UserActivateCommand } from '@application/handlers/user/auth/activate';
 import { UserLoginCommand, UserLoginResult } from '@application/handlers/user/auth/login';

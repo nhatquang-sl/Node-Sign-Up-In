@@ -2,8 +2,7 @@ import axios from 'axios';
 import LANG from '@libs/lang';
 import ENV from '@config';
 import { User } from '@database';
-import { Authorize, ICommandHandler, AuthorizeCommand } from '@application/mediator';
-import { NotFoundError } from '@application/common/exceptions';
+import { Authorize, ICommandHandler, AuthorizeCommand, NotFoundError } from '@qnn92/mediatorts';
 
 export class CreateListenKeyCommand extends AuthorizeCommand {
   constructor(accessToken: string) {

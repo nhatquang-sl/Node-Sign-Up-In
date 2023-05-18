@@ -1,5 +1,5 @@
 import UserLoginHistory from '@database/models/user-login-history';
-import { Authorize, AuthorizeCommand, ICommandHandler } from '@application/mediator';
+import { Authorize, AuthorizeCommand, ICommandHandler } from '@qnn92/mediatorts';
 
 class PaginationResult<T> {
   items: T[] = [];

@@ -1,8 +1,13 @@
-import { AuthorizeCommand } from '../../mediator/interfaces';
 import jwt, { TokenExpiredError } from 'jsonwebtoken';
 import ENV from '@config';
-import { ICommand, container, IPipelineBehavior } from '@application/mediator';
-import { UnauthorizedError, ForbiddenError } from '../exceptions';
+import {
+  ICommand,
+  container,
+  IPipelineBehavior,
+  AuthorizeCommand,
+  UnauthorizedError,
+  ForbiddenError,
+} from '@qnn92/mediatorts';
 
 export class AuthorizeBehavior implements IPipelineBehavior {
   handle = async (command: ICommand, next: () => Promise<any>): Promise<any> => {

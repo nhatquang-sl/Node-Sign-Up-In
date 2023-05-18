@@ -1,10 +1,9 @@
 import jwt from 'jsonwebtoken';
 import ENV from '@config';
 import LANG from '@libs/lang';
-import { mediator } from '@application/mediator';
+import { mediator, BadRequestError } from '@qnn92/mediatorts';
 import { generateTokens, delay, TokenParam } from '@application/common/utils';
 import { AuthorizeBehavior } from '@application/common/behaviors';
-import { BadRequestError } from '@application/common/exceptions';
 import { UserSetNewPasswordCommand } from '.';
 import { TIMESTAMP } from '@libs/constant';
 

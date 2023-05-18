@@ -1,7 +1,6 @@
 import LANG from '@libs/lang';
 import { dbContext, initializeDb, User } from '@database';
-import { BadRequestError, ConflictError } from '@application/common/exceptions';
-import { mediator } from '@application/mediator';
+import { mediator, BadRequestError, ConflictError } from '@qnn92/mediatorts';
 import { UserRegisterCommand } from '.';
 
 const user = {

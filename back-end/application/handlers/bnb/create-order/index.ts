@@ -9,8 +9,8 @@ import {
   ICommandValidator,
   ICommandHandler,
   AuthorizeCommand,
-} from '@application/mediator';
-import { BadRequestError } from '@application/common/exceptions';
+  BadRequestError,
+} from '@qnn92/mediatorts';
 import { bnbService } from '@application/handlers/bnb/service';
 import { OpenOrder } from '@libs/bnb';
 

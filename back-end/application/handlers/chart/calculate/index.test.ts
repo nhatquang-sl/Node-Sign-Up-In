@@ -1,5 +1,5 @@
 import { Kline } from '@libs/bnb';
-import { mediator } from '@application/mediator';
+import { mediator } from '@qnn92/mediatorts';
 
 import KLINES from './klines.json';
 import { CalculateChartCommand } from '.';

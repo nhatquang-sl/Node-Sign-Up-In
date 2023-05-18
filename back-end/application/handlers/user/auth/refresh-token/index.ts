@@ -4,14 +4,15 @@ import {
   TokenParam,
   decodeAccessToken,
 } from '@application/common/utils';
-import { BadRequestError, ForbiddenError } from '@application/common/exceptions';
 import {
-  RegisterHandler,
-  RegisterValidator,
+  ICommand,
   ICommandHandler,
   ICommandValidator,
-  ICommand,
-} from '@application/mediator';
+  RegisterHandler,
+  RegisterValidator,
+  BadRequestError,
+  ForbiddenError,
+} from '@qnn92/mediatorts';
 
 import { UserLoginHistory } from '@database';
 

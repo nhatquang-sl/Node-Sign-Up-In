@@ -4,7 +4,7 @@ import {
   ICommandValidator,
   ICommandHandler,
   RegisterHandler,
-} from '@application/mediator';
+} from '@qnn92/mediatorts';
 import { Kline } from '@libs/bnb';
 import { round2Dec, round4Dec } from '@libs/utilities';
 

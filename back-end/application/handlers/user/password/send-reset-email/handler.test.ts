@@ -1,7 +1,7 @@
 import { Op } from 'sequelize';
 import { dbContext, initializeDb, User, UserForgotPassword } from '@database';
 import { TIMESTAMP } from '@libs/constant';
-import { mediator } from '@application/mediator';
+import { mediator } from '@qnn92/mediatorts';
 import { UserSendResetPasswordEmailCommand, UserSendResetPasswordEmailResult } from '.';
 
 const userConfirmedEmail = {

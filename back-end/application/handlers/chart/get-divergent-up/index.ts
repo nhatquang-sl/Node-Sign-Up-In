@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { Kline } from '@libs/bnb';
-import { ICommandHandler, RegisterHandler } from '@application/mediator';
+import { ICommandHandler, RegisterHandler } from '@qnn92/mediatorts';
 
 export class GetDivergentUpCommand {
   klines: Kline[] = [];

@@ -1,8 +1,7 @@
 import bcrypt from 'bcrypt';
 import LANG from '@libs/lang';
 import { dbContext, initializeDb, User } from '@database';
-import { mediator } from '@application/mediator';
-import { BadRequestError, NotFoundError } from '@application/common/exceptions';
+import { mediator, BadRequestError, NotFoundError } from '@qnn92/mediatorts';
 import { UserActivateCommand } from '.';
 
 const user = {

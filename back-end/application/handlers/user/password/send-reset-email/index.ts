@@ -5,14 +5,15 @@ import { TIMESTAMP, FORGOT_PASSWORD_WAIT_SECONDS } from '@libs/constant';
 import { validateEmailAddress } from '@libs/user';
 
 import { generateTokens, sendResetPasswordEmail, TokenParam } from '@application/common/utils';
-import { BadRequestError, NotFoundError } from '@application/common/exceptions';
 import {
-  RegisterHandler,
-  RegisterValidator,
+  ICommand,
   ICommandHandler,
   ICommandValidator,
-  ICommand,
-} from '@application/mediator';
+  RegisterHandler,
+  RegisterValidator,
+  BadRequestError,
+  NotFoundError,
+} from '@qnn92/mediatorts';
 
 import { User, UserForgotPassword } from '@database';
 

@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { mediator } from '@application/mediator';
+import { mediator } from '@qnn92/mediatorts';
 import { UserGetAllSessionCommand } from '@application/handlers/user/session/get-all';
 import { getAccessToken } from '@controllers/utils';
 

@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { dbContext, initializeDb, User } from '@database';
 
-import { mediator } from '@application/mediator';
+import { mediator } from '@qnn92/mediatorts';
 import { generateTokens, TokenParam } from '@application/common/utils';
 import { AuthorizeBehavior } from '@application/common/behaviors';
 import { GetPositionsCommand } from '.';

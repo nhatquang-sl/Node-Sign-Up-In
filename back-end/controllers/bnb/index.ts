@@ -1,6 +1,6 @@
 import { getAccessToken } from '@controllers/utils';
 import express, { Request, Response } from 'express';
-import { mediator } from '@application/mediator';
+import { mediator } from '@qnn92/mediatorts';
 import {
   GetOpenOrdersCommand,
   GetPositionsCommand,

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import ENV from '@config';
-import { Authorize, ICommandHandler, AuthorizeCommand } from '@application/mediator';
+import { Authorize, ICommandHandler, AuthorizeCommand } from '@qnn92/mediatorts';
 import { bnbService } from '@application/handlers/bnb/service';
 import { Position } from '@libs/bnb';
 

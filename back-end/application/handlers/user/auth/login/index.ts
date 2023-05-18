@@ -3,14 +3,15 @@ import LANG from '@libs/lang';
 import { UserLoginDto, UserAuthDto, TokenType } from '@libs/user';
 
 import { generateTokens } from '@application/common/utils';
-import { BadRequestError, UnauthorizedError } from '@application/common/exceptions';
 import {
-  RegisterHandler,
-  RegisterValidator,
+  ICommand,
   ICommandHandler,
   ICommandValidator,
-  ICommand,
-} from '@application/mediator';
+  RegisterHandler,
+  RegisterValidator,
+  BadRequestError,
+  UnauthorizedError,
+} from '@qnn92/mediatorts';
 
 import { User, Role, UserLoginHistory } from '@database';
 

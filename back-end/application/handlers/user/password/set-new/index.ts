@@ -3,16 +3,16 @@ import { Op } from 'sequelize';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { User, UserForgotPassword } from '@database';
 import { validatePassword } from '@libs/user/validate';
-import { BadRequestError } from '@application/common/exceptions';
 import { decodeAccessToken } from '@application/common/utils';
 
 import {
-  Authorize,
-  RegisterValidator,
+  ICommand,
   ICommandHandler,
   ICommandValidator,
-  ICommand,
-} from '@application/mediator';
+  Authorize,
+  RegisterValidator,
+  BadRequestError,
+} from '@qnn92/mediatorts';
 import LANG from '@libs/lang';
 import { TokenType } from '@libs/user';
 

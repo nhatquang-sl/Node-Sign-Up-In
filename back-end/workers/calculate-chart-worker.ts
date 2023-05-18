@@ -1,6 +1,6 @@
 import { CalculateChartCommand } from '@application/handlers/chart/calculate';
 import { GetDivergentUpCommand } from '@application/handlers/chart/get-divergent-up';
-import { Mediator } from '@application/mediator';
+import { Mediator } from '@qnn92/mediatorts';
 import { bnbService, Kline } from '@libs/bnb';
 import { HOUR } from '@libs/constant/timestamp';
 
