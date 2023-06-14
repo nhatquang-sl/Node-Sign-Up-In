@@ -85,10 +85,14 @@ const errorLogger = (error: Error, request: Request, response: Response, next: N
 };
 app.use(errorLogger);
 
-dbContext.connect().then(async (er) => {
-  console.log(er);
-  // await initializeDb();
-  app.listen(ENV.PORT, () => console.log(`Server running on port ${ENV.PORT}`));
-});
+dbContext
+  .connect()
+  .then(async () => {
+    // await initializeDb();
+    app.listen(ENV.PORT, () => console.log(`Server running on port ${ENV.PORT}`));
+  })
+  .catch((err) => {
+    console.log(`CONNECT DATABASE ERROR: ${err}`);
+  });
 
 export default app;

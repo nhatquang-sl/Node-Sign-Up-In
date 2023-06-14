@@ -5,13 +5,13 @@
   "main": "index.js",
   "scripts": {
     "dev": "set NODE_ENV=development&& nodemon -r tsconfig-paths/register index.ts",
-    "clean": "shx rm -rf public && shx rm -rf dist && shx mkdir public",
-    "build": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json && shx cp -R node-sign-up-in-credentials dist/back-end",
-    "build-fe": "cd ../front-end && yarn run build && shx mv build/* ../back-end/public && cd ../back-end",
-    "build:heroku": "yarn run clean && yarn run build && yarn run build-fe && shx cp -R public dist/back-end",
+    "clean": "shx rm -rf public && shx rm -rf dist",
+    "build-be": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json && shx cp -R node-sign-up-in-credentials dist/back-end && shx mkdir dist/back-end/public",
+    "build-fe": "cd ../front-end && npm run build && shx mv build/* ../back-end/dist/back-end/public && cd ../back-end",
+    "build": "npm run clean && npm run build-be && npm run build-fe",
     "test": "set NODE_ENV=test&& jest --watch",
     "test-watch": "set NODE_ENV=test&& jest --watchAll",
-    "start": "yarn run build && node dist/back-end/index.js"
+    "start": "npm run build-be && node dist/back-end/index.js"
   },
   "keywords": [],
   "author": "",
