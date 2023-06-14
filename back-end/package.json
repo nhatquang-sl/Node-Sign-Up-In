@@ -9,7 +9,7 @@
     "build-be": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json && shx cp -R node-sign-up-in-credentials dist/back-end && shx mkdir dist/back-end/public",
     "build-fe": "cd ../front-end && npm run build && shx mv build/* ../back-end/dist/back-end/public && cd ../back-end",
     "build": "npm run clean && npm run build-be && npm run build-fe",
-    "test": "set NODE_ENV=test&& jest --watch",
+    "test": "set NODE_ENV=test&& jest",
     "test-watch": "set NODE_ENV=test&& jest --watchAll",
     "start": "npm run build-be && node dist/back-end/index.js"
   },
