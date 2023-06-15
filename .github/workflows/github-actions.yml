@@ -109,8 +109,7 @@ jobs:
           key: ${{ secrets.VPS_IDENTITY }}
           port: ${{ secrets.VPS_PORT }}
           script: |
-            docker ps -aq | xargs --no-run-if-empty docker stop | xargs --no-run-if-empty docker rm &&
-            docker run -d -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/node-sign-up-in:latest"
+            docker ps -aq | xargs --no-run-if-empty docker stop | xargs --no-run-if-empty docker rm && docker run -d -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/node-sign-up-in:latest
 
 
 
