@@ -108,7 +108,7 @@ jobs:
           chmod 600 $HOME/.ssh/ssh.key
           ssh -o StrictHostKeyChecking=no -i $HOME/.ssh/ssh.key ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "
             docker ps -aq | xargs --no-run-if-empty docker stop | xargs --no-run-if-empty docker rm &&
-            docker run --name ${{ secrets.DOCKERHUB_REPOSITORY }} -d -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:latest"
+            docker run --name ${{ secrets.DOCKERHUB_REPOSITORY }} -d -p 80:3500 ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:latest"
 
 
   # deploy-frontend-vercel:
