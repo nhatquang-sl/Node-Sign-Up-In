@@ -62,12 +62,15 @@ test('email address timeout and create new', async () => {
   let command = new UserSendResetPasswordEmailCommand({ emailAddress });
   const { lastDate } = (await mediator.send(command)) as UserSendResetPasswordEmailResult;
   const endedAt = new Date().getTime();
+  console.log(`UserSendResetPasswordEmail processed: ${endedAt - startedAt} ms`);
 
   await simulateSendEmailExpired();
+  console.log(`simulateSendEmailExpired processed: ${new Date().getTime() - startedAt} ms`);
 
   const startedAt2 = new Date().getTime();
   const result2 = (await mediator.send(command)) as UserSendResetPasswordEmailResult;
   const endedAt2 = new Date().getTime();
+  console.log(`UserSendResetPasswordEmail2 processed: ${endedAt2 - startedAt2} ms`);
 
   // assert
   expect(lastDate).toBeGreaterThanOrEqual(startedAt);
@@ -88,7 +91,7 @@ const simulateSendEmailExpired = async () => {
     attributes: ['id', 'createdAt'],
   });
   expect(ufp).not.toBeNull();
-  UserForgotPassword.update(
+  await UserForgotPassword.update(
     { createdAt: new Date(new Date().getTime() - TIMESTAMP.HOUR - TIMESTAMP.SECOND).toString() },
     { where: { id: ufp?.id } }
   );
