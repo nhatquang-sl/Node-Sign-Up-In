@@ -24,4 +24,8 @@ export const LANG = {
   BNB_TYPE_MISSING_ERROR: 'Type is required',
   BNB_QUANTITY_MISSING_ERROR: 'Quantity is required',
   BNB_ORDER_ID_MISSING_ERROR: 'OrderId is required',
+  GRID_PLAN_LOWER_PRICE_GT_ERROR: 'Lower Price must be greater than',
+  GRID_PLAN_UPPER_PRICE_GT_ERROR: 'Upper Price must be greater than',
+  GRID_PLAN_GRID_GTE_ERROR: 'Grid must be at least',
+  GRID_PLAN_INVESTMENT_GTE_ERROR: 'Investment must be at least',
 };
