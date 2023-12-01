@@ -68,20 +68,23 @@ function Sidebar() {
       <Divider />
       <Divider />
       <List>
-        {['Binance'].map((text) => (
+        {[
+          { text: 'Binance', path: 'bnb' },
+          { text: 'Plans', path: 'plans' },
+        ].map((item) => (
           <ListItem
-            key={text}
+            key={item.path}
             disablePadding
             button
             component={Link}
-            to={'/bnb'}
+            to={`/${item.path}`}
             onClick={handleDrawerClose}
           >
             <ListItemButton>
               <ListItemIcon>
                 <Icon>currency_bitcoin</Icon>
               </ListItemIcon>
-              <ListItemText primary={text} />
+              <ListItemText primary={item.text} />
             </ListItemButton>
           </ListItem>
         ))}

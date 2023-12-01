@@ -88,7 +88,7 @@ app.use(errorLogger);
 dbContext
   .connect()
   .then(async () => {
-    // await initializeDb();
+    await initializeDb();
     app.listen(ENV.PORT, () => console.log(`Server running on port ${ENV.PORT}`));
   })
   .catch((err) => {

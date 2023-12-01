@@ -20,6 +20,7 @@ import RequireAuth from './require-auth';
 import { RootState } from 'store';
 import { setLoading } from 'store/settings-slice';
 import { useRefreshTokenMutation } from 'store/auth-api';
+import Plans from 'pages/plans';
 
 function Main() {
   console.log('main');
@@ -57,6 +58,7 @@ function Main() {
         </Route>
         <Route element={<RequireAuth allowedRoles={['admin']} />}>
           <Route path="/bnb" element={<Binance />} />
+          <Route path="/plans" element={<Plans />} />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
