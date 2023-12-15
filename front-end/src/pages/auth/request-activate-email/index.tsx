@@ -1,25 +1,31 @@
-import React, { useEffect } from 'react';
-import { connect, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Container, Box } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import { openHeader } from 'store/settings/actions';
+import { selectAuthType } from 'store/auth-slice';
+import { useSendActivateEmailMutation } from 'store/auth-api';
+import { TokenType } from 'shared/user';
 
-import { Props, mapStateToProps, mapDispatchToProps } from './types';
-
-const RequestActivateEmail = (props: Props) => {
+const RequestActivateEmail = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const [sendActivateEmail, { isLoading }] = useSendActivateEmailMutation();
+  const authType = useSelector(selectAuthType);
 
-  const { accessToken } = props.auth;
   useEffect(() => {
-    if (!accessToken) navigate('/login');
-    else dispatch(openHeader());
-  }, [accessToken, navigate, dispatch]);
+    switch (authType) {
+      case TokenType.Login:
+        navigate('/', { replace: true });
+        break;
+      case TokenType.NeedActivate:
+        navigate('/request-activate-email', { replace: true });
+        break;
+    }
+  }, [authType, navigate]);
 
   const handleSendActivateEmail = async () => {
-    props.sendActivateLink();
+    await sendActivateEmail();
   };
 
   return (
@@ -31,10 +37,7 @@ const RequestActivateEmail = (props: Props) => {
           alignItems: 'center',
         }}
       >
-        <LoadingButton
-          loading={props.auth.pendingSendActivateLink()}
-          onClick={handleSendActivateEmail}
-        >
+        <LoadingButton loading={isLoading} onClick={handleSendActivateEmail}>
           Send active link to my email
         </LoadingButton>
       </Box>
@@ -42,4 +45,4 @@ const RequestActivateEmail = (props: Props) => {
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(RequestActivateEmail);
+export default RequestActivateEmail;

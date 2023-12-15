@@ -1,31 +1,58 @@
 import * as dotenv from 'dotenv';
 import path from 'path';
+import { z } from 'zod';
 
-console.log({ NODE_ENV: process.env.NODE_ENV });
 dotenv.config({ path: path.join(__dirname, '..', 'node-sign-up-in-credentials', '.env') });
 if (process.env.NODE_ENV?.trim() == 'development')
   dotenv.config({
     path: path.join(__dirname, '..', 'node-sign-up-in-credentials', '.development.env'),
     override: true,
   });
-const ENV = {
-  NODE_ENV: process.env.NODE_ENV,
-  APP_VERSION: process.env.APP_VERSION,
-  APP_HOST: process.env.APP_HOST ?? '',
-  PORT: process.env.PORT || 3500,
 
-  FE_ENDPOINT: 'http://localhost:3000',
+const envSchema = z.object({
+  // See https://cjihrig.com/node_env_considered_harmful
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('production'),
 
-  DB_NAME: process.env.DB_NAME ?? '',
-  DB_USERNAME: process.env.DB_USERNAME ?? '',
-  DB_PASSWORD: process.env.DB_PASSWORD,
-  DB_HOST: process.env.DB_HOST,
+  APP_VERSION: z.string(),
+  APP_HOST: z.string().optional(),
+  PORT: z.number().default(3500),
 
-  MJ_APIKEY_PUBLIC: process.env.MJ_APIKEY_PUBLIC ?? '',
-  MJ_APIKEY_PRIVATE: process.env.MJ_APIKEY_PRIVATE ?? '',
+  FE_ENDPOINT: z.string().url(),
 
-  ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET ?? '',
-  REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET ?? '',
-};
+  DB_NAME: z.string(),
+  DB_USERNAME: z.string(),
+  DB_PASSWORD: z.string(),
+  DB_HOST: z.string(),
+
+  MJ_APIKEY_PUBLIC: z.string(),
+  MJ_APIKEY_PRIVATE: z.string(),
+
+  ACCESS_TOKEN_SECRET: z.string(),
+  REFRESH_TOKEN_SECRET: z.string(),
+
+  BNB_API_KEY: z.string(),
+  BNB_SECRET_KEY: z.string(),
+  ALLOWED_ORIGINS: z.preprocess((val) => {
+    return val
+      ? String(val)
+          .split(',')
+          .map((x) => x.trim())
+      : [];
+  }, z.array(z.string())),
+});
+const ENV = Object.freeze(envSchema.parse(process.env));
+
+const secretEnvs: Array<keyof typeof envSchema.shape> = [
+  'DB_NAME',
+  'DB_USERNAME',
+  'DB_PASSWORD',
+  'MJ_APIKEY_PRIVATE',
+  'MJ_APIKEY_PUBLIC',
+  'BNB_API_KEY',
+  'BNB_SECRET_KEY',
+];
+for (const secretEnv of secretEnvs) {
+  delete process.env[secretEnv];
+}
 
 export default ENV;

@@ -1,5 +1,5 @@
 import { sendActivateEmail } from '@application/common/utils';
-import { Authorize, ICommandHandler, AuthorizeCommand } from '@application/mediator';
+import { Authorize, ICommandHandler, AuthorizeCommand } from '@qnn92/mediatorts';
 
 import { User } from '@database';
 

@@ -1,7 +1,6 @@
 import LANG from '@libs/lang';
 import { dbContext, initializeDb, User } from '@database';
-import { mediator } from '@application/mediator';
-import { NotFoundError, BadRequestError } from '@application/common/exceptions';
+import { mediator, NotFoundError, BadRequestError } from '@qnn92/mediatorts';
 import { UserSendResetPasswordEmailCommand } from '.';
 
 const userConfirmedEmail = {

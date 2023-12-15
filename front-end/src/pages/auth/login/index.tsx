@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { connect, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-
+import { useSelector } from 'react-redux';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Container,
   Box,
@@ -21,46 +20,43 @@ import {
 import LoadingButton from '@mui/lab/LoadingButton';
 
 import LANG from 'shared/lang';
-import { validateEmailAddress } from 'shared/user/validate';
-import { closeSidebarAndHeader } from 'store/settings/actions';
-import { showSnackbar } from 'store/snackbar/actions';
+import { TokenType, validateEmailAddress, UserLoginDto } from 'shared/user';
 
-import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
+import { useLoginMutation } from 'store/auth-api';
+import { selectAuthType } from 'store/auth-slice';
 
-const Login = (props: Props) => {
+interface State extends UserLoginDto {
+  emailAddressError: string | undefined;
+  passwordError: string | undefined;
+  showPassword: boolean;
+}
+
+const Login = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+
+  const authType = useSelector(selectAuthType);
+  const location = useLocation();
+  const [login, { isLoading }] = useLoginMutation();
 
   const [values, setValues] = useState<State>({
-    emailAddress: '',
+    emailAddress: process.env.REACT_APP_ENV === 'development' ? 'sunlight479@yahoo.com' : '',
     emailAddressError: undefined,
-    password: '',
+    password: process.env.REACT_APP_ENV === 'development' ? '123456x@X' : '',
     passwordError: undefined,
     showPassword: false,
   });
 
   useEffect(() => {
-    if (process.env.REACT_APP_ENV === 'development' && !values.emailAddress && !values.password) {
-      setValues((v) => ({
-        ...v,
-        emailAddress: 'sunlight479@yahoo.com',
-        password: '123456x@X',
-      }));
+    switch (authType) {
+      case TokenType.Login:
+        const from = location.state?.from?.pathname ?? '/';
+        navigate(from, { replace: true });
+        break;
+      case TokenType.NeedActivate:
+        navigate('/request-activate-email', { replace: true });
+        break;
     }
-  }, [values.emailAddress, values.password]);
-
-  const { accessToken, emailConfirmed } = props.auth;
-  const loginError = props.auth.error.login;
-
-  useEffect(() => {
-    if (accessToken && emailConfirmed) navigate('/');
-    else if (accessToken) navigate('/request-activate-email');
-    else dispatch(closeSidebarAndHeader());
-  }, [accessToken, emailConfirmed, navigate, dispatch]);
-
-  useEffect(() => {
-    loginError && dispatch(showSnackbar(loginError, 'error'));
-  }, [loginError, dispatch]);
+  }, [authType, location, navigate]);
 
   const handleClickShowPassword = () => {
     setValues({
@@ -82,15 +78,10 @@ const Login = (props: Props) => {
 
     const emailAddressError = validateEmailAddress(values.emailAddress);
     const passwordError = values.password ? undefined : LANG.USER_PASSWORD_MISSING_ERROR;
-    setValues({
-      ...values,
-      emailAddressError,
-      passwordError,
-    });
+    setValues({ ...values, emailAddressError, passwordError });
 
-    if (emailAddressError || passwordError) return;
-
-    props.login(values);
+    const isValid = !emailAddressError && !passwordError;
+    if (isValid) await login(values);
   };
 
   return (
@@ -157,7 +148,7 @@ const Login = (props: Props) => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            loading={props.auth.pendingLogin()}
+            loading={isLoading}
           >
             Submit
           </LoadingButton>
@@ -179,4 +170,4 @@ const Login = (props: Props) => {
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default Login;

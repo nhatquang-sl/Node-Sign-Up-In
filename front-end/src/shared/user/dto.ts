@@ -1,13 +1,13 @@
 export class UserDto {
-  declare id: number;
-  declare firstName: string;
-  declare lastName: string;
-  declare emailAddress: string;
-  declare emailConfirmed: boolean | false;
+  id: number = 0;
+  firstName: string = '';
+  lastName: string = '';
+  emailAddress: string = '';
+  emailConfirmed: boolean = false;
 }
 
 export class UserAuthDto extends UserDto {
-  declare accessToken: string;
+  accessToken: string = '';
 }
 
 export class UserLoginDto {
@@ -15,8 +15,8 @@ export class UserLoginDto {
     this.emailAddress = obj?.emailAddress;
     this.password = obj?.password;
   }
-  declare emailAddress: string;
-  declare password: string;
+  emailAddress: string;
+  password: string;
 }
 
 export class UserRegisterDto extends UserLoginDto {
@@ -25,17 +25,32 @@ export class UserRegisterDto extends UserLoginDto {
     this.firstName = obj.firstName;
     this.lastName = obj.lastName;
   }
-  declare firstName: string;
-  declare lastName: string;
+  firstName: string;
+  lastName: string;
 }
 
-export interface UserSession {
+export class UserRegisterErrorDto extends UserRegisterDto {
+  constructor(obj: any) {
+    super(obj);
+    this.firstName = obj.firstName;
+    this.lastName = obj.lastName;
+  }
+  firstName: string;
+  lastName: string;
+  firstNameError: string | undefined;
+  lastNameError: string | undefined;
+  emailAddressError: string | undefined;
+  passwordError: string[] = [];
+}
+
+export interface Session {
   id: number;
   userId: number;
   ipAddress: string;
   userAgent: string | null;
   accessToken: string | null;
   refreshToken: string | null;
+  createdAt: string;
 }
 
 export interface UserForgotPasswordDto {
@@ -47,6 +62,23 @@ export interface UserForgotPasswordDto {
   token: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export enum TokenType {
+  Login = 'LOGIN',
+  NeedActivate = 'NEED_ACTIVATE',
+  ResetPassword = 'RESET_PASSWORD',
+}
+
+export class TokenData {
+  id: number = 0;
+  firstName: string = '';
+  lastName: string = '';
+  emailAddress: string = '';
+  roles: string[] = [];
+  type: TokenType = TokenType.NeedActivate;
+  exp: number = 0;
+  iat: number = 0;
 }
 
 // export type { UserDto, UserAuthDto, UserLoginDto };

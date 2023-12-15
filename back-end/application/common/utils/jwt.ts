@@ -1,25 +1,40 @@
 import jwt from 'jsonwebtoken';
 import ENV from '@config';
-import { User } from '@database';
+import { TokenData } from '@libs/user';
 
-export const generateJwt = (user: User, type: string) => {
-  const accessToken = jwt.sign(
-    {
-      userId: user.id,
-      emailConfirmed: user.emailConfirmed,
-      roles: user?.roles?.map((r) => r.code),
-      type,
-    },
-    ENV.ACCESS_TOKEN_SECRET,
-    { expiresIn: '1d' } // 30s
-  );
-  const refreshToken = jwt.sign(
-    {
-      emailAddress: user.emailAddress,
-    },
-    ENV.REFRESH_TOKEN_SECRET,
-    { expiresIn: '1d' }
-  );
+export type TokenParam = {
+  id: number;
+  roles: string[];
+  firstName: string;
+  lastName: string;
+  emailAddress: string;
+  type: string;
+};
+
+export const generateTokens = (
+  user: TokenParam,
+  expiresIn: '3s' | '5m' | '15m' | '30m' = '15m'
+) => {
+  const accessToken = jwt.sign(user, ENV.ACCESS_TOKEN_SECRET, { expiresIn });
+  const refreshToken = jwt.sign(user, ENV.REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
 
   return { accessToken, refreshToken };
+};
+
+export const decodeAccessToken = async (accessToken: string | null) => {
+  return new Promise<TokenData>((resolve, reject) =>
+    jwt.verify(accessToken ?? '', ENV.ACCESS_TOKEN_SECRET, (err: any, decoded: any) => {
+      if (err) reject(err);
+      resolve(decoded as TokenData);
+    })
+  );
+};
+
+export const decodeRefreshToken = async (refreshToken: string) => {
+  return new Promise<TokenData>((resolve, reject) =>
+    jwt.verify(refreshToken, ENV.REFRESH_TOKEN_SECRET, (err: any, decoded: any) => {
+      if (err) reject(err);
+      resolve(decoded as TokenData);
+    })
+  );
 };

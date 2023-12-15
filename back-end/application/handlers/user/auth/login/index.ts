@@ -1,16 +1,17 @@
 import bcrypt from 'bcrypt';
 import LANG from '@libs/lang';
-import { UserLoginDto, UserAuthDto } from '@libs/user/dto';
+import { UserLoginDto, UserAuthDto, TokenType } from '@libs/user';
 
-import { generateJwt } from '@application/common/utils';
-import { BadRequestError, UnauthorizedError } from '@application/common/exceptions';
+import { generateTokens } from '@application/common/utils';
 import {
-  RegisterHandler,
-  RegisterValidator,
+  ICommand,
   ICommandHandler,
   ICommandValidator,
-  ICommand,
-} from '@application/mediator';
+  RegisterHandler,
+  RegisterValidator,
+  BadRequestError,
+  UnauthorizedError,
+} from '@qnn92/mediatorts';
 
 import { User, Role, UserLoginHistory } from '@database';
 
@@ -50,7 +51,15 @@ export class UserLoginCommandHandler implements ICommandHandler<UserLoginCommand
     if (!match) throw new UnauthorizedError({ message: LANG.USER_NAME_PASSWORD_INVALID_ERROR });
 
     // Create JWTs
-    const { accessToken, refreshToken } = generateJwt(foundUser, 'LOGIN');
+    const { accessToken, refreshToken } = generateTokens({
+      id: foundUser.id,
+      emailAddress: foundUser.emailAddress,
+      firstName: foundUser.firstName,
+      lastName: foundUser.lastName,
+      roles: foundUser.roles?.map((x) => x.code) ?? [],
+      type: foundUser.emailConfirmed ? TokenType.Login : TokenType.NeedActivate,
+    });
+
     await UserLoginHistory.create({
       userId: foundUser.id,
       accessToken,

@@ -1,36 +1,30 @@
-import { useState, useEffect } from 'react';
-import { connect, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Container, Box } from '@mui/material';
-import { registerConfirm, logOut } from 'store/auth/actions';
-import CircularProgress from '@mui/material/CircularProgress';
+import { Container, Box, CircularProgress } from '@mui/material';
 
-import { closeSidebarAndHeader } from 'store/settings/actions';
-
-import { Props, mapStateToProps, mapDispatchToProps } from './types';
-
-const RegisterConfirm = (props: Props) => {
+import { showSnackbar } from 'store/snackbar-slice';
+import { useActivateMutation } from 'store/auth-api';
+const RegisterConfirm = () => {
   const { activationCode } = useParams();
-  const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [activate] = useActivateMutation();
 
-  console.log(activationCode);
   useEffect(() => {
-    if (activationCode) {
-      dispatch(logOut());
-      dispatch(closeSidebarAndHeader());
-      setSubmitted(true);
-      dispatch(registerConfirm(activationCode));
-    }
+    const registerConfirm = async () => {
+      try {
+        await activate(activationCode ?? '').unwrap();
+        dispatch(showSnackbar('Activate your account success', 'success'));
+      } catch (err) {
+        const { message } = err as { message: string };
+        dispatch(showSnackbar(message, 'error'));
+      }
+      navigate('/login', { replace: true });
+    };
+
+    registerConfirm();
   }, [activationCode, navigate, dispatch]);
-
-  useEffect(() => {
-    console.log({ init: submitted, pending: props.auth.pendingRegisterConfirm() });
-    if (submitted && !props.auth.pendingRegisterConfirm()) {
-      navigate('/login');
-    }
-  }, [submitted, props.auth, navigate]);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -41,4 +35,4 @@ const RegisterConfirm = (props: Props) => {
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(RegisterConfirm);
+export default RegisterConfirm;

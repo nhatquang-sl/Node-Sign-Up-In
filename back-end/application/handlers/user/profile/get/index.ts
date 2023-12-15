@@ -1,8 +1,7 @@
 import LANG from '@libs/lang';
 import { UserAuthDto } from '@libs/user/dto';
 import { User } from '@database';
-import { Authorize, ICommandHandler, AuthorizeCommand } from '@application/mediator';
-import { NotFoundError } from '@application/common/exceptions';
+import { Authorize, ICommandHandler, AuthorizeCommand, NotFoundError } from '@qnn92/mediatorts';
 
 export class UserGetProfileCommand extends AuthorizeCommand {
   constructor(accessToken: string) {

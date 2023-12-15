@@ -1,16 +1,21 @@
+import dbContext from './db-context';
 import User from '@database/models/user';
 import UserForgotPassword from '@database/models/user-forgot-password';
 import Role from '@database/models/role';
 import UserRole from '@database/models/user-role';
-import dbContext from './db-context';
 import UserLoginHistory from '@database/models/user-login-history';
+import GridPlan from '@database/models/grid-plan';
 
 const initializeDb = async () => {
   // https://sequelize.org/docs/v6/core-concepts/model-basics/#model-synchronization
-  // await UserRole.drop();
-  // await UserForgotPassword.drop();
-  await dbContext.sequelize.sync({ force: true });
-  // await UserRole.sync({ force: true });
+  try {
+    // await UserRole.drop();
+    // await UserForgotPassword.drop();
+    // await dbContext.sequelize.sync({ force: true });
+    await GridPlan.sync({ force: true });
+  } catch (err) {
+    console.log({ err });
+  }
   const roles = await Role.findAll();
   if (!roles.length) {
     Role.bulkCreate([
@@ -20,4 +25,13 @@ const initializeDb = async () => {
     ]);
   }
 };
-export { User, UserLoginHistory, UserForgotPassword, Role, UserRole, dbContext, initializeDb };
+export {
+  dbContext,
+  initializeDb,
+  User,
+  UserLoginHistory,
+  UserForgotPassword,
+  Role,
+  UserRole,
+  GridPlan,
+};

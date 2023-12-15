@@ -1,12 +1,13 @@
 import LANG from '@libs/lang';
 import {
-  RegisterHandler,
-  RegisterValidator,
+  ICommand,
   ICommandHandler,
   ICommandValidator,
-  ICommand,
-} from '@application/mediator';
-import { BadRequestError, NotFoundError } from '@application/common/exceptions';
+  RegisterHandler,
+  RegisterValidator,
+  BadRequestError,
+  NotFoundError,
+} from '@qnn92/mediatorts';
 
 import { User } from '@database';
 

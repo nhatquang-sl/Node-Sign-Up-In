@@ -1,19 +1,19 @@
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
-import jwt from 'jsonwebtoken';
 
 import LANG from '@libs/lang';
-import { UserRegisterDto, UserAuthDto, validateUserRegister } from '@libs/user';
+import { UserRegisterDto, UserAuthDto, validateUserRegister, TokenType } from '@libs/user';
 
-import { sendActivateEmail } from '@application/common/utils';
-import { BadRequestError, ConflictError } from '@application/common/exceptions';
+import { sendActivateEmail, generateTokens } from '@application/common/utils';
 import {
-  RegisterHandler,
-  RegisterValidator,
+  ICommand,
   ICommandHandler,
   ICommandValidator,
-  ICommand,
-} from '@application/mediator';
+  RegisterHandler,
+  RegisterValidator,
+  BadRequestError,
+  ConflictError,
+} from '@qnn92/mediatorts';
 
 import { User, UserRole, UserLoginHistory } from '@database';
 
@@ -38,8 +38,8 @@ export class UserRegisterCommandHandler
   async handle(command: UserRegisterCommand): Promise<UserRegisterResult> {
     const { ipAddress, userAgent } = command;
     // encrypt the password
-    const salt = uuid().split('-')[0];
-    const password = await bcrypt.hash(command.password + salt, 10);
+    const salt = await bcrypt.genSalt();
+    const password = await bcrypt.hash(command.password + salt, bcrypt.getRounds(salt));
     const securityStamp = uuid();
 
     // Create and store the new user
@@ -58,21 +58,14 @@ export class UserRegisterCommandHandler
     await UserRole.bulkCreate(userRoles);
 
     // Create JWTs
-    const accessToken = jwt.sign(
-      {
-        userId: result.id,
-      },
-      process.env.ACCESS_TOKEN_SECRET as string,
-      { expiresIn: '1d' }
-    );
-
-    const refreshToken = jwt.sign(
-      {
-        userId: result.id,
-      },
-      process.env.REFRESH_TOKEN_SECRET as string,
-      { expiresIn: '1d' }
-    );
+    const { accessToken, refreshToken } = generateTokens({
+      id: result.id,
+      emailAddress: result.emailAddress,
+      firstName: result.firstName,
+      lastName: result.lastName,
+      roles: result.roles?.map((x) => x.code) ?? [],
+      type: TokenType.NeedActivate,
+    });
 
     await Promise.all([
       UserLoginHistory.create({

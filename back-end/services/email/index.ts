@@ -24,7 +24,7 @@ const sendEmail = async (toEmail: string, subject: string, message: string) => {
   });
 
   let response = await request;
-  console.log(response);
+  // console.log(response);
 };
 
 export { sendEmail };

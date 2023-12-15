@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { connect, useDispatch } from 'react-redux';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -14,50 +14,32 @@ import {
   FormHelperText,
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { showSnackbar } from 'store/snackbar/actions';
 
+import LANG from 'shared/lang';
 import { validatePassword } from 'shared/user/validate';
 
-import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
+import { showSnackbar } from 'store/snackbar-slice';
+import { useResetPasswordMutation } from 'store/auth-api';
 
-const ResetPassword = (props: Props) => {
+class State {
+  password: string = '';
+  passwordError: string[] = [];
+  showPassword: boolean = false;
+  submitted: boolean = false;
+}
+
+const ResetPassword = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
+
   const { token } = useParams();
   const [values, setValues] = useState<State>({
-    password: '',
-    // password: '123456x@X',
+    password: process.env.REACT_APP_ENV === 'development' ? '123456x@X' : '',
     passwordError: [],
     showPassword: false,
     submitted: false,
-    loading: false,
   });
-
-  useEffect(() => {
-    props.auth.error.message && dispatch(showSnackbar(props.auth.error.message, 'error'));
-  }, [props.auth.error.message, dispatch]);
-
-  useEffect(() => {
-    setValues((v) => ({ ...v, passwordError: props.auth.error.password }));
-  }, [props.auth.error.password]);
-
-  useEffect(() => {
-    const { password, message } = props.auth.error;
-    let loading = values.loading;
-    if (loading !== props.auth.pendingSetNewPassword()) {
-      setValues((v) => ({ ...v, loading: !loading }));
-    }
-
-    if (
-      values.submitted &&
-      loading &&
-      !password.length &&
-      !message &&
-      !props.auth.pendingSetNewPassword() &&
-      !props.global.errNetwork
-    )
-      navigate('/login');
-  }, [props.auth, values.submitted, values.loading, navigate]);
 
   const handleChange = (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [prop]: event.target.value });
@@ -78,15 +60,24 @@ const ResetPassword = (props: Props) => {
     });
   };
 
-  const handleSubmit = (event: React.SyntheticEvent) => {
+  const handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
     const passwordError = validatePassword(values.password);
 
-    setValues({ ...values, passwordError, submitted: true });
+    setValues({ ...values, submitted: true, passwordError });
 
     if (passwordError.length) return;
-    // console.log({ token, password: values.password });
-    props.setNewPassword(token ?? '', values.password);
+
+    try {
+      await resetPassword({ token: token ?? '', password: values.password }).unwrap();
+
+      dispatch(showSnackbar(LANG.USER_RESET_PASSWORD_SUCCESS, 'success'));
+      navigate('/login', { replace: true });
+    } catch (err) {
+      const { message, passwordError } = err as { message: string; passwordError: string[] };
+      message && dispatch(showSnackbar(message, 'error'));
+      setValues({ ...values, passwordError: passwordError ?? [] });
+    }
   };
 
   const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -142,7 +133,7 @@ const ResetPassword = (props: Props) => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            loading={props.auth.pendingSetNewPassword()}
+            loading={isLoading}
           >
             Submit
           </LoadingButton>
@@ -152,4 +143,4 @@ const ResetPassword = (props: Props) => {
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ResetPassword);
+export default ResetPassword;

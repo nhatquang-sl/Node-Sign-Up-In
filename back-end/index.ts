@@ -2,20 +2,22 @@ import 'express-async-errors';
 import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import ENV from '@config';
 import corsOptions from '@config/cors-options';
 import { dbContext, initializeDb } from '@database';
 
-import { mediator } from '@application/mediator';
-import { AuthorizeBehavior } from '@application/common/behaviors/authorize';
-import authRoute from '@controllers/auth';
-import userRoute from '@controllers/user';
 import {
+  mediator,
   BadRequestError,
   UnauthorizedError,
   NotFoundError,
   ConflictError,
-} from '@application/common/exceptions';
+} from '@qnn92/mediatorts';
+import { AuthorizeBehavior } from '@application/common/behaviors/authorize';
+import authRoute from '@controllers/auth';
+import userRoute from '@controllers/user';
+import bnbRoute from '@controllers/bnb';
 
 console.log(ENV);
 
@@ -42,7 +44,6 @@ router.get('/health-check', (req, res) => {
   res.json({
     ENV: ENV.NODE_ENV,
     APP_VERSION: ENV.APP_VERSION,
-    APP_HOST: ENV.APP_HOST,
   });
 });
 
@@ -65,10 +66,11 @@ const requestLogger = (request: Request, response: Response, next: NextFunction)
 };
 
 app.use(requestLogger);
-
-app.use('/', router);
+app.use(cookieParser());
 app.use('/auth', authRoute);
 app.use('/user', userRoute);
+app.use('/bnb', bnbRoute);
+app.use('/', router);
 
 // https://medium.com/@utkuu/error-handling-in-express-js-and-express-async-errors-package-639c91ba3aa2
 const errorLogger = (error: Error, request: Request, response: Response, next: NextFunction) => {
@@ -83,9 +85,14 @@ const errorLogger = (error: Error, request: Request, response: Response, next: N
 };
 app.use(errorLogger);
 
-dbContext.connect().then(async () => {
-  // await initializeDb();
-  app.listen(ENV.PORT, () => console.log(`Server running on port ${ENV.PORT}`));
-});
+dbContext
+  .connect()
+  .then(async () => {
+    await initializeDb();
+    app.listen(ENV.PORT, () => console.log(`Server running on port ${ENV.PORT}`));
+  })
+  .catch((err) => {
+    console.log(`CONNECT DATABASE ERROR: ${err}`);
+  });
 
 export default app;

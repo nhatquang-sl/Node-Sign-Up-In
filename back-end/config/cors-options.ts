@@ -1,13 +1,14 @@
-const allowedOrigins = ['http://127.0.0.1:3000', 'http://localhost:3000', 'http://127.0.0.1:8080'];
+import ENV from '@config';
 
 const corsOptions = {
   origin: (origin: any, callback: any) => {
-    callback(null, true);
-    // if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-    // } else {
-    //   callback(new Error('Not allowed by CORS'));
-    // }
+    if (ENV.ALLOWED_ORIGINS.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
   },
+  credentials: true,
   optionsSuccessStatus: 200,
 };
 

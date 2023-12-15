@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { dbContext, initializeDb, User, UserLoginHistory, Role } from '@database';
-import { mediator } from '@application/mediator';
+import { mediator } from '@qnn92/mediatorts';
 import { UserRegisterCommand, UserRegisterResult } from '.';
 
 const user = {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { connect, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -19,63 +19,51 @@ import {
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import { validateUserRegister } from 'shared/user/validate';
-import { closeSidebarAndHeader } from 'store/settings/actions';
+import {
+  validateUserRegister,
+  UserRegisterDto,
+  UserRegisterErrorDto,
+  TokenType,
+} from 'shared/user';
 
-import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
+import { RootState } from 'store';
+import { setAuth } from 'store/auth-slice';
+import { useRegisterMutation } from 'store/auth-api';
 
-const Register = (props: Props) => {
+interface State extends UserRegisterErrorDto {
+  showPassword: boolean;
+  submitted: boolean;
+}
+
+const Register = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const { accessToken, emailConfirmed } = props.auth;
-  useEffect(() => {
-    if (accessToken && emailConfirmed) navigate('/');
-    else if (accessToken) navigate('/request-activate-email');
-    else dispatch(closeSidebarAndHeader());
-  }, [accessToken, emailConfirmed, navigate, dispatch]);
-
-  const { firstNameError, lastNameError, emailAddressError, passwordError } = props.auth;
-  useEffect(() => {
-    setValues((v) => ({
-      ...v,
-      firstNameError,
-      lastNameError,
-      emailAddressError,
-      passwordError,
-    }));
-  }, [firstNameError, lastNameError, emailAddressError, passwordError]);
+  const [register, { isLoading }] = useRegisterMutation();
+  const auth = useSelector((state: RootState) => state.auth);
 
   const [values, setValues] = useState<State>({
-    firstName: '',
+    firstName: process.env.REACT_APP_ENV === 'development' ? 'quang' : '',
     firstNameError: '',
-    lastName: '',
+    lastName: process.env.REACT_APP_ENV === 'development' ? 'nguyen' : '',
     lastNameError: '',
-    emailAddress: '',
+    emailAddress: process.env.REACT_APP_ENV === 'development' ? `${Date.now()}@yopmail.com` : '',
     emailAddressError: '',
-    password: '',
+    password: process.env.REACT_APP_ENV === 'development' ? '123456x@X' : '',
     passwordError: [],
     showPassword: false,
     submitted: false,
   });
 
   useEffect(() => {
-    if (
-      process.env.REACT_APP_ENV === 'development' &&
-      !values.firstName &&
-      !values.lastName &&
-      !values.emailAddress &&
-      !values.password
-    ) {
-      setValues((v) => ({
-        ...v,
-        firstName: 'quang',
-        lastName: 'nguyen',
-        emailAddress: 'sunlight479@yahoo.com',
-        password: '123456x@X',
-      }));
+    switch (auth.type) {
+      case TokenType.Login:
+        navigate('/', { replace: true });
+        break;
+      case TokenType.NeedActivate:
+        navigate('/request-activate-email', { replace: true });
+        break;
     }
-  }, [values.firstName, values.lastName, values.emailAddress, values.password]);
+  }, [auth.type, navigate]);
 
   const handleChange = (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [prop]: event.target.value });
@@ -124,7 +112,20 @@ const Register = (props: Props) => {
       return;
     }
 
-    props.register(values);
+    try {
+      const res = await register(JSON.parse(JSON.stringify(new UserRegisterDto(values)))).unwrap();
+      dispatch(setAuth(res.accessToken));
+    } catch (err) {
+      const { firstNameError, lastNameError, emailAddressError, passwordError } =
+        err as UserRegisterErrorDto;
+      setValues({
+        ...values,
+        firstNameError,
+        lastNameError,
+        emailAddressError,
+        passwordError: passwordError ?? [],
+      });
+    }
   };
 
   return (
@@ -226,7 +227,7 @@ const Register = (props: Props) => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            loading={props.auth.pendingRegister()}
+            loading={isLoading}
           >
             Submit
           </LoadingButton>
@@ -243,4 +244,4 @@ const Register = (props: Props) => {
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Register);
+export default Register;

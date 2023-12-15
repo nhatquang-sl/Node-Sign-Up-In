@@ -1,13 +1,13 @@
 import ENV from '@config';
 import { generateActivationLink } from '@application/common/utils';
 import {
-  ICommandHandler,
   ICommand,
+  ICommandHandler,
+  ICommandValidator,
   RegisterHandler,
   RegisterValidator,
-  ICommandValidator,
-} from '@application/mediator';
-import { NotFoundError } from '@application/common/exceptions';
+  NotFoundError,
+} from '@qnn92/mediatorts';
 
 import { User } from '@database';
 

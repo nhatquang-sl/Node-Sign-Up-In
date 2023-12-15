@@ -1,12 +1,13 @@
 import express, { Request, Response } from 'express';
 
-import { mediator } from '@application/mediator';
+import { mediator } from '@qnn92/mediatorts';
 import { UserRegisterCommand, UserRegisterResult } from '@application/handlers/user/auth/register';
 import { UserActivateCommand } from '@application/handlers/user/auth/activate';
 import { UserLoginCommand, UserLoginResult } from '@application/handlers/user/auth/login';
 import { UserSendActivationEmailCommand } from '@application/handlers/user/auth/send-activation-email';
 import { UserGetProfileCommand } from '@application/handlers/user/profile/get';
 import { UserGetActivationLinkCommand } from '@application/handlers/user/auth/get-activation-link';
+import { UserRefreshTokenCommand } from '@application/handlers/user/auth/refresh-token';
 import {
   UserSendResetPasswordEmailCommand,
   UserSetNewPasswordCommand,
@@ -86,6 +87,20 @@ router.post('/reset-password/set-new', async (request: Request, response: Respon
   const { token, password } = request.body;
   const command = new UserSetNewPasswordCommand(token, password);
   response.json(await mediator.send(command));
+});
+
+router.get('/refresh-token', async (request: Request, response: Response) => {
+  console.log(JSON.stringify(request.cookies));
+  const command = new UserRefreshTokenCommand(request.cookies['jwt'], {
+    ipAddress: request.ip,
+    userAgent: request.get('User-Agent'),
+  });
+  response.json({ accessToken: await mediator.send(command) });
+});
+
+router.get('/log-out', async (request: Request, response: Response) => {
+  response.clearCookie('jwt', { httpOnly: true });
+  response.sendStatus(204);
 });
 
 export default router;

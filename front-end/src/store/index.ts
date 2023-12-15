@@ -1,46 +1,28 @@
-import { applyMiddleware, createStore, combineReducers } from 'redux';
-import logger from 'redux-logger';
-import thunk from 'redux-thunk';
-import promiseMiddleware from 'redux-promise-middleware';
-import axios, { AxiosRequestConfig, AxiosError } from 'axios';
+import { appApi } from 'store/app-api';
+import { configureStore } from '@reduxjs/toolkit';
+import counterReducer from './counter-slice';
+import settingsSlice from './settings-slice';
+import authReducer from './auth-slice';
+import snackbarSlice from './snackbar-slice';
+import sessionsReducer from './sessions-slice';
+import bnbReducer from './bnb-slice';
 
-import settings from './settings/reducer';
-import auth from './auth/reducer';
-import user from './user/reducer';
-import snackbar from './snackbar/reducer';
-import global from './global/reducer';
-import { showSnackbar } from './snackbar/actions';
-import { logOut } from './auth/actions';
-import { errNetwork } from './global/actions';
-
-// Combine Reducers
-var reducer = combineReducers({ settings, auth, user, snackbar, global });
-
-let middleWare = applyMiddleware(promiseMiddleware, logger, thunk);
-// middleWare = applyMiddleware(promiseMiddleware, thunk);
-const store = createStore(reducer, middleWare);
-
-axios.interceptors.request.use((config: AxiosRequestConfig<any>) => {
-  if (config && config.headers && localStorage.auth) {
-    const auth = JSON.parse(localStorage.auth);
-    config.headers.Authorization = `Bearer ${auth.accessToken}`;
-  }
-  return config;
+const store = configureStore({
+  reducer: {
+    counter: counterReducer,
+    settings: settingsSlice,
+    auth: authReducer,
+    snackbar: snackbarSlice,
+    sessions: sessionsReducer,
+    bnb: bnbReducer,
+    [appApi.reducerPath]: appApi.reducer,
+  },
+  // Adding the api middleware enables caching, invalidation, polling,
+  // and other useful features of `rtk-query`.
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({}).concat([appApi.middleware]),
+  devTools: process.env.NODE_ENV === 'development',
 });
 
-axios.interceptors.response.use(
-  function (response) {
-    return response;
-  },
-  function (error: AxiosError) {
-    if (error.code === 'ERR_NETWORK') {
-      store.dispatch(showSnackbar(error.message, 'error'));
-      store.dispatch(errNetwork());
-    } else if (store.getState().global.errNetwork) store.dispatch(errNetwork(false));
-
-    if (error.response?.status === 401) store.dispatch(logOut());
-    console.log(error.response);
-    return Promise.reject(error);
-  }
-);
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
 export default store;

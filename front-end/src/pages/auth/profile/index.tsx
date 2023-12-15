@@ -1,18 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { connect, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { styled } from '@mui/material/styles';
 import { Box, Avatar, TextField, Grid } from '@mui/material';
 
-// import LoadingButton from '@mui/lab/LoadingButton';
-
-// import { validateEmailAddress } from 'shared/user/validate';
-// import { closeSidebarAndHeader } from 'store/settings/actions';
-// import { showSnackbar } from 'store/snackbar/actions';
-
-import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
-import { getProfile } from 'store/auth/actions';
-import { loading } from 'store/settings/actions';
+import { selectAuth } from 'store/auth-slice';
 
 const CssTextField = styled(TextField)({
   '& .Mui-disabled': {
@@ -24,52 +14,15 @@ const CssTextField = styled(TextField)({
   },
 });
 
-const Profile = (props: Props) => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { accessToken, firstName, lastName, emailAddress } = props.auth;
-
-  let [gettingProfile, setGettingProfile] = useState(false);
-  const [values, setValues] = useState<State>({
-    firstName: firstName,
-    firstNameError: '',
-    lastName: lastName,
-    lastNameError: '',
-    emailAddress: emailAddress,
-    emailAddressError: '',
-    password: '',
-    submitted: false,
-  });
-
-  useEffect(() => {
-    console.log('Profile');
-    if (!accessToken) navigate('/login'); // need to login
-    else if (!gettingProfile) {
-      // start getting profile
-      setGettingProfile(() => true);
-      dispatch(getProfile());
-      dispatch(loading());
-    } else if (gettingProfile && !props.auth.pendingGetProfile() && props.settings.loading) {
-      // finish getting profile
-      dispatch(loading(false));
-    }
-
-    // update message errors if need.
-    const { firstNameError, lastNameError, emailAddressError, passwordError } = props.auth;
-    setValues((v) => ({
-      ...v,
-      firstNameError,
-      lastNameError,
-      emailAddressError,
-      passwordError,
-    }));
-  }, [props.settings.loading, props.auth, gettingProfile, accessToken, navigate, dispatch]);
+const Profile = () => {
+  const auth = useSelector(selectAuth);
+  const { firstName, lastName, emailAddress } = auth;
 
   return (
     <Grid container spacing={2} justifyContent="center">
       <Grid item>
         <Avatar
-          src={`https://joeschmoe.io/api/v1/male/${values.firstName}`}
+          src={`https://joeschmoe.io/api/v1/male/${firstName}`}
           sx={{ width: 156, height: 156 }}
         />
       </Grid>
@@ -84,10 +37,7 @@ const Profile = (props: Props) => {
                 id="firstName"
                 label="First Name"
                 name="firstName"
-                value={values.firstName}
-                // onChange={handleChange('firstName')}
-                error={!!values.firstNameError?.length}
-                helperText={values.firstNameError}
+                value={firstName}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -98,10 +48,7 @@ const Profile = (props: Props) => {
                 id="lastName"
                 label="Last Name"
                 name="lastName"
-                value={values.lastName}
-                // onChange={handleChange('lastName')}
-                error={!!values.lastNameError?.length}
-                helperText={values.lastNameError}
+                value={lastName}
               />
             </Grid>
             <Grid item xs={12}>
@@ -112,7 +59,7 @@ const Profile = (props: Props) => {
                 name="email"
                 autoComplete="email"
                 disabled
-                value={values.emailAddress}
+                value={emailAddress}
               />
             </Grid>
           </Grid>
@@ -122,4 +69,4 @@ const Profile = (props: Props) => {
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Profile);
+export default Profile;

@@ -1,43 +1,55 @@
-import React, { useState } from 'react';
-import { connect } from 'react-redux';
+import { useState, useEffect, useCallback } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { Container, Box, Avatar, Icon, Typography, TextField, Grid } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import { validateEmailAddress } from 'shared/user/validate';
+import { TokenType, validateEmailAddress } from 'shared/user';
+import { FORGOT_PASSWORD_WAIT_SECONDS } from 'shared/constant';
+import { selectAuthType } from 'store/auth-slice';
+import { useForgotPasswordMutation } from 'store/auth-api';
+import { State } from './types';
 
-import { Props, State, mapStateToProps, mapDispatchToProps } from './types';
+const ForgotPassword = () => {
+  const DEFAULT_COUNTDOWN = 0;
 
-const ForgotPassword = (props: Props) => {
-  const THRESHOLD_SECONDS = 120;
-  const DEFAULT_COUNTDOWN = -1;
+  const navigate = useNavigate();
+  const authType = useSelector(selectAuthType);
+  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
 
-  const { lastDateResetPassword } = props.auth;
+  const [countdown, setCountdown] = useState(DEFAULT_COUNTDOWN);
+  const [values, setValues] = useState(new State());
+  const [lastDate, setLastDate] = useState(0);
 
-  const [countdown, setCountdown] = useState<number>(DEFAULT_COUNTDOWN);
-  const [values, setValues] = useState<State>(new State());
-
-  const calculateDiffLastTime = React.useCallback(
-    () => Math.floor((new Date().getTime() - lastDateResetPassword) / 1000),
-    [lastDateResetPassword]
+  const calculateCountdownSeconds = useCallback(
+    () => FORGOT_PASSWORD_WAIT_SECONDS - Math.floor((new Date().getTime() - lastDate) / 1000),
+    [lastDate]
   );
 
-  React.useEffect(() => {
-    let seconds = calculateDiffLastTime();
-    if (THRESHOLD_SECONDS - seconds > 0) {
+  useEffect(() => {
+    switch (authType) {
+      case TokenType.Login:
+        navigate('/', { replace: true });
+        break;
+      case TokenType.NeedActivate:
+        navigate('/request-activate-email', { replace: true });
+        break;
+    }
+  }, [authType, navigate]);
+
+  useEffect(() => {
+    let seconds = calculateCountdownSeconds();
+    if (seconds > DEFAULT_COUNTDOWN) {
+      setCountdown(seconds);
       const timer = setInterval(() => {
-        seconds = calculateDiffLastTime();
-        if (THRESHOLD_SECONDS - seconds > DEFAULT_COUNTDOWN - 1)
-          setCountdown(() => THRESHOLD_SECONDS - seconds);
+        seconds = calculateCountdownSeconds();
+        if (seconds >= DEFAULT_COUNTDOWN) setCountdown(seconds);
         else clearInterval(timer);
       }, 1000);
 
       return () => clearInterval(timer);
     }
-  }, [lastDateResetPassword, DEFAULT_COUNTDOWN, calculateDiffLastTime]);
-
-  React.useEffect(() => {
-    setValues((v) => ({ ...v, emailAddressError: props.auth.emailAddressError }));
-  }, [props.auth.emailAddressError]);
+  }, [lastDate, DEFAULT_COUNTDOWN, calculateCountdownSeconds]);
 
   const handleChange = (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [prop]: event.target.value });
@@ -64,7 +76,15 @@ const ForgotPassword = (props: Props) => {
     });
 
     if (emailAddressError) return;
-    props.getSendEmailResetPassword(values.emailAddress);
+
+    try {
+      const res = await forgotPassword(values.emailAddress).unwrap();
+      const { lastDate } = res;
+      setLastDate(lastDate);
+    } catch (err) {
+      const { message } = err as { message: string };
+      setValues((v) => ({ ...v, emailAddressError: message }));
+    }
   };
 
   return (
@@ -107,11 +127,8 @@ const ForgotPassword = (props: Props) => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            loading={
-              props.auth.pendingSendEmailResetPassword() ||
-              THRESHOLD_SECONDS - calculateDiffLastTime() > DEFAULT_COUNTDOWN
-            }
-            loadingPosition={props.auth.pendingSendEmailResetPassword() ? 'center' : 'start'}
+            loading={isLoading || countdown > DEFAULT_COUNTDOWN}
+            loadingPosition={isLoading ? 'center' : 'start'}
             startIcon={<div></div>}
           >
             {countdown > DEFAULT_COUNTDOWN ? countdown : 'Submit'}
@@ -122,4 +139,4 @@ const ForgotPassword = (props: Props) => {
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ForgotPassword);
+export default ForgotPassword;
